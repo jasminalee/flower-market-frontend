@@ -1,7 +1,6 @@
 // 引入全局样式
 import './assets/variables.css'
 import './assets/main.css'
-import './assets/global.css'
 // 公共 UI 辅助样式（按钮、表格、card、avatar 等）
 import '@/assets/ui.css'
 
