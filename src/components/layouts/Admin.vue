@@ -90,16 +90,6 @@
           </div>
 
           <div class="header-right">
-            <!-- 主题切换 -->
-            <el-switch
-              v-model="isDarkTheme"
-              @change="toggleTheme"
-              inline-prompt
-              :active-icon="Moon"
-              :inactive-icon="Sunny"
-              class="theme-switch"
-            />
-            
             <!-- 用户菜单 -->
             <el-dropdown @command="handleUserCommand" class="user-dropdown">
               <div class="user-info">
@@ -132,14 +122,6 @@
             <router-view />
           </div>
         </el-main>
-
-        <!-- 底部 -->
-        <el-footer class="footer">
-          <div class="footer-content">
-            <span>&copy; 2024 花卉市场管理系统. 保留所有权利.</span>
-            <span>Version 1.0.0</span>
-          </div>
-        </el-footer>
       </el-container>
     </el-container>
   </div>
@@ -469,7 +451,7 @@ watch(route, () => {
 }
 
 .content-wrapper {
-  padding: 24px;
+  padding: 12px;
   min-height: calc(100vh - 64px - 60px);
 }
 
@@ -481,13 +463,7 @@ watch(route, () => {
   height: 60px;
 }
 
-.footer-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: #666;
-  font-size: 12px;
-}
+
 
 /* 响应式设计 */
 @media (max-width: 768px) {
@@ -526,10 +502,6 @@ watch(route, () => {
 :global(.dark) .footer {
   background: #1f1f1f;
   border-top-color: #333;
-}
-
-:global(.dark) .footer-content {
-  color: #ccc;
 }
 
 :global(.dark) .user-info:hover {
