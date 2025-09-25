@@ -1,6 +1,5 @@
 import axios from 'axios'
-
-const BASE = 'http://localhost:18091'
+import { API_BASE_URL } from '@/config'
 
 export default {
   /**
@@ -8,10 +7,9 @@ export default {
    * params: { current, size, keyword, status }
    */
   async page(params = {}) {
-    const url = `${BASE}/sysUser/page`
+    const url = `${API_BASE_URL}/sysUser/page`
     const res = await axios.get(url, { params })
     // 返回后端原始数据对象（records, total, current, size 等）
     return res.data
   }
 }
-
