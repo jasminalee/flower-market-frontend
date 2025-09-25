@@ -104,7 +104,6 @@ const goToLogin = () => {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 40px;
-  width: 100%;
 }
 
 .header .container {

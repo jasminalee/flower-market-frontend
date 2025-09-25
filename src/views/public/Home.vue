@@ -21,9 +21,6 @@
           </el-button>
         </div>
       </div>
-      <div class="hero-image">
-        <img :src="heroImage" alt="Beautiful flowers" />
-      </div>
     </section>
 
     <!-- 特色产品区域 -->

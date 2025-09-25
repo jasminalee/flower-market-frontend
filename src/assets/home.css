@@ -8,7 +8,7 @@
 .hero-section {
   background: var(--gradient-primary);
   color: white;
-  padding: 100px 0;
+  padding: 50px 0 0 100px;
   display: flex;
   align-items: center;
   min-height: 80vh;
@@ -35,7 +35,6 @@
   grid-template-columns: 1fr 1fr;
   gap: 80px;
   align-items: center;
-  width: 100%;
   position: relative;
   z-index: 1;
 }
@@ -67,22 +66,11 @@
   flex-wrap: wrap;
 }
 
-.hero-image {
-  text-align: center;
-}
 
-.hero-image img {
-  width: 100%;
-  height: 400px;
-  object-fit: cover;
-  border-radius: var(--border-radius-round);
-  box-shadow: var(--box-shadow-dark);
-  transition: transform 0.3s ease;
-}
 
-.hero-image img:hover {
-  transform: scale(1.05);
-}
+
+
+
 
 /* 特色产品区域 */
 .featured-section {
@@ -339,9 +327,6 @@
     font-size: 4rem;
   }
   
-  .hero-image img {
-    height: 500px;
-  }
 }
 
 @media (min-width: 1200px) and (max-width: 1599px) {
