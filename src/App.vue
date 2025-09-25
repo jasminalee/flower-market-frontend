@@ -19,8 +19,6 @@ onMounted(() => {
 </template>
 
 <style>
-/* 全局样式重置 - 现在由 global.css 处理 */
-
 /* Element Plus 主题变量自定义 - 使用 CSS 变量 */
 :root {
   --el-color-primary: var(--primary-color);

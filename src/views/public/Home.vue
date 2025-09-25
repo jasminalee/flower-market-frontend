@@ -123,10 +123,10 @@ import {
 } from '@element-plus/icons-vue'
 
 // 引入样式文件
-import '@/assets/pages/home.css'
+import '@/assets/home.css'
 
 // import local images to avoid external network requests
-import heroImage from '@/assets/beautiful-flowers.svg'
+import heroImage from '@/assets/placeholders/beautiful-flowers.svg'
 import roseImg from '@/assets/placeholders/rose.svg'
 import sunflowerImg from '@/assets/placeholders/sunflower.svg'
 import lilyImg from '@/assets/placeholders/lily.svg'
