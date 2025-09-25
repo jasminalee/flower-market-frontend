@@ -2,7 +2,7 @@
 import './assets/variables.css'
 import './assets/main.css'
 // 公共 UI 辅助样式（按钮、表格、card、avatar 等）
-import '@/assets/ui.css'
+import '@/assets/components.css'
 
 // 引入主题系统
 import './composables/useTheme'
