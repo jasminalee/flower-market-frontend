@@ -71,7 +71,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { User, House } from '@element-plus/icons-vue'
-import ThemeToggle from '../../components/ThemeToggle.vue'
+import ThemeToggle from '../components/ThemeToggle.vue'
 
 const router = useRouter()
 

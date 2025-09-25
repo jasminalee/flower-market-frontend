@@ -9,7 +9,7 @@ const routes = [
   // 前台路由 - 使用公共布局
   {
     path: '/',
-    component: () => import('@/layouts/public/Layout.vue'),
+    component: () => import('@/layouts/Public.vue'),
     children: [
       {
         path: '',
@@ -37,7 +37,7 @@ const routes = [
   // 后台管理路由 - 使用管理后台布局
   {
     path: '/admin',
-    component: () => import('@/layouts/admin/Layout.vue'),
+    component: () => import('@/layouts/Admin.vue'),
     meta: { requiresAuth: true },
     children: [
       {

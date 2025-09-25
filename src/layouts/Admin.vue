@@ -148,7 +148,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/store/auth'
+import { useAuthStore } from '@/store/auth.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Management, Fold, Expand, User, ArrowDown, Setting, 

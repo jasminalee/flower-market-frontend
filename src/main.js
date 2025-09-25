@@ -1,10 +1,10 @@
 import './assets/main.css'
 
 // 引入全局样式
-import './styles/variables.css'
-import './styles/global.css'
+import './assets/variables.css'
+import './assets/global.css'
 // 公共 UI 辅助样式（按钮、表格、card、avatar 等）
-import './styles/components/ui.css'
+import '@/assets/components/ui.css'
 
 // 引入主题系统
 import './composables/useTheme'
