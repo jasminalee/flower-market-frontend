@@ -1,11 +1,10 @@
 // 引入全局样式
-import './assets/variables.css'
-import './assets/main.css'
+import '@/assets/variables.css'
 // 公共 UI 辅助样式（按钮、表格、card、avatar 等）
-import '@/assets/components.css'
+import '@/assets/common.css'
 
 // 引入主题系统
-import './composables/useTheme'
+import '@/composables/useTheme'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

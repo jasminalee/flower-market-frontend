@@ -30,7 +30,7 @@
           
           <el-button type="primary" @click="goToLogin">
             <el-icon><User /></el-icon>
-            进入管理后台
+            登录
           </el-button>
         </div>
       </div>
@@ -170,6 +170,7 @@ const goToLogin = () => {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin: 0 40px 0 0;
 }
 
 .theme-toggle-btn {
