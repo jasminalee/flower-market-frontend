@@ -130,7 +130,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/store/auth'
+import { useAuthStore } from '@/config/store.js'
 import { ElMessage } from 'element-plus'
 import { User, Lock, Management, CircleCheck, ArrowLeft } from '@element-plus/icons-vue'
 

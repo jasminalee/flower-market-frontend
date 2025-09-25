@@ -131,7 +131,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/store/auth'
+import { useAuthStore } from '@/config/store.js'
 import { ElMessage } from 'element-plus'
 import {
   Sunny, TrendCharts, Bottom, ArrowRight, User, Goods, 

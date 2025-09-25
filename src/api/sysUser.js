@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { API_BASE_URL } from '@/api/baseUrl.js'
+import { API_BASE_URL } from '@/config/baseUrl.js'
 
 export default {
   /**

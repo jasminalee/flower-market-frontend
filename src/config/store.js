@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { mockApi } from '@/mock/api'
+import { mockApi } from '@/config/mock.js'
 
 /**
  * 用户认证状态管理

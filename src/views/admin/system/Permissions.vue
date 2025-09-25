@@ -155,8 +155,8 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { useAuthStore } from '@/store/auth'
-import { mockApi } from '@/mock/api'
+import { useAuthStore } from '@/config/store.js'
+import { mockApi } from '@/config/mock.js'
 import { ElMessage } from 'element-plus'
 import { Search, Refresh } from '@element-plus/icons-vue'
 

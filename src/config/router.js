@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/store/auth'
+import { useAuthStore } from '@/config/store.js'
 
 /**
  * 路由配置
@@ -9,7 +9,7 @@ const routes = [
   // 前台路由 - 使用公共布局
   {
     path: '/',
-    component: () => import('@/layouts/Public.vue'),
+    component: () => import('@/components/layouts/Public.vue'),
     children: [
       {
         path: '',
@@ -37,7 +37,7 @@ const routes = [
   // 后台管理路由 - 使用管理后台布局
   {
     path: '/admin',
-    component: () => import('@/layouts/Admin.vue'),
+    component: () => import('@/components/layouts/Admin.vue'),
     meta: { requiresAuth: true },
     children: [
       {
