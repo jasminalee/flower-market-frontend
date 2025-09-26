@@ -100,11 +100,7 @@ const goToLogin = () => {
   border-bottom: 1px solid var(--border-color-light);
 }
 
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 40px;
-}
+/* 使用 common.css 中的统一 container 样式 */
 
 .header .container {
   display: flex;
@@ -230,37 +226,7 @@ const goToLogin = () => {
   color: var(--text-color-secondary);
 }
 
-/* 响应式设计 */
-@media (min-width: 1600px) {
-  .container {
-    max-width: 1600px;
-    padding: 0 60px;
-  }
-  
-  .header .container {
-    padding: 0 60px;
-  }
-  
-  .nav-menu {
-    gap: 40px;
-  }
-  
-  .nav-item {
-    font-size: 18px;
-    padding: 10px 20px;
-  }
-  
-  .logo-text {
-    font-size: 28px;
-  }
-}
-
-@media (min-width: 1200px) and (max-width: 1599px) {
-  .container {
-    max-width: 1400px;
-    padding: 0 40px;
-  }
-}
+/* 特定响应式样式（使用 common.css 中的通用媒体查询） */
 
 @media (max-width: 768px) {
   .header .container {

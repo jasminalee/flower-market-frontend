@@ -78,36 +78,6 @@
   background: var(--bg-color);
 }
 
-.section-header {
-  text-align: center;
-  margin-bottom: 60px;
-}
-
-.section-header h2 {
-  font-size: 2.5rem;
-  font-weight: 600;
-  margin-bottom: var(--spacing-medium);
-  color: var(--text-color-primary);
-  position: relative;
-}
-
-.section-header h2::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: var(--gradient-primary);
-  border-radius: 2px;
-}
-
-.section-header p {
-  font-size: var(--font-size-large);
-  color: var(--text-color-regular);
-}
-
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -120,7 +90,7 @@
   border-radius: var(--spacing-base);
   overflow: hidden;
   box-shadow: var(--box-shadow-light);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: var(--transition-transform), var(--transition-box-shadow);
   cursor: pointer;
   border: 1px solid var(--border-color-extra-light);
 }
@@ -140,7 +110,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: var(--transition-transform);
 }
 
 .product-card:hover .product-image img {
@@ -157,6 +127,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -224,7 +195,7 @@
   background: var(--bg-color);
   border-radius: var(--spacing-base);
   box-shadow: var(--box-shadow-light);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: var(--transition-transform), var(--transition-box-shadow);
   border: 1px solid var(--border-color-extra-light);
 }
 
@@ -290,7 +261,7 @@
   border-radius: var(--spacing-base);
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  transition: transform 0.3s ease;
+  transition: var(--transition-transform);
 }
 
 .stat-item:hover {
@@ -311,14 +282,14 @@
   font-weight: 500;
 }
 
-/* 响应式设计 */
+/* 为避免与common.css中的stat-card冲突，增加特定命名空间 */
+.stats-section .stat-item {
+  /* 特定于首页stats-section中的stat-item样式 */
+}
+
+/* 响应式设计 - 使用 common.css 中的通用媒体查询 */
 @media (min-width: 1600px) {
   .hero-section .container {
-    max-width: var(--container-max-width-large);
-    padding: 0 var(--container-padding-large);
-  }
-  
-  .container {
     max-width: var(--container-max-width-large);
     padding: 0 var(--container-padding-large);
   }
@@ -326,7 +297,6 @@
   .hero-title {
     font-size: 4rem;
   }
-  
 }
 
 @media (min-width: 1200px) and (max-width: 1599px) {

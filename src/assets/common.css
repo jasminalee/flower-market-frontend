@@ -43,7 +43,11 @@
   min-height: calc(100vh - var(--header-height) - var(--footer-height));
 }
 
-/* 页面头部 */
+/* ========================================================================== */
+/* 通用页面样式组件 */
+/* ========================================================================== */
+
+/* 页面头部通用样式 */
 .page-header {
   margin-bottom: var(--spacing-large);
 }
@@ -64,6 +68,109 @@
 .page-header .header-left p {
   color: var(--text-color-regular);
   margin: 0;
+}
+
+/* 通用章节头部样式 */
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-header h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-medium);
+  color: var(--text-color-primary);
+  position: relative;
+}
+
+.section-header h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
+}
+
+.section-header p {
+  font-size: var(--font-size-large);
+  color: var(--text-color-regular);
+}
+
+/* 通用网格布局样式 */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-large);
+}
+
+.grid-auto-fill {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-large);
+}
+
+/* 通用筛选栏样式 */
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-large);
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+  white-space: nowrap;
+}
+
+.filter-label {
+  font-weight: var(--button-font-weight);
+  color: var(--text-color-regular);
+}
+
+/* 搜索框通用样式 */
+.search-box {
+  flex: 1;
+  max-width: 300px;
+  min-width: 200px;
+}
+
+/* 筛选区域通用样式 */
+.filters-section {
+  background: var(--bg-color);
+  padding: var(--spacing-large) 0;
+  border-bottom: 1px solid var(--border-color-extra-light);
+  margin-bottom: var(--spacing-large);
+}
+
+/* 产品网格通用样式 */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-large);
+  margin-bottom: var(--spacing-extra-large);
+}
+
+/* 产品区域通用样式 */
+.products-section {
+  padding: var(--spacing-large) 0;
+}
+
+/* 加载容器通用样式 */
+.loading-container {
+  padding: var(--spacing-extra-large) 0;
+}
+
+/* 无结果状态通用样式 */
+.no-results {
+  text-align: center;
+  padding: var(--spacing-extra-large) 0;
 }
 
 /* 卡片样式 */
@@ -438,6 +545,40 @@
 }
 
 /* ========================================================================== */
+/* 产品相关组件样式 */
+/* ========================================================================== */
+
+/* 通用产品标签样式 */
+.product-tags {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tag {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+}
+
+.tag-new {
+  background: var(--success-color);
+}
+
+.tag-hot {
+  background: var(--danger-color);
+}
+
+.tag-discount {
+  background: var(--warning-color);
+}
+
+/* ========================================================================== */
 /* 工具类 Utility Classes */
 .container-wide {
   max-width: var(--container-max-width-large);
@@ -518,25 +659,7 @@
 .pb-4 { padding-bottom: var(--spacing-medium); }
 .pb-5 { padding-bottom: var(--spacing-large); }
 
-.hidden-mobile {
-  display: none !important;
-}
 
-@media (min-width: 768px) {
-  .hidden-mobile {
-    display: block !important;
-  }
-}
-
-.hidden-desktop {
-  display: block !important;
-}
-
-@media (min-width: 768px) {
-  .hidden-desktop {
-    display: none !important;
-  }
-}
 
 /* ========================================================================== */
 /* 全局基础样式 */
@@ -864,6 +987,7 @@ select:focus {
   color: var(--primary-color);
 }
 
+/* 全局响应式设计 */
 @media (max-width: 768px) {
   .container {
     padding: 0 var(--container-padding-small);
@@ -877,6 +1001,17 @@ select:focus {
 @media (min-width: 769px) {
   .hidden-desktop {
     display: none !important;
+  }
+  
+  .hidden-mobile {
+    display: block !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: var(--container-max-width);
+    padding: 0 var(--container-padding);
   }
 }
 

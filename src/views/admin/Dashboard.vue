@@ -379,7 +379,7 @@ onMounted(() => {
   font-size: 1rem;
 }
 
-/* 统计卡片 */
+/* 统计卡片 - 使用common.css中的stat-card样式 */
 .stats-section {
   margin-bottom: var(--spacing-large);
 }
