@@ -2,12 +2,6 @@
  * 统一组件样式标准
  * 包含项目中常用的UI组件样式和工具类
  */
-/* 仅保留自定义变量，不含 Element Plus 组件相关样式 */
-:root {
-  --table-border: var(--border-color);
-  --table-header-bg: var(--bg-color-page);
-  --table-row-hover: var(--primary-extra-light);
-}
 
 /* ========================================================================== */
 /* 主题切换动画 */
@@ -44,33 +38,222 @@
 }
 
 /* ========================================================================== */
-/* 通用页面样式组件 */
+/* 页面头部统一样式 */
 /* ========================================================================== */
 
-/* 页面头部通用样式 */
+/* 页面头部通用样式 - 管理页面使用 */
 .page-header {
-  margin-bottom: var(--spacing-large);
+  background: var(--gradient-primary);
+  color: white;
+  padding: 40px 0;
+  position: relative;
+  overflow: hidden;
 }
 
-.page-header .header-content {
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="header-grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23header-grain)"/></svg>');
+  pointer-events: none;
+}
+
+.page-header .container {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 }
 
-.page-header .header-left h1 {
-  font-size: var(--font-size-extra-large);
+.page-header-content {
+  flex: 1;
+}
+
+.page-header-content h1 {
+  font-size: 2rem;
   font-weight: 600;
   margin-bottom: var(--spacing-small);
-  color: var(--text-color-primary);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.page-header .header-left p {
-  color: var(--text-color-regular);
+.page-header-content p {
+  font-size: var(--font-size-medium);
+  opacity: 0.9;
   margin: 0;
 }
 
-/* 通用章节头部样式 */
+.page-header-actions {
+  margin-left: var(--spacing-large);
+}
+
+/* 产品页面头部样式 - 产品页面使用 */
+.product-page-header {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 60px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="product-grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23product-grain)"/></svg>');
+  pointer-events: none;
+}
+
+.product-page-header .container {
+  position: relative;
+  z-index: 1;
+}
+
+.product-page-header h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-medium);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.product-page-header p {
+  font-size: var(--font-size-large);
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* ========================================================================== */
+/* 筛选区域统一样式 */
+/* ========================================================================== */
+
+/* 筛选区域通用样式 */
+.filters-section {
+  background: var(--bg-color);
+  padding: var(--spacing-large) 0;
+  border-bottom: 1px solid var(--border-color-extra-light);
+  margin-bottom: var(--spacing-large);
+}
+
+/* 筛选栏通用样式 */
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-medium);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filters-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-medium);
+  align-items: center;
+  flex: 1;
+}
+
+.filters-right {
+  display: flex;
+  gap: var(--spacing-small);
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+  white-space: nowrap;
+}
+
+.filter-label {
+  font-weight: var(--button-font-weight);
+  color: var(--text-color-regular);
+}
+
+/* 搜索框通用样式 */
+.search-box {
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.search-group {
+  display: flex;
+  gap: var(--spacing-small);
+  align-items: center;
+}
+
+/* ========================================================================== */
+/* 表格组件统一样式 */
+/* ========================================================================== */
+
+/* 表格容器通用样式 */
+.table-container {
+  background: var(--bg-color);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  border: 1px solid var(--border-color-extra-light);
+}
+
+/* ========================================================================== */
+/* 响应式设计通用规则 */
+/* ========================================================================== */
+
+@media (max-width: 768px) {
+  .page-header .container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-medium);
+  }
+  
+  .page-header-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filters-left {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filters-right {
+    justify-content: center;
+  }
+  
+  .search-box {
+    min-width: auto;
+    max-width: none;
+  }
+  
+  .product-page-header {
+    padding: 40px 0;
+  }
+  
+  .product-page-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .product-page-header p {
+    font-size: var(--font-size-medium);
+  }
+}
+
+/* ========================================================================== */
+/* 通用组件样式 */
+/* ========================================================================== */
+
+/* 章节头部样式 */
 .section-header {
   text-align: center;
   margin-bottom: 60px;
@@ -101,7 +284,7 @@
   color: var(--text-color-regular);
 }
 
-/* 通用网格布局样式 */
+/* 网格布局样式 */
 .grid-auto-fit {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -114,42 +297,7 @@
   gap: var(--spacing-large);
 }
 
-/* 通用筛选栏样式 */
-.filters-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-large);
-  align-items: center;
-}
-
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-small);
-  white-space: nowrap;
-}
-
-.filter-label {
-  font-weight: var(--button-font-weight);
-  color: var(--text-color-regular);
-}
-
-/* 搜索框通用样式 */
-.search-box {
-  flex: 1;
-  max-width: 300px;
-  min-width: 200px;
-}
-
-/* 筛选区域通用样式 */
-.filters-section {
-  background: var(--bg-color);
-  padding: var(--spacing-large) 0;
-  border-bottom: 1px solid var(--border-color-extra-light);
-  margin-bottom: var(--spacing-large);
-}
-
-/* 产品网格通用样式 */
+/* 产品相关组件样式 */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -157,17 +305,15 @@
   margin-bottom: var(--spacing-extra-large);
 }
 
-/* 产品区域通用样式 */
 .products-section {
   padding: var(--spacing-large) 0;
 }
 
-/* 加载容器通用样式 */
+/* 加载和空状态样式 */
 .loading-container {
   padding: var(--spacing-extra-large) 0;
 }
 
-/* 无结果状态通用样式 */
 .no-results {
   text-align: center;
   padding: var(--spacing-extra-large) 0;
@@ -370,11 +516,6 @@
   margin-top: var(--spacing-large);
 }
 
-/* 对话框底部 */
-.dialog-footer {
-  text-align: right;
-}
-
 /* 错误页面样式 */
 .error-page {
   min-height: 100vh;
@@ -542,6 +683,99 @@
 
 .slide-in-up {
   animation: slideInUp var(--animation-duration-base) var(--animation-timing-function);
+}
+
+/* ========================================================================== */
+/* 通用产品卡片样式 */
+/* ========================================================================== */
+
+/* 产品卡片通用样式 */
+.product-card {
+  background: var(--bg-color);
+  border-radius: var(--spacing-base);
+  overflow: hidden;
+  box-shadow: var(--box-shadow-light);
+  transition: var(--transition-transform), var(--transition-box-shadow);
+  cursor: pointer;
+  border: 1px solid var(--border-color-extra-light);
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--box-shadow-dark);
+}
+
+.product-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition-transform);
+}
+
+.product-card:hover .product-image img {
+  transform: scale(1.1);
+}
+
+.product-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.product-card:hover .product-overlay {
+  opacity: 1;
+}
+
+.product-info {
+  padding: var(--spacing-large);
+}
+
+.product-info h3 {
+  font-size: var(--font-size-large);
+  font-weight: 600;
+  margin-bottom: var(--spacing-small);
+  color: var(--text-color-primary);
+}
+
+.product-description {
+  color: var(--text-color-regular);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-medium);
+  line-height: 1.5;
+}
+
+.product-price {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+  margin-bottom: var(--spacing-base);
+}
+
+.current-price {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--warning-color);
+}
+
+.original-price {
+  font-size: 1rem;
+  color: var(--text-color-placeholder);
+  text-decoration: line-through;
 }
 
 /* ========================================================================== */

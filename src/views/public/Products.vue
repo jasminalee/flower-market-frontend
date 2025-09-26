@@ -1,7 +1,7 @@
 <template>
   <div class="products">
     <!-- 页面头部 -->
-    <div class="page-header">
+    <div class="product-page-header">
       <div class="container">
         <h1>花卉产品</h1>
         <p>发现我们精心挑选的优质花卉产品</p>
@@ -12,54 +12,60 @@
     <div class="filters-section">
       <div class="container">
         <div class="filters-bar">
-          <!-- 搜索框 -->
-          <div class="search-box">
-            <el-input
-              v-model="searchQuery"
-              placeholder="搜索花卉产品..."
-              @input="handleSearch"
-              clearable
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
+          <!-- 搜索框区域 -->
+          <div class="filters-left">
+            <div class="search-group">
+              <div class="search-box">
+                <el-input
+                  v-model="searchQuery"
+                  placeholder="搜索花卉产品..."
+                  @input="handleSearch"
+                  clearable
+                >
+                  <template #prefix>
+                    <el-icon><Search /></el-icon>
+                  </template>
+                </el-input>
+              </div>
+            </div>
+
+            <!-- 分类筛选 -->
+            <div class="filter-group">
+              <span class="filter-label">分类：</span>
+              <el-radio-group v-model="selectedCategory" @change="handleCategoryChange">
+                <el-radio-button label="">全部</el-radio-button>
+                <el-radio-button label="rose">玫瑰</el-radio-button>
+                <el-radio-button label="lily">百合</el-radio-button>
+                <el-radio-button label="sunflower">向日葵</el-radio-button>
+                <el-radio-button label="carnation">康乃馨</el-radio-button>
+              </el-radio-group>
+            </div>
+
+            <!-- 价格筛选 -->
+            <div class="filter-group">
+              <span class="filter-label">价格：</span>
+              <el-radio-group v-model="selectedPriceRange" @change="handlePriceChange">
+                <el-radio-button label="">全部</el-radio-button>
+                <el-radio-button label="0-100">¥0-100</el-radio-button>
+                <el-radio-button label="100-300">¥100-300</el-radio-button>
+                <el-radio-button label="300-500">¥300-500</el-radio-button>
+                <el-radio-button label="500+">¥500+</el-radio-button>
+              </el-radio-group>
+            </div>
           </div>
 
-          <!-- 分类筛选 -->
-          <div class="filter-group">
-            <span class="filter-label">分类：</span>
-            <el-radio-group v-model="selectedCategory" @change="handleCategoryChange">
-              <el-radio-button label="">全部</el-radio-button>
-              <el-radio-button label="rose">玫瑰</el-radio-button>
-              <el-radio-button label="lily">百合</el-radio-button>
-              <el-radio-button label="sunflower">向日葵</el-radio-button>
-              <el-radio-button label="carnation">康乃馨</el-radio-button>
-            </el-radio-group>
-          </div>
-
-          <!-- 价格筛选 -->
-          <div class="filter-group">
-            <span class="filter-label">价格：</span>
-            <el-radio-group v-model="selectedPriceRange" @change="handlePriceChange">
-              <el-radio-button label="">全部</el-radio-button>
-              <el-radio-button label="0-100">¥0-100</el-radio-button>
-              <el-radio-button label="100-300">¥100-300</el-radio-button>
-              <el-radio-button label="300-500">¥300-500</el-radio-button>
-              <el-radio-button label="500+">¥500+</el-radio-button>
-            </el-radio-group>
-          </div>
-
-          <!-- 排序 -->
-          <div class="filter-group">
-            <span class="filter-label">排序：</span>
-            <el-select v-model="sortBy" placeholder="选择排序方式" @change="handleSort">
-              <el-option label="默认" value="default" />
-              <el-option label="价格从低到高" value="price-asc" />
-              <el-option label="价格从高到低" value="price-desc" />
-              <el-option label="评分最高" value="rating-desc" />
-              <el-option label="最新上架" value="newest" />
-            </el-select>
+          <!-- 排序区域 -->
+          <div class="filters-right">
+            <div class="filter-group">
+              <span class="filter-label">排序：</span>
+              <el-select v-model="sortBy" placeholder="选择排序方式" @change="handleSort">
+                <el-option label="默认" value="default" />
+                <el-option label="价格从低到高" value="price-asc" />
+                <el-option label="价格从高到低" value="price-desc" />
+                <el-option label="评分最高" value="rating-desc" />
+                <el-option label="最新上架" value="newest" />
+              </el-select>
+            </div>
           </div>
         </div>
       </div>
@@ -400,7 +406,5 @@ onMounted(async () => {
 })
 </script>
 
-<!-- 引入首页样式以使用统一的 product-card 样式 -->
-<style src="@/assets/home.css"></style>
 <!-- 引入产品页面专用样式 -->
 <style src="@/assets/products.css"></style>
