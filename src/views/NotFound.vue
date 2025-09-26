@@ -1,6 +1,6 @@
 <template>
-  <div class="not-found-page">
-    <div class="not-found-container">
+  <div class="error-page">
+    <div class="error-container slide-in-up">
       <div class="not-found-content">
         <!-- 404 图标 -->
         <div class="error-icon">
@@ -91,104 +91,10 @@ const goBack = () => {
 </script>
 
 <style scoped>
-.not-found-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.not-found-container {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  padding: 60px 40px;
-  text-align: center;
-  max-width: 600px;
-  width: 100%;
-}
-
-.error-icon {
-  margin-bottom: 32px;
-}
-
-.error-info {
-  margin-bottom: 40px;
-}
-
-.error-title {
-  font-size: 6rem;
-  font-weight: 700;
-  color: #409eff;
-  margin-bottom: 16px;
-  line-height: 1;
-}
-
-.error-subtitle {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 16px;
-}
-
-.error-description {
-  font-size: 1.1rem;
-  color: #666;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.error-actions {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
-}
-
-.suggestions {
-  border-top: 1px solid #eee;
-  padding-top: 32px;
-}
-
-.suggestions h3 {
-  font-size: 1.1rem;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.suggestion-links {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 16px;
-}
-
-.suggestion-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: #f8f9fa;
-  color: #666;
-  text-decoration: none;
-  border-radius: 8px;
-  transition: all 0.3s;
-  font-size: 14px;
-}
-
-.suggestion-link:hover {
-  background: #e9ecef;
-  color: #409eff;
-  transform: translateY(-2px);
-}
-
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .not-found-container {
-    padding: 40px 24px;
+  .error-container {
+    padding: 40px var(--spacing-large);
   }
 
   .error-title {
@@ -218,12 +124,12 @@ const goBack = () => {
 }
 
 @media (max-width: 480px) {
-  .not-found-page {
-    padding: 16px;
+  .error-page {
+    padding: var(--spacing-medium);
   }
 
-  .not-found-container {
-    padding: 32px 20px;
+  .error-container {
+    padding: 32px var(--spacing-large);
   }
 
   .error-title {
@@ -232,38 +138,6 @@ const goBack = () => {
 
   .error-icon .el-icon {
     font-size: 80px !important;
-  }
-}
-
-/* 动画效果 */
-.not-found-container {
-  animation: slideInUp 0.6s ease-out;
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.error-icon {
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-10px);
-  }
-  60% {
-    transform: translateY(-5px);
   }
 }
 </style>

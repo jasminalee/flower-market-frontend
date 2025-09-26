@@ -283,44 +283,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.permissions-page {
-  /* 页面容器样式已在全局定义 */
-}
-
-/* 页面头部 */
-.page-header {
-  margin-bottom: 24px;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.header-left h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-.header-left p {
-  color: #666;
-  margin: 0;
-}
-
-/* 卡片样式 */
-.filter-card {
-  margin-bottom: 16px;
-}
-
-.tree-card .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 /* 权限名称样式 */
 .permission-name {
   display: flex;
@@ -329,7 +291,7 @@ onMounted(() => {
 
 /* 权限树样式 */
 .permission-tree {
-  margin-top: 16px;
+  margin-top: var(--spacing-medium);
 }
 
 .tree-node {
@@ -337,7 +299,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-right: 16px;
+  padding-right: var(--spacing-medium);
 }
 
 .node-content {
@@ -355,8 +317,8 @@ onMounted(() => {
 }
 
 .permission-code {
-  font-size: 12px;
-  color: #999;
+  font-size: var(--font-size-small);
+  color: var(--text-color-placeholder);
   font-family: monospace;
 }
 
@@ -364,29 +326,29 @@ onMounted(() => {
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
-    gap: 16px;
+    gap: var(--spacing-medium);
     align-items: stretch;
   }
 
   .tree-node {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
-    padding-right: 8px;
+    gap: var(--spacing-small);
+    padding-right: var(--spacing-small);
   }
 
   .node-extra {
-    margin-left: 24px;
+    margin-left: var(--spacing-large);
   }
 }
 
 @media (max-width: 480px) {
   .permissions-page {
-    padding: 16px;
-    margin: -24px;
+    padding: var(--spacing-medium);
+    margin: calc(0px - var(--spacing-large));
   }
 
-  .header-left h1 {
+  .page-header .header-left h1 {
     font-size: 1.25rem;
   }
 }

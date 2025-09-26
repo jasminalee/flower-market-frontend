@@ -448,33 +448,12 @@ onMounted(() => {
   color: #333;
 }
 
-.header-left p {
-  color: #666;
-  margin: 0;
-}
-
-/* 卡片样式 */
-.filter-card {
-  margin-bottom: 16px;
-}
-
-/* 分页容器 */
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-}
-
-/* 对话框底部 */
-.dialog-footer {
-  text-align: right;
-}
-
+<style scoped>
 /* 响应式设计 */
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
-    gap: 16px;
+    gap: var(--spacing-medium);
     align-items: stretch;
   }
 
@@ -486,16 +465,16 @@ onMounted(() => {
 
 @media (max-width: 480px) {
   .roles-page {
-    padding: 16px;
-    margin: -24px;
+    padding: var(--spacing-medium);
+    margin: calc(0px - var(--spacing-large));
   }
 
-  .header-left h1 {
+  .page-header .header-left h1 {
     font-size: 1.25rem;
   }
 
   .pagination-container {
-    margin-top: 16px;
+    margin-top: var(--spacing-medium);
   }
 }
 </style>

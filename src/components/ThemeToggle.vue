@@ -84,8 +84,9 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // 主题状态
-const { theme, isDark } = useTheme()
+const { theme } = useTheme()
 const currentTheme = ref<Theme | 'system'>(theme)
+const isDark = computed(() => theme === 'dark')
 
 // 计算属性
 const buttonText = computed(() => {
@@ -177,7 +178,7 @@ const handleThemeChangeEvent = (newTheme: Theme) => {
 .theme-icon-btn {
   font-size: 18px;
   color: var(--text-color-regular);
-  transition: all 0.3s ease;
+  transition: var(--transition-base);
 }
 
 .theme-icon-btn:hover {
@@ -192,12 +193,12 @@ const handleThemeChangeEvent = (newTheme: Theme) => {
 .theme-option {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-small);
 }
 
 /* 主题切换动画 */
 .theme-toggle .el-button {
-  transition: all 0.3s ease;
+  transition: var(--transition-base);
 }
 
 .theme-toggle .el-switch {

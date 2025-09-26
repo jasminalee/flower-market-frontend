@@ -594,59 +594,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.users-page {
-  /* 页面容器样式已在全局定义 */
-}
-
-/* 页面头部 */
-.page-header {
-  margin-bottom: 24px;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.header-left h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-.header-left p {
-  color: #666;
-  margin: 0;
-}
-
-/* 卡片样式 */
-.filter-card {
-  margin-bottom: 16px;
-}
-
-.table-card {
-  /* Element Plus card 默认样式 */
-}
-
-/* 分页容器 */
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-}
-
-/* 对话框底部 */
-.dialog-footer {
-  text-align: right;
-}
-
 /* 响应式设计 */
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
-    gap: 16px;
+    gap: var(--spacing-medium);
     align-items: stretch;
   }
 
@@ -657,26 +609,26 @@ onMounted(() => {
 
   /* 表格在移动端的优化 */
   :deep(.el-table) {
-    font-size: 12px;
+    font-size: var(--font-size-small);
   }
 
   :deep(.el-table .cell) {
-    padding: 8px;
+    padding: var(--spacing-small);
   }
 }
 
 @media (max-width: 480px) {
   .users-page {
-    padding: 16px;
-    margin: -24px;
+    padding: var(--spacing-medium);
+    margin: calc(0px - var(--spacing-large));
   }
 
-  .header-left h1 {
+  .page-header .header-left h1 {
     font-size: 1.25rem;
   }
 
   .pagination-container {
-    margin-top: 16px;
+    margin-top: var(--spacing-medium);
   }
 
   /* 隐藏一些在小屏幕上不重要的列 */
