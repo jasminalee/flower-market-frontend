@@ -1,60 +1,62 @@
 <template>
   <div class="roles-page">
-    <!-- 页面头部 -->
-    <div class="page-header">
-      <div class="header-content">
-        <div class="header-left">
-          <h1>角色管理</h1>
-          <p>管理系统中的用户角色和权限</p>
-        </div>
-        <div class="header-right">
-          <el-button 
-            type="primary" 
+    <!-- 页面头部（使用 Element Plus 的 el-page-header） -->
+    <el-page-header class="page-header" :title="'角色管理'">
+      <template #content>
+        管理系统中的用户角色和权限
+      </template>
+    </el-page-header>
+
+    <!-- 搜索和筛选 -->
+    <el-card class="filter-card">
+      <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
+        <el-col :span="18">
+          <el-form :model="searchForm" inline>
+            <el-form-item label="关键词">
+              <el-input
+                v-model="searchForm.keyword"
+                placeholder="搜索角色名称或编码"
+                clearable
+                @keyup.enter="handleSearch"
+              >
+                <template #prefix>
+                  <el-icon><Search /></el-icon>
+                </template>
+              </el-input>
+            </el-form-item>
+
+            <el-form-item label="状态">
+              <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
+                <el-option label="启用" value="active" />
+                <el-option label="禁用" value="disabled" />
+              </el-select>
+            </el-form-item>
+
+            <el-form-item>
+              <el-button type="primary" @click="handleSearch">
+                <el-icon><Search /></el-icon>
+                搜索
+              </el-button>
+              <el-button @click="handleReset">
+                <el-icon><Refresh /></el-icon>
+                重置
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </el-col>
+
+        <el-col :span="6" style="text-align: right;">
+          <el-button
+            type="primary"
             @click="handleAdd"
             v-if="hasPermission('system:role:create')"
           >
             <el-icon><Plus /></el-icon>
             新增角色
           </el-button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 搜索和筛选 -->
-    <el-card class="filter-card">
-      <el-form :model="searchForm" inline>
-        <el-form-item label="关键词">
-          <el-input
-            v-model="searchForm.keyword"
-            placeholder="搜索角色名称或编码"
-            clearable
-            @keyup.enter="handleSearch"
-          >
-            <template #prefix>
-              <el-icon><Search /></el-icon>
-            </template>
-          </el-input>
-        </el-form-item>
-        
-        <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
-            <el-option label="启用" value="active" />
-            <el-option label="禁用" value="disabled" />
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">
-            <el-icon><Search /></el-icon>
-            搜索
-          </el-button>
-          <el-button @click="handleReset">
-            <el-icon><Refresh /></el-icon>
-            重置
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+        </el-col>
+      </el-row>
+     </el-card>
 
     <!-- 角色列表 -->
     <el-card class="table-card">
@@ -426,55 +428,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.roles-page {
-  /* 页面容器样式已在全局定义 */
-}
-
-/* 页面头部 */
-.page-header {
-  margin-bottom: 24px;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.header-left h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-<style scoped>
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    gap: var(--spacing-medium);
-    align-items: stretch;
-  }
-
-  .header-right {
-    display: flex;
-    justify-content: flex-end;
-  }
-}
-
-@media (max-width: 480px) {
-  .roles-page {
-    padding: var(--spacing-medium);
-    margin: calc(0px - var(--spacing-large));
-  }
-
-  .page-header .header-left h1 {
-    font-size: 1.25rem;
-  }
-
-  .pagination-container {
-    margin-top: var(--spacing-medium);
-  }
-}
 </style>

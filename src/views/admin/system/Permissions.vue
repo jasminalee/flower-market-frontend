@@ -1,56 +1,68 @@
 <template>
   <div class="permissions-page">
-    <!-- 页面头部 -->
-    <div class="page-header">
-      <div class="header-content">
-        <div class="header-left">
-          <h1>权限管理</h1>
-          <p>管理系统中的所有权限和菜单配置</p>
-        </div>
-      </div>
-    </div>
+    <!-- 页面头部（使用 Element Plus 的 el-page-header） -->
+    <el-page-header class="page-header" :title="'权限管理'">
+      <template #content>
+        管理系统中的所有权限和菜单配置
+      </template>
+    </el-page-header>
 
     <!-- 搜索和筛选 -->
     <el-card class="filter-card">
-      <el-form :model="searchForm" inline>
-        <el-form-item label="关键词">
-          <el-input
-            v-model="searchForm.keyword"
-            placeholder="搜索权限名称或编码"
-            clearable
-            @keyup.enter="handleSearch"
+      <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
+        <el-col :span="18">
+          <el-form :model="searchForm" inline>
+            <el-form-item label="关键字">
+              <el-input
+                v-model="searchForm.keyword"
+                placeholder="搜索权限名称或编码"
+                clearable
+                @keyup.enter="handleSearch"
+              >
+                <template #prefix>
+                  <el-icon><Search /></el-icon>
+                </template>
+              </el-input>
+            </el-form-item>
+
+            <el-form-item label="类型">
+              <el-select v-model="searchForm.type" placeholder="选择类型" clearable>
+                <el-option label="菜单" value="menu" />
+                <el-option label="按钮" value="button" />
+              </el-select>
+            </el-form-item>
+
+            <el-form-item label="状态">
+              <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
+                <el-option label="启用" value="active" />
+                <el-option label="禁用" value="disabled" />
+              </el-select>
+            </el-form-item>
+
+            <el-form-item>
+              <el-button type="primary" @click="handleSearch">
+                <el-icon><Search /></el-icon>
+                搜索
+              </el-button>
+              <el-button @click="handleReset">
+                <el-icon><Refresh /></el-icon>
+                重置
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </el-col>
+
+        <el-col :span="6" style="text-align: right;">
+          <el-button
+            type="primary"
+            @click="handleAdd"
+            v-if="hasPermission('system:permission:create')"
           >
-            <template #prefix>
-              <el-icon><Search /></el-icon>
-            </template>
-          </el-input>
-        </el-form-item>
-        
-        <el-form-item label="类型">
-          <el-select v-model="searchForm.type" placeholder="选择类型" clearable>
-            <el-option label="菜单" value="menu" />
-            <el-option label="按钮" value="button" />
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
-            <el-option label="启用" value="active" />
-            <el-option label="禁用" value="disabled" />
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">
-            <el-icon><Search /></el-icon>
-            搜索
+            <el-icon><Plus /></el-icon>
+            新增权限
           </el-button>
-          <el-button @click="handleReset">
-            <el-icon><Refresh /></el-icon>
-            重置
-          </el-button>
-        </el-form-item>
-      </el-form>
+        </el-col>
+      </el-row>
     </el-card>
 
     <!-- 权限列表 -->
@@ -154,11 +166,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/config/store.js'
 import { mockApi } from '@/config/mock.js'
 import { ElMessage } from 'element-plus'
-import { Search, Refresh } from '@element-plus/icons-vue'
+import { Search, Refresh, Plus } from '@element-plus/icons-vue'
 
 const authStore = useAuthStore()
 
@@ -275,6 +287,14 @@ const expandAll = () => {
   }
 }
 
+/**
+ * 新增权限
+ */
+const handleAdd = () => {
+  // TODO: 实现新增权限逻辑
+  ElMessage.success('新增权限功能尚未实现')
+}
+
 // 生命周期
 onMounted(() => {
   loadPermissionList()
@@ -283,73 +303,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 权限名称样式 */
-.permission-name {
-  display: flex;
-  align-items: center;
-}
 
-/* 权限树样式 */
-.permission-tree {
-  margin-top: var(--spacing-medium);
-}
-
-.tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-right: var(--spacing-medium);
-}
-
-.node-content {
-  display: flex;
-  align-items: center;
-}
-
-.node-label {
-  font-weight: 500;
-}
-
-.node-extra {
-  display: flex;
-  align-items: center;
-}
-
-.permission-code {
-  font-size: var(--font-size-small);
-  color: var(--text-color-placeholder);
-  font-family: monospace;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    gap: var(--spacing-medium);
-    align-items: stretch;
-  }
-
-  .tree-node {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-small);
-    padding-right: var(--spacing-small);
-  }
-
-  .node-extra {
-    margin-left: var(--spacing-large);
-  }
-}
-
-@media (max-width: 480px) {
-  .permissions-page {
-    padding: var(--spacing-medium);
-    margin: calc(0px - var(--spacing-large));
-  }
-
-  .page-header .header-left h1 {
-    font-size: 1.25rem;
-  }
-}
 </style>

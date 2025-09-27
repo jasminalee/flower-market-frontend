@@ -45,7 +45,7 @@
 .page-header {
   background: var(--gradient-primary);
   color: white;
-  padding: 40px 0;
+  padding: 10px;
   position: relative;
   overflow: hidden;
 }
@@ -144,10 +144,26 @@
 /* 筛选栏通用样式 */
 .filters-bar {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--spacing-medium);
   align-items: center;
   justify-content: space-between;
+}
+
+.filter-card .filters-bar {
+  padding: 12px 16px;
+}
+
+.filter-card .filters-left {
+  display: flex;
+  gap: var(--spacing-medium);
+  align-items: center;
+  flex: 1;
+}
+
+.filter-card .filters-right {
+  display: flex;
+  gap: var(--spacing-small);
+  align-items: center;
 }
 
 .filters-left {

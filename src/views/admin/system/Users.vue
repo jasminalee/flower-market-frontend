@@ -1,60 +1,62 @@
 <template>
   <div class="users-page">
-    <!-- 页面头部 -->
-    <div class="page-header">
-      <div class="header-content">
-        <div class="header-left">
-          <h1>用户管理</h1>
-          <p>管理系统中的所有用户账户</p>
-        </div>
-        <div class="header-right">
-          <el-button 
-            type="primary" 
+    <!-- 页面头部（使用 Element Plus 的 el-page-header） -->
+    <el-page-header class="page-header" :title="'用户管理'">
+      <template #content>
+        管理系统中的所有用户账户
+      </template>
+    </el-page-header>
+
+    <!-- 搜索和筛选 -->
+    <el-card class="filter-card">
+      <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
+        <el-col :span="18">
+          <el-form :model="searchForm" inline>
+            <el-form-item label="关键词">
+              <el-input
+                v-model="searchForm.keyword"
+                placeholder="搜索用户名、姓名或邮箱"
+                clearable
+                @clear="handleSearch"
+                @keyup.enter="handleSearch"
+              >
+                <template #prefix>
+                  <el-icon><Search /></el-icon>
+                </template>
+              </el-input>
+            </el-form-item>
+
+            <el-form-item label="状态">
+              <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
+                <el-option label="启用" value="active" />
+                <el-option label="禁用" value="disabled" />
+              </el-select>
+            </el-form-item>
+
+            <el-form-item>
+              <el-button type="primary" @click="handleSearch">
+                <el-icon><Search /></el-icon>
+                搜索
+              </el-button>
+              <el-button @click="handleReset">
+                <el-icon><Refresh /></el-icon>
+                重置
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </el-col>
+
+        <el-col :span="6" style="text-align: right;">
+          <el-button
+            type="primary"
             @click="handleAdd"
             v-if="hasPermission('system:user:create')"
           >
             <el-icon><Plus /></el-icon>
             新增用户
           </el-button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 搜索和筛选 -->
-    <el-card class="filter-card">
-      <el-form :model="searchForm" inline>
-        <el-form-item label="关键词">
-          <el-input
-            v-model="searchForm.keyword"
-            placeholder="搜索用户名、姓名或邮箱"
-            clearable
-            @clear="handleSearch"
-            @keyup.enter="handleSearch"
-          >
-            <template #prefix>
-              <el-icon><Search /></el-icon>
-            </template>
-          </el-input>
-        </el-form-item>
-        
-        <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
-            <el-option label="启用" value="active" />
-            <el-option label="禁用" value="disabled" />
-          </el-select>
-        </el-form-item>
-        
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">
-            <el-icon><Search /></el-icon>
-            搜索
-          </el-button>
-          <el-button @click="handleReset">
-            <el-icon><Refresh /></el-icon>
-            重置
-          </el-button>
-        </el-form-item>
-      </el-form>
+        </el-col>
+      </el-row>
     </el-card>
 
     <!-- 用户列表 -->
@@ -310,6 +312,18 @@ const userForm = reactive({
   status: 'active'
 })
 
+// 计算属性
+const dialogTitle = computed(() => isEdit.value ? '编辑用户' : '新增用户')
+const hasPermission = (permission) => authStore.hasPermission(permission)
+
+// 验证器：确认密码（提取为顶层函数以避免 linter 警告）
+const validateConfirmPassword = (rule, value) => {
+  if (value !== userForm.password) {
+    return Promise.reject(new Error('两次输入的密码不一致'))
+  }
+  return Promise.resolve()
+}
+
 // 表单验证规则
 const userRules = {
   username: [
@@ -334,29 +348,14 @@ const userRules = {
   ],
   confirmPassword: [
     { required: true, message: '请确认密码', trigger: 'blur' },
-    {
-      validator: (rule, value, callback) => {
-        if (value !== userForm.password) {
-          callback(new Error('两次输入的密码不一致'))
-        } else {
-          callback()
-        }
-      },
-      trigger: 'blur'
-    }
+    { validator: validateConfirmPassword, trigger: 'blur' }
   ],
-  roleIds: [
-    { required: true, message: '请选择角色', trigger: 'change' }
-  ]
+   roleIds: [
+     { required: true, message: '请选择角色', trigger: 'change' }
+   ]
 }
 
-// 计算属性
-const dialogTitle = computed(() => isEdit.value ? '编辑用户' : '新增用户')
-const hasPermission = (permission) => authStore.hasPermission(permission)
-
-/**
- * 加载用户列表
- */
+// 加载用户列表
 const loadUserList = async () => {
   loading.value = true
   try {
@@ -594,46 +593,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    gap: var(--spacing-medium);
-    align-items: stretch;
-  }
 
-  .header-right {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  /* 表格在移动端的优化 */
-  :deep(.el-table) {
-    font-size: var(--font-size-small);
-  }
-
-  :deep(.el-table .cell) {
-    padding: var(--spacing-small);
-  }
-}
-
-@media (max-width: 480px) {
-  .users-page {
-    padding: var(--spacing-medium);
-    margin: calc(0px - var(--spacing-large));
-  }
-
-  .page-header .header-left h1 {
-    font-size: 1.25rem;
-  }
-
-  .pagination-container {
-    margin-top: var(--spacing-medium);
-  }
-
-  /* 隐藏一些在小屏幕上不重要的列 */
-  :deep(.el-table .hidden-xs-only) {
-    display: none;
-  }
-}
 </style>
