@@ -165,10 +165,13 @@ const userMenus = computed(() => {
     }
   ]
 
+  // 检查用户是否为admin
+  const isAdmin = authStore.user && authStore.user.username === 'admin'
+
   // 系统管理模块 - 根据权限动态添加
   const systemMenus = []
   
-  if (authStore.hasPermission('system:user:list')) {
+  if (isAdmin || authStore.hasPermission('system:user:list')) {
     systemMenus.push({
       path: '/admin/system/users',
       title: '用户管理',
@@ -176,7 +179,7 @@ const userMenus = computed(() => {
     })
   }
   
-  if (authStore.hasPermission('system:role:list')) {
+  if (isAdmin || authStore.hasPermission('system:role:list')) {
     systemMenus.push({
       path: '/admin/system/roles',
       title: '角色管理',
@@ -184,7 +187,7 @@ const userMenus = computed(() => {
     })
   }
   
-  if (authStore.hasPermission('system:permission:list')) {
+  if (isAdmin || authStore.hasPermission('system:permission:list')) {
     systemMenus.push({
       path: '/admin/system/permissions',
       title: '权限管理',

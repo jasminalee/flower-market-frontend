@@ -135,8 +135,11 @@ router.beforeEach(async (to, from, next) => {
       return
     }
 
-    // 检查权限
-    if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {
+    // 检查是否为admin用户
+    const isAdmin = authStore.user && authStore.user.username === 'admin'
+    
+    // 检查权限（admin用户跳过权限检查）
+    if (to.meta.permission && !isAdmin && !authStore.hasPermission(to.meta.permission)) {
       // 没有权限，重定向到仪表板
       next({ name: 'AdminDashboard' })
       return
