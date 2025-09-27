@@ -393,7 +393,7 @@ const loadUserList = async () => {
     console.log('response:', response)
     // backend returns { records: [...], total }
     if (response) {
-      const records = response.records || []
+      const records = response.data.records || []
       userList.value = records.map(u => ({
         id: u.id,
         username: u.username,

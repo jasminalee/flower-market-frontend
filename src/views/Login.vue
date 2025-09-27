@@ -8,19 +8,27 @@
           <p>专业的花卉产品管理平台</p>
           <div class="features">
             <div class="feature-item">
-              <el-icon><CircleCheck /></el-icon>
+              <el-icon>
+                <CircleCheck/>
+              </el-icon>
               <span>权限管理</span>
             </div>
             <div class="feature-item">
-              <el-icon><CircleCheck /></el-icon>
+              <el-icon>
+                <CircleCheck/>
+              </el-icon>
               <span>产品管理</span>
             </div>
             <div class="feature-item">
-              <el-icon><CircleCheck /></el-icon>
+              <el-icon>
+                <CircleCheck/>
+              </el-icon>
               <span>订单管理</span>
             </div>
             <div class="feature-item">
-              <el-icon><CircleCheck /></el-icon>
+              <el-icon>
+                <CircleCheck/>
+              </el-icon>
               <span>数据统计</span>
             </div>
           </div>
@@ -34,40 +42,40 @@
           <div class="form-header">
             <div class="logo">
               <el-icon size="40" color="#409eff">
-                <Management />
+                <Management/>
               </el-icon>
             </div>
             <h2>登录管理后台</h2>
             <p>请输入您的账户信息</p>
           </div>
 
-          <!-- 登录表单 -->
+          <!-- 登录表单 el-from element表单组件 vue-ref vue-:model -->
           <el-form
-            ref="loginFormRef"
-            :model="loginForm"
-            :rules="loginRules"
-            size="large"
-            @submit.prevent="handleLogin"
+              ref="loginFormRef"
+              :model="loginForm"
+              :rules="loginRules"
+              size="large"
+              @submit.prevent="handleLogin"
           >
             <el-form-item prop="username">
               <el-input
-                v-model="loginForm.username"
-                placeholder="请输入用户名"
-                :prefix-icon="User"
-                clearable
-                @keyup.enter="handleLogin"
+                  v-model="loginForm.username"
+                  placeholder="请输入用户名"
+                  :prefix-icon="User"
+                  clearable
+                  @keyup.enter="handleLogin"
               />
             </el-form-item>
 
             <el-form-item prop="password">
               <el-input
-                v-model="loginForm.password"
-                type="password"
-                placeholder="请输入密码"
-                :prefix-icon="Lock"
-                show-password
-                clearable
-                @keyup.enter="handleLogin"
+                  v-model="loginForm.password"
+                  type="password"
+                  placeholder="请输入密码"
+                  :prefix-icon="Lock"
+                  show-password
+                  clearable
+                  @keyup.enter="handleLogin"
               />
             </el-form-item>
 
@@ -84,11 +92,11 @@
 
             <el-form-item>
               <el-button
-                type="primary"
-                size="large"
-                :loading="loading"
-                @click="handleLogin"
-                class="login-btn"
+                  type="primary"
+                  size="large"
+                  :loading="loading"
+                  @click="handleLogin"
+                  class="login-btn"
               >
                 {{ loading ? '登录中...' : '登录' }}
               </el-button>
@@ -109,7 +117,9 @@
           <!-- 返回首页 -->
           <div class="back-home">
             <el-button type="text" @click="goHome">
-              <el-icon><ArrowLeft /></el-icon>
+              <el-icon>
+                <ArrowLeft/>
+              </el-icon>
               返回首页
             </el-button>
           </div>
@@ -120,11 +130,11 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/config/store.js'
-import { ElMessage } from 'element-plus'
-import { User, Lock, Management, CircleCheck, ArrowLeft } from '@element-plus/icons-vue'
+import {ref, reactive} from 'vue'
+import {useRouter, useRoute} from 'vue-router'
+import {useAuthStore} from '@/config/store.js'
+import {ElMessage} from 'element-plus'
+import {User, Lock, Management, CircleCheck, ArrowLeft} from '@element-plus/icons-vue'
 import '@/assets/login.css'
 
 const router = useRouter()
@@ -145,11 +155,11 @@ const loginForm = reactive({
 // 表单验证规则
 const loginRules = {
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' }
+    {required: true, message: '请输入用户名', trigger: 'blur'},
+    {min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur'}
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' }
+    {required: true, message: '请输入密码', trigger: 'blur'}
   ]
 }
 
@@ -162,7 +172,7 @@ const handleLogin = async () => {
   try {
     // 表单验证
     await loginFormRef.value.validate()
-    
+
     loading.value = true
 
     // 执行登录
@@ -173,7 +183,7 @@ const handleLogin = async () => {
 
     if (success) {
       ElMessage.success('登录成功')
-      
+
       // 跳转到目标页面或默认页面
       const redirect = route.query.redirect || '/admin/dashboard'
       router.push(redirect)
@@ -193,9 +203,9 @@ const handleLogin = async () => {
  */
 const fillDemoAccount = (type) => {
   const accounts = {
-    admin: { username: 'admin', password: 'admin' }
+    admin: {username: 'admin', password: 'admin'}
   }
-  
+
   const account = accounts[type]
   if (account) {
     loginForm.username = account.username

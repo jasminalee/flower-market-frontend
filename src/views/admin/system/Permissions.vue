@@ -185,7 +185,7 @@ const permissionTree = ref([])
 // 搜索表单
 const searchForm = reactive({
   keyword: '',
-  type: '',
+  type: '3',
   status: ''
 })
 
@@ -213,7 +213,7 @@ const loadPermissionList = async () => {
 
     const response = await sysPermissionApi.page(params)
     if (response) {
-      const records = response.records || []
+      const records = response.data.records || []
       permissionList.value = records.map(p => ({
         id: p.id,
         name: p.permissionName,

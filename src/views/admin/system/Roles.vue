@@ -265,7 +265,7 @@ const loadRoleList = async () => {
     
     const response = await sysRoleApi.page(params)
     if (response) {
-      const records = response.records || []
+      const records = response.data.records || []
       roleList.value = records
       pagination.total = response.total != null ? response.total : (response.count || 0)
       pagination.page = response.current || pagination.page

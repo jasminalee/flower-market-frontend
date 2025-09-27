@@ -1,7 +1,6 @@
-// filepath: e:\IdeaProjects\flower-market-frontend\src\api\apiClient.js
 import axios from 'axios'
-import { API_BASE_URL } from '@/config/baseUrl.js'
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:18091'
+// http请求工具封装, 默认封装请求服务前缀
 const client = axios.create({
   baseURL: API_BASE_URL,
   // 可以在这里设置全局头（例如 token）
