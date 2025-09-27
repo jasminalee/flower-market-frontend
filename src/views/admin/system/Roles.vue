@@ -14,6 +14,7 @@
           <el-form :model="searchForm" inline>
             <el-form-item label="关键词">
               <el-input
+                class="search-input"
                 v-model="searchForm.keyword"
                 placeholder="搜索角色名称或编码"
                 clearable
