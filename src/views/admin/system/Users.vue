@@ -100,12 +100,12 @@
         <el-table-column label="角色" min-width="120">
           <template #default="{ row }">
             <el-tag
-                v-for="role in row.roles"
-                :key="role"
+                v-for="roleName in row.roles"
+                :key="roleName"
                 size="small"
                 style="margin-right: 4px;"
             >
-              {{ role }}
+              {{ roleName }}
             </el-tag>
           </template>
         </el-table-column>
@@ -120,45 +120,46 @@
 
         <el-table-column prop="createdAt" label="创建时间" min-width="160"/>
 
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="230" fixed="right">
           <template #default="{ row }">
-            <el-button
-                type="primary"
-                size="small"
-                text
-                @click="handleView(row)"
-            >
-              <el-icon>
-                <View/>
-              </el-icon>
-              查看
-            </el-button>
 
-            <el-button
-                type="warning"
-                size="small"
-                text
-                @click="handleEdit(row)"
-                v-if="hasPermission('system:user:update')"
-            >
-              <el-icon>
-                <Edit/>
-              </el-icon>
-              编辑
-            </el-button>
+              <el-button
+                  type="primary"
+                  size="small"
+                  text
+                  @click="handleView(row)"
+              >
+                <el-icon>
+                  <View/>
+                </el-icon>
+                查看
+              </el-button>
 
-            <el-button
-                type="danger"
-                size="small"
-                text
-                @click="handleDelete(row)"
-                v-if="hasPermission('system:user:delete') && row.username !== 'admin'"
-            >
-              <el-icon>
-                <Delete/>
-              </el-icon>
-              删除
-            </el-button>
+              <el-button
+                  type="warning"
+                  size="small"
+                  text
+                  @click="handleEdit(row)"
+                  v-if="hasPermission('system:user:update')"
+              >
+                <el-icon>
+                  <Edit/>
+                </el-icon>
+                编辑
+              </el-button>
+
+              <el-button
+                  type="danger"
+                  size="small"
+                  text
+                  @click="handleDelete(row)"
+                  v-if="hasPermission('system:user:delete') && row.username !== 'admin'"
+              >
+                <el-icon>
+                  <Delete/>
+                </el-icon>
+                删除
+              </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -179,7 +180,7 @@
 
     <!-- 用户表单对话框 -->
     <el-dialog
-        :title="dialogTitle"
+        :title="viewMode ? '查看用户' : dialogTitle"
         v-model="dialogVisible"
         width="600px"
         :close-on-click-modal="false"
@@ -189,6 +190,7 @@
           :model="userForm"
           :rules="userRules"
           label-width="80px"
+          :disabled="viewMode"
       >
         <el-row :gutter="16">
           <el-col :span="12">
@@ -220,7 +222,7 @@
           </el-col>
         </el-row>
 
-        <el-row :gutter="16" v-if="!isEdit">
+        <el-row :gutter="16" v-if="!isEdit && !viewMode">
           <el-col :span="12">
             <el-form-item label="密码" prop="password">
               <el-input
@@ -246,11 +248,11 @@
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item label="角色" prop="roleIds">
-              <el-select v-model="userForm.roleIds" placeholder="选择角色" multiple>
+              <el-select v-model="userForm.roleIds" placeholder="选择角色" multiple :disabled="viewMode">
                 <el-option
                     v-for="role in roleOptions"
                     :key="role.id"
-                    :label="role.name"
+                    :label="role.name || role.roleName"
                     :value="role.id"
                 />
               </el-select>
@@ -270,7 +272,7 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSave" :loading="saving">
+          <el-button v-if="!viewMode" type="primary" @click="handleSave" :loading="saving">
             {{ saving ? '保存中...' : '保存' }}
           </el-button>
         </div>
@@ -282,8 +284,8 @@
 <script setup>
 import {ref, reactive, computed, onMounted} from 'vue'
 import {useAuthStore} from '@/config/store.js'
-import {mockApi} from '@/config/mock.js'
 import sysUserApi from '@/api/sysUser'
+import sysRoleApi from '@/api/sysRole'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {
   Plus, Search, Refresh, User, View, Edit, Delete
@@ -296,6 +298,7 @@ const loading = ref(false)
 const saving = ref(false)
 const dialogVisible = ref(false)
 const isEdit = ref(false)
+const viewMode = ref(false) // 查看模式
 const userFormRef = ref()
 const selectedUsers = ref([])
 
@@ -402,7 +405,7 @@ const loadUserList = async () => {
         createdAt: u.createTime || u.createdAt || '',
         avatar: u.avatar || '',
         roleIds: u.roleIds || [],
-        roles: u.roles || []
+        roles: u.roles || u.roleNames || [] // 确保角色名称正确映射
       }))
       pagination.total = response.total != null ? response.total : (response.count || 0)
       pagination.page = response.current || pagination.page
@@ -421,12 +424,25 @@ const loadUserList = async () => {
  */
 const loadRoleOptions = async () => {
   try {
-    const response = await mockApi.roles.list({size: 100})
-    if (response.success) {
-      roleOptions.value = response.data.list.filter(role => role.status === 'active')
+    const params = {
+      current: 1,
+      size: 100
+    }
+    
+    const response = await sysRoleApi.page(params)
+    if (response) {
+      const records = response.records || []
+      // 确保正确映射角色字段
+      roleOptions.value = records.map(role => ({
+        id: role.id,
+        name: role.roleName || role.name,
+        code: role.roleCode || role.code,
+        status: role.status
+      })).filter(role => role.status === 1)
     }
   } catch (error) {
     console.error('加载角色选项失败:', error)
+    ElMessage.error('加载角色选项失败')
   }
 }
 
@@ -485,8 +501,23 @@ const handleAdd = () => {
  * 查看用户
  */
 const handleView = (user) => {
-  ElMessage.info(`查看用户：${user.name}`)
-  // 这里可以实现查看用户详情的功能
+  // 填充表单数据用于查看
+  isEdit.value = false
+  Object.assign(userForm, {
+    id: user.id,
+    username: user.username,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    roleIds: user.roleIds || [],
+    status: user.status,
+    password: '',
+    confirmPassword: ''
+  })
+  
+  // 启用查看模式
+  viewMode.value = true
+  dialogVisible.value = true
 }
 
 /**
@@ -523,12 +554,12 @@ const handleDelete = async (user) => {
         }
     )
 
-    const response = await mockApi.users.delete(user.id)
-    if (response.success) {
+    const response = await sysUserApi.remove(user.id)
+    if (response !== undefined) {
       ElMessage.success('删除成功')
       loadUserList()
     } else {
-      ElMessage.error(response.message || '删除失败')
+      ElMessage.error('删除失败')
     }
   } catch (error) {
     if (error !== 'cancel') {
@@ -542,6 +573,12 @@ const handleDelete = async (user) => {
  * 保存用户
  */
 const handleSave = async () => {
+  // 查看模式下不保存
+  if (viewMode.value) {
+    dialogVisible.value = false
+    return
+  }
+  
   if (!userFormRef.value) return
 
   try {
@@ -551,11 +588,11 @@ const handleSave = async () => {
 
     const userData = {
       username: userForm.username,
-      name: userForm.name,
+      nickname: userForm.name,
       email: userForm.email,
       phone: userForm.phone,
       roleIds: userForm.roleIds,
-      status: userForm.status
+      status: userForm.status === 'active' ? 1 : 0
     }
 
     if (!isEdit.value) {
@@ -563,15 +600,15 @@ const handleSave = async () => {
     }
 
     const response = isEdit.value
-        ? await mockApi.users.update(userForm.id, userData)
-        : await mockApi.users.create(userData)
+        ? await sysUserApi.update(userForm.id, userData)
+        : await sysUserApi.create(userData)
 
-    if (response.success) {
+    if (response !== undefined) {
       ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
       dialogVisible.value = false
       loadUserList()
     } else {
-      ElMessage.error(response.message || '保存失败')
+      ElMessage.error('保存失败')
     }
   } catch (error) {
     console.error('保存用户失败:', error)
@@ -596,6 +633,9 @@ const resetUserForm = () => {
     roleIds: [],
     status: 'active'
   })
+
+  // 退出查看模式
+  viewMode.value = false
 
   if (userFormRef.value) {
     userFormRef.value.resetFields()

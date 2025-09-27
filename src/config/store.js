@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { mockApi } from '@/config/mock.js'
+import authApi from '@/api/auth.js'
 
 /**
  * 用户认证状态管理
@@ -24,13 +24,13 @@ export const useAuthStore = defineStore('auth', () => {
    */
   const login = async (credentials) => {
     try {
-      const response = await mockApi.auth.login(credentials)
+      const response = await authApi.login(credentials)
       
-      if (response.success) {
-        token.value = response.data.token
-        user.value = response.data.user
-        permissions.value = response.data.permissions || []
-        roles.value = response.data.roles || []
+      if (response) {
+        token.value = response.token
+        user.value = response.user
+        permissions.value = response.permissions || []
+        roles.value = response.roles || []
         
         // 保存到本地存储
         localStorage.setItem('token', token.value)

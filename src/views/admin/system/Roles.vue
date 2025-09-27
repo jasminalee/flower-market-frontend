@@ -188,7 +188,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/config/store.js'
-import { mockApi } from '@/config/mock.js'
+import sysRoleApi from '@/api/sysRole.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Refresh, Edit, Delete } from '@element-plus/icons-vue'
 
@@ -257,16 +257,19 @@ const loadRoleList = async () => {
   loading.value = true
   try {
     const params = {
-      page: pagination.page,
+      current: pagination.page,
       size: pagination.size,
-      keyword: searchForm.keyword,
-      status: searchForm.status
+      keyword: searchForm.keyword || undefined,
+      status: searchForm.status || undefined
     }
     
-    const response = await mockApi.roles.list(params)
-    if (response.success) {
-      roleList.value = response.data.list
-      pagination.total = response.data.total
+    const response = await sysRoleApi.page(params)
+    if (response) {
+      const records = response.records || []
+      roleList.value = records
+      pagination.total = response.total != null ? response.total : (response.count || 0)
+      pagination.page = response.current || pagination.page
+      pagination.size = response.size || pagination.size
     }
   } catch (error) {
     console.error('加载角色列表失败:', error)
@@ -342,7 +345,7 @@ const handleEdit = (role) => {
 const handleDelete = async (role) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除角色 "${role.name}" 吗？`,
+      `确定要删除角色 "${role.roleName}" 吗？`,
       '确认删除',
       {
         confirmButtonText: '确定',
@@ -351,12 +354,12 @@ const handleDelete = async (role) => {
       }
     )
     
-    const response = await mockApi.roles.delete(role.id)
-    if (response.success) {
+    const response = await sysRoleApi.remove(role.id)
+    if (response !== undefined) {
       ElMessage.success('删除成功')
       loadRoleList()
     } else {
-      ElMessage.error(response.message || '删除失败')
+      ElMessage.error('删除失败')
     }
   } catch (error) {
     if (error !== 'cancel') {
@@ -378,23 +381,23 @@ const handleSave = async () => {
     saving.value = true
     
     const roleData = {
-      name: roleForm.name,
-      code: roleForm.code,
+      roleName: roleForm.name,
+      roleCode: roleForm.code,
       description: roleForm.description,
       sort: roleForm.sort,
-      status: roleForm.status
+      status: roleForm.status === 'active' ? 1 : 0
     }
     
     const response = isEdit.value 
-      ? await mockApi.roles.update(roleForm.id, roleData)
-      : await mockApi.roles.create(roleData)
+      ? await sysRoleApi.update(roleForm.id, roleData)
+      : await sysRoleApi.create(roleData)
     
-    if (response.success) {
+    if (response !== undefined) {
       ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
       dialogVisible.value = false
       loadRoleList()
     } else {
-      ElMessage.error(response.message || '保存失败')
+      ElMessage.error('保存失败')
     }
   } catch (error) {
     console.error('保存角色失败:', error)

@@ -10,7 +10,7 @@
     <!-- 搜索和筛选 -->
     <el-card class="filter-card">
       <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
-        <el-col :span="18">
+        <el-col :span="20">
           <el-form :model="searchForm" inline>
             <el-form-item label="关键字">
               <el-input
@@ -167,7 +167,7 @@
 <script setup>
 import {ref, reactive, onMounted} from 'vue'
 import {useAuthStore} from '@/config/store.js'
-import {mockApi} from '@/config/mock.js'
+import sysPermissionApi from '@/api/sysPermission.js'
 import {ElMessage} from 'element-plus'
 import {Search, Refresh, Plus} from '@element-plus/icons-vue'
 
@@ -205,14 +205,27 @@ const loadPermissionList = async () => {
   loading.value = true
   try {
     const params = {
-      keyword: searchForm.keyword,
-      type: searchForm.type,
-      status: searchForm.status
+      current: 1,
+      size: 1000, // 获取所有权限
+      permissionName: searchForm.keyword || undefined,
+      permissionType: searchForm.type || undefined
     }
 
-    const response = await mockApi.permissions.list(params)
-    if (response.success) {
-      permissionList.value = response.data
+    const response = await sysPermissionApi.page(params)
+    if (response) {
+      const records = response.records || []
+      permissionList.value = records.map(p => ({
+        id: p.id,
+        name: p.permissionName,
+        code: p.permissionCode,
+        type: p.permissionType === 1 ? 'menu' : p.permissionType === 2 ? 'button' : 'api',
+        parentId: p.parentId,
+        path: p.url,
+        icon: p.icon,
+        sort: p.sort,
+        status: p.status === 1 ? 'active' : 'disabled',
+        description: p.description
+      }))
     }
   } catch (error) {
     console.error('加载权限列表失败:', error)
@@ -227,9 +240,38 @@ const loadPermissionList = async () => {
  */
 const loadPermissionTree = async () => {
   try {
-    const response = await mockApi.permissions.tree()
-    if (response.success) {
-      permissionTree.value = response.data
+    const params = {
+      current: 1,
+      size: 1000 // 获取所有权限
+    }
+    
+    const response = await sysPermissionApi.page(params)
+    if (response) {
+      const records = response.records || []
+      const permissions = records.map(p => ({
+        id: p.id,
+        name: p.permissionName,
+        code: p.permissionCode,
+        type: p.permissionType === 1 ? 'menu' : p.permissionType === 2 ? 'button' : 'api',
+        parentId: p.parentId,
+        path: p.url,
+        icon: p.icon,
+        sort: p.sort,
+        status: p.status === 1 ? 'active' : 'disabled',
+        description: p.description
+      }))
+      
+      // 构建权限树结构
+      const buildTree = (permissions, parentId = 0) => {
+        return permissions
+          .filter(permission => permission.parentId === parentId)
+          .map(permission => ({
+            ...permission,
+            children: buildTree(permissions, permission.id)
+          }))
+      }
+      
+      permissionTree.value = buildTree(permissions)
     }
   } catch (error) {
     console.error('加载权限树失败:', error)

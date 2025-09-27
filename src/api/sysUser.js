@@ -1,5 +1,5 @@
-import axios from 'axios'
-import { API_BASE_URL } from '@/config/baseUrl.js'
+// filepath: e:\IdeaProjects\flower-market-frontend\src\api\sysUser.js
+import api from './apiClient'
 
 export default {
   /**
@@ -7,9 +7,32 @@ export default {
    * params: { current, size, keyword, status }
    */
   async page(params = {}) {
-    const url = `${API_BASE_URL}/sysUser/page`
-    const res = await axios.get(url, { params })
-    // 返回后端原始数据对象（records, total, current, size 等）
-    return res.data
+    // api 已经配置 baseURL 为 API_BASE_URL，所以只写相对路径
+    return api.get('/sysUser/page', { params })
+  },
+
+  /**
+   * 创建用户
+   * data: object
+   */
+  async create(data = {}) {
+    return api.post('/sysUser', data)
+  },
+
+  /**
+   * 更新用户
+   * id: number
+   * data: object
+   */
+  async update(id, data = {}) {
+    return api.put(`/sysUser/${id}`, data)
+  },
+
+  /**
+   * 删除用户
+   * id: number
+   */
+  async remove(id) {
+    return api.delete(`/sysUser/${id}`)
   }
 }
