@@ -92,8 +92,16 @@ export const useAuthStore = defineStore('auth', () => {
    * @returns {Boolean}
    */
   const hasPermission = (permission) => {
-    if (!permission) return true
-    return permissions.value.includes(permission)
+    // 如果没有指定权限要求，返回true
+    if (!permission) return true;
+    
+    // 如果用户是admin，拥有所有权限
+    if (user.value && user.value.username === 'admin') {
+      return true;
+    }
+    
+    // 检查用户是否拥有该权限
+    return permissions.value.includes(permission);
   }
 
   /**
@@ -102,8 +110,16 @@ export const useAuthStore = defineStore('auth', () => {
    * @returns {Boolean}
    */
   const hasRole = (role) => {
-    if (!role) return true
-    return roles.value.includes(role)
+    // 如果没有指定角色要求，返回true
+    if (!role) return true;
+    
+    // 如果用户是admin，拥有所有角色
+    if (user.value && user.value.username === 'admin') {
+      return true;
+    }
+    
+    // 检查用户是否拥有该角色
+    return roles.value.includes(role);
   }
 
   /**
