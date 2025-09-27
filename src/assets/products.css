@@ -1,3 +1,8 @@
+/*
+  注：已将本文件中页面实际使用的关键样式合并到 `src/assets/common.css`。
+  为了安全起见，此文件暂时保留为备份，后续可在确认无问题后删除或归档。
+*/
+
 /* 产品页面专用样式 */
 
 .products {
@@ -28,7 +33,7 @@
   justify-content: space-between;
 }
 
-/* 产品页面响应式设计 */
+/* 响应式规则 */
 @media (max-width: 480px) {
   .product-page-header h1 {
     font-size: 2rem;
@@ -52,7 +57,7 @@
   }
 }
 
-/* 适配不同屏幕尺寸的网格布局 */
+/* 大屏调整 */
 @media (min-width: 1200px) {
   .products-grid {
     grid-template-columns: repeat(4, 1fr);

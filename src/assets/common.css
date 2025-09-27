@@ -795,42 +795,84 @@
 }
 
 /* ========================================================================== */
-/* 产品相关组件样式 */
+/* 产品相关组件样式（补充来自 products.css，已合并以避免单独导入） */
 /* ========================================================================== */
+.product-page {
+  min-height: 100vh;
+  background-color: var(--bg-color-page);
+}
 
-/* 通用产品标签样式 */
-.product-tags {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+/* 产品卡片特有样式（子选择器补充） */
+.product-card .product-category {
+  margin-bottom: var(--spacing-small);
+}
+
+.product-card .product-rating {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: var(--spacing-small);
+  margin-bottom: var(--spacing-base);
 }
 
-.tag {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  color: white;
+.product-card .sales-count {
+  font-size: var(--font-size-small);
+  color: var(--text-color-regular);
 }
 
-.tag-new {
-  background: var(--success-color);
+.product-card .product-actions {
+  display: flex;
+  gap: var(--spacing-small);
+  justify-content: space-between;
 }
 
-.tag-hot {
-  background: var(--danger-color);
+/* 小屏幕下的产品页面响应式微调（来自 products.css） */
+@media (max-width: 480px) {
+  .product-page-header h1 {
+    font-size: 2rem;
+  }
+
+  .product-page-header p {
+    font-size: var(--font-size-base);
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pagination-container {
+    margin-top: var(--spacing-medium);
+  }
+
+  .product-card .product-actions {
+    flex-direction: column;
+    gap: var(--spacing-small);
+  }
 }
 
-.tag-discount {
-  background: var(--warning-color);
+/* 大屏幕下产品网格列数调整（来自 products.css） */
+@media (min-width: 1200px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1600px) {
+  .products-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .product-page-header h1 {
+    font-size: 3.5rem;
+  }
 }
 
 /* ========================================================================== */
-/* 工具类 Utility Classes */
-.container-wide {
+ /* 工具类 Utility Classes (moved to src/assets/common-unused.css for cleanup)
+   Reason: these utility classes were not referenced anywhere in src/ (checked via repository grep).
+   They are preserved in common-unused.css if needed later. */
+/* ========================================================================== */
+
+/* .container-wide {
   max-width: var(--container-max-width-large);
   margin: 0 auto;
   padding: 0 var(--container-padding-large);
@@ -907,9 +949,7 @@
 .pb-2 { padding-bottom: var(--spacing-small); }
 .pb-3 { padding-bottom: var(--spacing-base); }
 .pb-4 { padding-bottom: var(--spacing-medium); }
-.pb-5 { padding-bottom: var(--spacing-large); }
-
-
+.pb-5 { padding-bottom: var(--spacing-large); } */
 
 /* ========================================================================== */
 /* 全局基础样式 */
