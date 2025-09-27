@@ -101,15 +101,7 @@
             <div class="demo-list">
               <div class="demo-item" @click="fillDemoAccount('admin')">
                 <strong>超级管理员</strong>
-                <span>admin / admin123</span>
-              </div>
-              <div class="demo-item" @click="fillDemoAccount('manager')">
-                <strong>管理员</strong>
-                <span>manager / manager123</span>
-              </div>
-              <div class="demo-item" @click="fillDemoAccount('user')">
-                <strong>普通用户</strong>
-                <span>user / user123</span>
+                <span>admin / admin</span>
               </div>
             </div>
           </div>
@@ -133,6 +125,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/config/store.js'
 import { ElMessage } from 'element-plus'
 import { User, Lock, Management, CircleCheck, ArrowLeft } from '@element-plus/icons-vue'
+import '@/assets/login.css'
 
 const router = useRouter()
 const route = useRoute()
@@ -156,8 +149,7 @@ const loginRules = {
     { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' }
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度在 6 到 20 个字符', trigger: 'blur' }
+    { required: true, message: '请输入密码', trigger: 'blur' }
   ]
 }
 
@@ -201,9 +193,7 @@ const handleLogin = async () => {
  */
 const fillDemoAccount = (type) => {
   const accounts = {
-    admin: { username: 'admin', password: 'admin123' },
-    manager: { username: 'manager', password: 'manager123' },
-    user: { username: 'user', password: 'user123' }
+    admin: { username: 'admin', password: 'admin' }
   }
   
   const account = accounts[type]
@@ -223,253 +213,5 @@ const goHome = () => {
 </script>
 
 <style scoped>
-.login-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
 
-.login-container {
-  width: 100%;
-  max-width: 1000px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 600px;
-}
-
-/* 左侧背景区域 */
-.login-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 60px 40px;
-  display: flex;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.login-bg::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><path d="m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/></g></g></svg>') repeat;
-  opacity: 0.1;
-  animation: float 20s infinite linear;
-}
-
-@keyframes float {
-  0% { transform: translateX(0) translateY(0) rotate(0deg); }
-  100% { transform: translateX(-60px) translateY(-60px) rotate(360deg); }
-}
-
-.bg-content {
-  position: relative;
-  z-index: 1;
-}
-
-.bg-content h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  line-height: 1.2;
-}
-
-.bg-content p {
-  font-size: 1.1rem;
-  opacity: 0.9;
-  margin-bottom: 40px;
-}
-
-.features {
-  display: grid;
-  gap: 16px;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1rem;
-}
-
-.feature-item .el-icon {
-  color: #67c23a;
-}
-
-/* 右侧登录表单 */
-.login-form-container {
-  padding: 60px 40px;
-  display: flex;
-  align-items: center;
-}
-
-.login-form {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.form-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.logo {
-  margin-bottom: 16px;
-}
-
-.form-header h2 {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.form-header p {
-  color: #666;
-  font-size: 14px;
-}
-
-/* 表单样式 */
-.el-form-item {
-  margin-bottom: 24px;
-}
-
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.login-btn {
-  width: 100%;
-  height: 48px;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-/* 演示账户 */
-.demo-accounts {
-  margin-top: 32px;
-}
-
-.demo-list {
-  display: grid;
-  gap: 8px;
-}
-
-.demo-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: #f5f7fa;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.demo-item:hover {
-  background: #e1f3ff;
-  transform: translateX(4px);
-}
-
-.demo-item strong {
-  color: #333;
-  font-size: 14px;
-}
-
-.demo-item span {
-  color: #666;
-  font-size: 12px;
-  font-family: monospace;
-}
-
-/* 返回首页 */
-.back-home {
-  margin-top: 24px;
-  text-align: center;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .login-container {
-    grid-template-columns: 1fr;
-    max-width: 400px;
-  }
-
-  .login-bg {
-    display: none;
-  }
-
-  .login-form-container {
-    padding: 40px 24px;
-  }
-
-  .bg-content h1 {
-    font-size: 2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .login-page {
-    padding: 16px;
-  }
-
-  .login-form-container {
-    padding: 32px 20px;
-  }
-
-  .form-header h2 {
-    font-size: 1.5rem;
-  }
-
-  .demo-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-}
-
-/* 动画效果 */
-.login-form {
-  animation: slideInUp 0.6s ease-out;
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.bg-content {
-  animation: slideInLeft 0.8s ease-out;
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
 </style>

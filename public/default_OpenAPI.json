@@ -13,6 +13,10 @@
       "x-order": "2147483647"
     },
     {
+      "name": "权限认证接口",
+      "x-order": "2147483647"
+    },
+    {
       "name": "用户角色关联表对象功能接口",
       "x-order": "2147483647"
     },
@@ -34,6 +38,55 @@
     }
   ],
   "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "权限认证接口"
+        ],
+        "summary": "用户登录",
+        "operationId": "loginUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "loginRequest",
+            "description": "loginRequest",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/系统用户信息",
+              "originalRef": "系统用户信息"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ResponseResult",
+              "originalRef": "ResponseResult"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-order": "2147483647"
+      }
+    },
     "/error": {
       "get": {
         "tags": [
@@ -289,7 +342,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/definitions/ResponseResult«boolean»",
+              "originalRef": "ResponseResult«boolean»"
             }
           },
           "201": {
@@ -418,8 +472,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Page«系统权限表»",
-              "originalRef": "Page«系统权限表»"
+              "$ref": "#/definitions/ResponseResult«Page«系统权限表»»",
+              "originalRef": "ResponseResult«Page«系统权限表»»"
             }
           },
           "401": {
@@ -459,8 +513,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/系统权限表",
-              "originalRef": "系统权限表"
+              "$ref": "#/definitions/ResponseResult«系统权限表»",
+              "originalRef": "ResponseResult«系统权限表»"
             }
           },
           "401": {
@@ -498,7 +552,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/definitions/ResponseResult«boolean»",
+              "originalRef": "ResponseResult«boolean»"
             }
           },
           "204": {
@@ -543,7 +598,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/definitions/ResponseResult«boolean»",
+              "originalRef": "ResponseResult«boolean»"
             }
           },
           "201": {
@@ -641,8 +697,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Page«系统角色表»",
-              "originalRef": "Page«系统角色表»"
+              "$ref": "#/definitions/ResponseResult«Page«系统角色表»»",
+              "originalRef": "ResponseResult«Page«系统角色表»»"
             }
           },
           "401": {
@@ -682,8 +738,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/系统角色表",
-              "originalRef": "系统角色表"
+              "$ref": "#/definitions/ResponseResult«系统角色表»",
+              "originalRef": "ResponseResult«系统角色表»"
             }
           },
           "401": {
@@ -721,7 +777,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/definitions/ResponseResult«boolean»",
+              "originalRef": "ResponseResult«boolean»"
             }
           },
           "204": {
@@ -766,7 +823,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/definitions/ResponseResult«boolean»",
+              "originalRef": "ResponseResult«boolean»"
             }
           },
           "201": {
@@ -851,8 +909,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Page«角色权限关联表»",
-              "originalRef": "Page«角色权限关联表»"
+              "$ref": "#/definitions/ResponseResult«Page«角色权限关联表»»",
+              "originalRef": "ResponseResult«Page«角色权限关联表»»"
             }
           },
           "401": {
@@ -892,8 +950,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/角色权限关联表",
-              "originalRef": "角色权限关联表"
+              "$ref": "#/definitions/ResponseResult«角色权限关联表»",
+              "originalRef": "ResponseResult«角色权限关联表»"
             }
           },
           "401": {
@@ -931,7 +989,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/definitions/ResponseResult«boolean»",
+              "originalRef": "ResponseResult«boolean»"
             }
           },
           "204": {
@@ -952,7 +1011,7 @@
         "tags": [
           "系统用户表对象功能接口"
         ],
-        "summary": "新增/更新系统与用户",
+        "summary": "新增/更新系统与用户(包含角色信息)",
         "operationId": "addUsingPOST_3",
         "consumes": [
           "application/json"
@@ -963,12 +1022,12 @@
         "parameters": [
           {
             "in": "body",
-            "name": "sysUser",
-            "description": "sysUser",
+            "name": "sysUserWithRole",
+            "description": "sysUserWithRole",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/系统用户信息",
-              "originalRef": "系统用户信息"
+              "$ref": "#/definitions/系统用户信息(包含角色信息)",
+              "originalRef": "系统用户信息(包含角色信息)"
             }
           }
         ],
@@ -976,7 +1035,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/definitions/ResponseResult«boolean»",
+              "originalRef": "ResponseResult«boolean»"
             }
           },
           "201": {
@@ -1103,8 +1163,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Page«系统用户信息»",
-              "originalRef": "Page«系统用户信息»"
+              "$ref": "#/definitions/ResponseResult«Page«系统用户信息»»",
+              "originalRef": "ResponseResult«Page«系统用户信息»»"
             }
           },
           "401": {
@@ -1144,8 +1204,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/系统用户信息",
-              "originalRef": "系统用户信息"
+              "$ref": "#/definitions/ResponseResult«系统用户信息»",
+              "originalRef": "ResponseResult«系统用户信息»"
             }
           },
           "401": {
@@ -1183,7 +1243,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/definitions/ResponseResult«boolean»",
+              "originalRef": "ResponseResult«boolean»"
             }
           },
           "204": {
@@ -1228,7 +1289,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/definitions/ResponseResult«boolean»",
+              "originalRef": "ResponseResult«boolean»"
             }
           },
           "201": {
@@ -1313,8 +1375,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Page«用户角色关联表»",
-              "originalRef": "Page«用户角色关联表»"
+              "$ref": "#/definitions/ResponseResult«Page«用户角色关联表»»",
+              "originalRef": "ResponseResult«Page«用户角色关联表»»"
             }
           },
           "401": {
@@ -1354,8 +1416,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/用户角色关联表",
-              "originalRef": "用户角色关联表"
+              "$ref": "#/definitions/ResponseResult«用户角色关联表»",
+              "originalRef": "ResponseResult«用户角色关联表»"
             }
           },
           "401": {
@@ -1393,7 +1455,8 @@
           "200": {
             "description": "OK",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/definitions/ResponseResult«boolean»",
+              "originalRef": "ResponseResult«boolean»"
             }
           },
           "204": {
@@ -1530,47 +1593,57 @@
       "type": "object",
       "properties": {
         "countId": {
-          "type": "string"
+          "type": "string",
+          "refType": null
         },
         "current": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "refType": null
         },
         "maxLimit": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "refType": null
         },
         "optimizeCountSql": {
-          "type": "boolean"
+          "type": "boolean",
+          "refType": null
         },
         "orders": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/OrderItem",
             "originalRef": "OrderItem"
-          }
+          },
+          "refType": "OrderItem"
         },
         "pages": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "refType": null
         },
         "records": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/用户角色关联表",
             "originalRef": "用户角色关联表"
-          }
+          },
+          "refType": "用户角色关联表"
         },
         "searchCount": {
-          "type": "boolean"
+          "type": "boolean",
+          "refType": null
         },
         "size": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "refType": null
         },
         "total": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "refType": null
         }
       },
       "title": "Page«用户角色关联表»"
@@ -1771,12 +1844,261 @@
       },
       "title": "Page«角色权限关联表»"
     },
+    "ResponseResult": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "type": "object"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult"
+    },
+    "ResponseResult«Page«用户角色关联表»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "$ref": "#/definitions/Page«用户角色关联表»",
+          "originalRef": "Page«用户角色关联表»"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«Page«用户角色关联表»»"
+    },
+    "ResponseResult«Page«系统权限表»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "$ref": "#/definitions/Page«系统权限表»",
+          "originalRef": "Page«系统权限表»"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«Page«系统权限表»»"
+    },
+    "ResponseResult«Page«系统用户信息»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "$ref": "#/definitions/Page«系统用户信息»",
+          "originalRef": "Page«系统用户信息»"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«Page«系统用户信息»»"
+    },
+    "ResponseResult«Page«系统角色表»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "$ref": "#/definitions/Page«系统角色表»",
+          "originalRef": "Page«系统角色表»"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«Page«系统角色表»»"
+    },
+    "ResponseResult«Page«角色权限关联表»»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "$ref": "#/definitions/Page«角色权限关联表»",
+          "originalRef": "Page«角色权限关联表»"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«Page«角色权限关联表»»"
+    },
+    "ResponseResult«boolean»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«boolean»"
+    },
+    "ResponseResult«用户角色关联表»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "$ref": "#/definitions/用户角色关联表",
+          "originalRef": "用户角色关联表"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«用户角色关联表»"
+    },
+    "ResponseResult«系统权限表»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "$ref": "#/definitions/系统权限表",
+          "originalRef": "系统权限表"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«系统权限表»"
+    },
+    "ResponseResult«系统用户信息»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "$ref": "#/definitions/系统用户信息",
+          "originalRef": "系统用户信息"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«系统用户信息»"
+    },
+    "ResponseResult«系统角色表»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "$ref": "#/definitions/系统角色表",
+          "originalRef": "系统角色表"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«系统角色表»"
+    },
+    "ResponseResult«角色权限关联表»": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "$ref": "#/definitions/角色权限关联表",
+          "originalRef": "角色权限关联表"
+        },
+        "message": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "ResponseResult«角色权限关联表»"
+    },
     "View": {
       "type": "object",
       "properties": {
         "contentType": {
-          "type": "string",
-          "refType": null
+          "type": "string"
         }
       },
       "title": "View"
@@ -1817,58 +2139,48 @@
         "createTime": {
           "type": "string",
           "format": "date-time",
-          "description": "创建时间",
-          "refType": null
+          "description": "创建时间"
         },
         "id": {
           "type": "integer",
           "format": "int64",
-          "description": "权限ID",
-          "refType": null
+          "description": "权限ID"
         },
         "method": {
           "type": "string",
-          "description": "请求方法（GET/POST等，适用于接口权限）",
-          "refType": null
+          "description": "请求方法（GET/POST等，适用于接口权限）"
         },
         "parentId": {
           "type": "integer",
           "format": "int64",
-          "description": "父权限ID（用于构建权限树）",
-          "refType": null
+          "description": "父权限ID（用于构建权限树）"
         },
         "permissionCode": {
           "type": "string",
-          "description": "权限编码",
-          "refType": null
+          "description": "权限编码"
         },
         "permissionName": {
           "type": "string",
-          "description": "权限名称",
-          "refType": null
+          "description": "权限名称"
         },
         "permissionType": {
           "type": "string",
           "format": "byte",
-          "description": "权限类型（1-菜单，2-按钮，3-接口）",
-          "refType": null
+          "description": "权限类型（1-菜单，2-按钮，3-接口）"
         },
         "sort": {
           "type": "integer",
           "format": "int32",
-          "description": "排序号",
-          "refType": null
+          "description": "排序号"
         },
         "updateTime": {
           "type": "string",
           "format": "date-time",
-          "description": "更新时间",
-          "refType": null
+          "description": "更新时间"
         },
         "url": {
           "type": "string",
-          "description": "资源路径（如URL）",
-          "refType": null
+          "description": "资源路径（如URL）"
         }
       },
       "title": "系统权限表"
@@ -1933,41 +2245,90 @@
       },
       "title": "系统用户信息"
     },
+    "系统用户信息(包含角色信息)": {
+      "type": "object",
+      "properties": {
+        "addr": {
+          "type": "string",
+          "description": "用户地址"
+        },
+        "createTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "创建时间"
+        },
+        "email": {
+          "type": "string",
+          "description": "用户邮箱"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "用户唯一标识"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "用户展示昵称"
+        },
+        "password": {
+          "type": "string",
+          "description": "加密存储的密码"
+        },
+        "phone": {
+          "type": "string",
+          "description": "用户联系电话"
+        },
+        "roleId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "角色ID"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "description": "用户状态（0-禁用，1-正常）"
+        },
+        "updateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "更新时间"
+        },
+        "username": {
+          "type": "string",
+          "description": "登录用户名"
+        }
+      },
+      "title": "系统用户信息(包含角色信息)"
+    },
     "系统角色表": {
       "type": "object",
       "properties": {
         "createTime": {
           "type": "string",
           "format": "date-time",
-          "description": "创建时间",
-          "refType": null
+          "description": "创建时间"
         },
         "description": {
           "type": "string",
-          "description": "角色描述",
-          "refType": null
+          "description": "角色描述"
         },
         "id": {
           "type": "integer",
           "format": "int64",
-          "description": "角色ID",
-          "refType": null
+          "description": "角色ID"
         },
         "roleCode": {
           "type": "string",
-          "description": "角色编码",
-          "refType": null
+          "description": "角色编码"
         },
         "roleName": {
           "type": "string",
-          "description": "角色名称",
-          "refType": null
+          "description": "角色名称"
         },
         "updateTime": {
           "type": "string",
           "format": "date-time",
-          "description": "更新时间",
-          "refType": null
+          "description": "更新时间"
         }
       },
       "title": "系统角色表"
@@ -1978,26 +2339,22 @@
         "createTime": {
           "type": "string",
           "format": "date-time",
-          "description": "创建时间",
-          "refType": null
+          "description": "创建时间"
         },
         "id": {
           "type": "integer",
           "format": "int64",
-          "description": "ID",
-          "refType": null
+          "description": "ID"
         },
         "permissionId": {
           "type": "integer",
           "format": "int64",
-          "description": "权限ID",
-          "refType": null
+          "description": "权限ID"
         },
         "roleId": {
           "type": "integer",
           "format": "int64",
-          "description": "角色ID",
-          "refType": null
+          "description": "角色ID"
         }
       },
       "title": "角色权限关联表"

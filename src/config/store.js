@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
   const roles = ref([])
 
   // 计算属性
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
+  const isAuthenticated = computed(() => !!token.value)
   const userInfo = computed(() => user.value)
 
   /**
@@ -26,19 +26,37 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await authApi.login(credentials)
       
-      if (response) {
-        token.value = response.token
-        user.value = response.user
-        permissions.value = response.permissions || []
-        roles.value = response.roles || []
-        
-        // 保存到本地存储
-        localStorage.setItem('token', token.value)
-        localStorage.setItem('user', JSON.stringify(user.value))
-        localStorage.setItem('permissions', JSON.stringify(permissions.value))
-        localStorage.setItem('roles', JSON.stringify(roles.value))
-        
-        return true
+      // 根据OpenAPI文档，响应格式应为ResponseResult对象
+      if (response && response.code === 200) {
+        // 从响应中提取token和用户信息
+        // 根据文档，登录成功后返回的数据结构可能包含token和user信息
+        if (response.data && typeof response.data === 'object') {
+          // 如果data中有token字段，直接使用
+          if (response.data.token) {
+            token.value = response.data.token
+            user.value = response.data.user || { username: credentials.username }
+          } else {
+            // 如果整个data就是token
+            token.value = response.data
+            user.value = { username: credentials.username }
+          }
+          
+          // 保存到本地存储
+          localStorage.setItem('token', token.value)
+          localStorage.setItem('user', JSON.stringify(user.value))
+          
+          return true
+        } else if (typeof response.data === 'string') {
+          // 如果data是字符串形式的token
+          token.value = response.data
+          user.value = { username: credentials.username }
+          
+          // 保存到本地存储
+          localStorage.setItem('token', token.value)
+          localStorage.setItem('user', JSON.stringify(user.value))
+          
+          return true
+        }
       }
       return false
     } catch (error) {

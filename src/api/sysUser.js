@@ -12,20 +12,11 @@ export default {
   },
 
   /**
-   * 创建用户
+   * 创建或更新用户（包含角色信息）
    * data: object
    */
-  async create(data = {}) {
+  async save(data = {}) {
     return api.post('/sysUser', data)
-  },
-
-  /**
-   * 更新用户
-   * id: number
-   * data: object
-   */
-  async update(id, data = {}) {
-    return api.put(`/sysUser/${id}`, data)
   },
 
   /**
