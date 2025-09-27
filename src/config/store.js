@@ -35,6 +35,9 @@ export const useAuthStore = defineStore('auth', () => {
           if (response.data.token) {
             token.value = response.data.token
             user.value = response.data.user || { username: credentials.username }
+            // 设置权限信息
+            permissions.value = response.data.permissions || []
+            roles.value = response.data.roles || []
           } else {
             // 如果整个data就是token
             token.value = response.data
@@ -44,6 +47,8 @@ export const useAuthStore = defineStore('auth', () => {
           // 保存到本地存储
           localStorage.setItem('token', token.value)
           localStorage.setItem('user', JSON.stringify(user.value))
+          localStorage.setItem('permissions', JSON.stringify(permissions.value))
+          localStorage.setItem('roles', JSON.stringify(roles.value))
           
           return true
         } else if (typeof response.data === 'string') {
