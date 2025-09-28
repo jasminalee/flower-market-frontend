@@ -19,6 +19,14 @@ export default {
   },
 
   /**
+   * 列表查询
+   * params: { permissionName, permissionCode, permissionType, ... }
+   */
+  async list(params = {}) {
+    return api.get('/sysPermission/list', { params })
+  },
+
+  /**
    * 根据 id 查询
    */
   async getById(id) {
@@ -32,4 +40,3 @@ export default {
     return api.delete(`/sysPermission/${id}`)
   }
 }
-

@@ -1,5 +1,4 @@
 <template>
-  <div class="users-page">
     <!-- 页面头部（使用 Element Plus 的 el-page-header） -->
     <el-page-header class="page-header" :title="'用户管理'">
       <template #content>
@@ -234,7 +233,6 @@
         </div>
       </template>
     </el-dialog>
-  </div>
 </template>
 
 <script setup>
