@@ -1,5 +1,4 @@
 <template>
-  <div class="roles-page">
     <!-- 页面头部（使用 Element Plus 的 el-page-header） -->
     <el-page-header class="page-header" :title="'角色管理'">
       <template #content>
@@ -165,7 +164,6 @@
         </div>
       </template>
     </el-dialog>
-  </div>
 </template>
 
 <script setup>
@@ -538,41 +536,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.roles-page {
-  padding: 20px;
-}
-
-.page-header {
-  margin-bottom: 20px;
-}
-
-.filter-card {
-  margin-bottom: 20px;
-}
-
-.filters-bar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.table-card {
-  margin-bottom: 20px;
-}
-
-.pagination-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.search-input {
-  width: 200px;
-}
 </style>
