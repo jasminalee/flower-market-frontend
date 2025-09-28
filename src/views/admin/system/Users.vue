@@ -90,6 +90,8 @@
             <el-tag v-if="getRoleById(row.roleId)" size="small" style="margin-right: 4px;">
               {{ getRoleById(row.roleId).roleName }}
             </el-tag>
+            <span v-else-if="row.role && row.role.roleName">{{ row.role.roleName }}</span>
+            <span v-else-if="row.roles && Array.isArray(row.roles) && row.roles.length > 0">{{ row.roles[0].roleName }}</span>
             <span v-else>N/A</span>
           </template>
         </el-table-column>
@@ -210,9 +212,6 @@
                     :value="role.id"
                 />
               </el-select>
-              <!-- 调试信息 -->
-              <div v-if="false">Debug: userForm.roleId = {{ userForm.roleId }}</div>
-              <div v-if="false">Debug: roleOptions = {{ roleOptions }}</div>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -398,7 +397,8 @@ const loadUserList = async () => {
  */
 const loadRoleOptions = async () => {
   try {
-    const response = await sysRoleApi.list()
+    // 根据API文档，list接口可以接受查询参数
+    const response = await sysRoleApi.list({})
     if (response && response.code === 200) {
       const records = response.data || []
       console.log('Loaded role options:', records)
@@ -512,7 +512,7 @@ const handleOpenForm = (user) => {
     phone: user.phone,
     addr: user.addr || '',
     roleId: roleId,
-    status: user.status === 1 ? 1 : 0,
+    status: user.status === 0 ? 0 : 1,
     password: '',
     confirmPassword: ''
   })
@@ -576,7 +576,7 @@ const handleSave = async () => {
       phone: userForm.phone,
       addr: userForm.addr,
       roleId: userForm.roleId,
-      status: userForm.status === 1 ? 1 : 0
+      status: userForm.status === 0 ? 0 : 1
     }
 
     // 如果是新增模式，添加密码

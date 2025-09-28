@@ -26,13 +26,6 @@
               </el-input>
             </el-form-item>
 
-            <el-form-item label="状态">
-              <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
-                <el-option label="启用" value="active" />
-                <el-option label="禁用" value="disabled" />
-              </el-select>
-            </el-form-item>
-
             <el-form-item>
               <el-button type="primary" @click="handleSearch">
                 <el-icon><Search /></el-icon>
@@ -67,20 +60,11 @@
         stripe
         style="width: 100%"
       >
-        <el-table-column prop="name" label="角色名称" min-width="120" />
-        <el-table-column prop="code" label="角色编码" min-width="120" />
+        <el-table-column prop="roleName" label="角色名称" min-width="120" />
+        <el-table-column prop="roleCode" label="角色编码" min-width="120" />
         <el-table-column prop="description" label="描述" min-width="200" />
-        <el-table-column prop="sort" label="排序" width="80" />
         
-        <el-table-column label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
-              {{ row.status === 'active' ? '启用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        
-        <el-table-column prop="createdAt" label="创建时间" min-width="160" />
+        <el-table-column prop="createTime" label="创建时间" min-width="160" />
         
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
@@ -100,7 +84,7 @@
               size="small"
               text
               @click="handleDelete(row)"
-              v-if="hasPermission('system:role:delete') && row.code !== 'super_admin'"
+              v-if="hasPermission('system:role:delete') && row.roleCode !== 'super_admin'"
             >
               <el-icon><Delete /></el-icon>
               删除
@@ -135,13 +119,13 @@
         :rules="roleRules"
         label-width="80px"
       >
-        <el-form-item label="角色名称" prop="name">
-          <el-input v-model="roleForm.name" placeholder="请输入角色名称" />
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="roleForm.roleName" placeholder="请输入角色名称" />
         </el-form-item>
         
-        <el-form-item label="角色编码" prop="code">
+        <el-form-item label="角色编码" prop="roleCode">
           <el-input 
-            v-model="roleForm.code" 
+            v-model="roleForm.roleCode" 
             placeholder="请输入角色编码"
             :disabled="isEdit"
           />
@@ -154,22 +138,6 @@
             placeholder="请输入角色描述"
             :rows="3"
           />
-        </el-form-item>
-        
-        <el-form-item label="排序" prop="sort">
-          <el-input-number 
-            v-model="roleForm.sort" 
-            :min="1" 
-            :max="999"
-            placeholder="排序"
-          />
-        </el-form-item>
-        
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="roleForm.status">
-            <el-radio label="active">启用</el-radio>
-            <el-radio label="disabled">禁用</el-radio>
-          </el-radio-group>
         </el-form-item>
       </el-form>
       
@@ -186,7 +154,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { useAuthStore } from '@/config/store.js'
 import sysRoleApi from '@/api/sysRole.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -206,8 +174,7 @@ const roleList = ref([])
 
 // 搜索表单
 const searchForm = reactive({
-  keyword: '',
-  status: ''
+  keyword: ''
 })
 
 // 分页信息
@@ -220,29 +187,24 @@ const pagination = reactive({
 // 角色表单
 const roleForm = reactive({
   id: null,
-  name: '',
-  code: '',
-  description: '',
-  sort: 1,
-  status: 'active'
+  roleName: '',
+  roleCode: '',
+  description: ''
 })
 
 // 表单验证规则
 const roleRules = {
-  name: [
+  roleName: [
     { required: true, message: '请输入角色名称', trigger: 'blur' },
     { min: 2, max: 50, message: '角色名称长度在 2 到 50 个字符', trigger: 'blur' }
   ],
-  code: [
+  roleCode: [
     { required: true, message: '请输入角色编码', trigger: 'blur' },
     { min: 2, max: 50, message: '角色编码长度在 2 到 50 个字符', trigger: 'blur' },
     { pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: '角色编码只能包含字母、数字和下划线，且以字母开头', trigger: 'blur' }
   ],
   description: [
     { max: 200, message: '描述长度不能超过 200 个字符', trigger: 'blur' }
-  ],
-  sort: [
-    { required: true, message: '请输入排序', trigger: 'blur' }
   ]
 }
 
@@ -259,8 +221,8 @@ const loadRoleList = async () => {
     const params = {
       current: pagination.page,
       size: pagination.size,
-      keyword: searchForm.keyword || undefined,
-      status: searchForm.status || undefined
+      roleName: searchForm.keyword || undefined,
+      roleCode: searchForm.keyword || undefined
     }
     
     const response = await sysRoleApi.page(params)
@@ -270,6 +232,10 @@ const loadRoleList = async () => {
       pagination.total = response.total != null ? response.total : (response.count || 0)
       pagination.page = response.current || pagination.page
       pagination.size = response.size || pagination.size
+      // Only show success message for non-initial loads
+      if (pagination.total > 0) {
+        ElMessage.success(`角色列表加载成功，共 ${pagination.total} 条记录`)
+      }
     }
   } catch (error) {
     console.error('加载角色列表失败:', error)
@@ -285,6 +251,7 @@ const loadRoleList = async () => {
 const handleSearch = () => {
   pagination.page = 1
   loadRoleList()
+  ElMessage.success('操作成功')
 }
 
 /**
@@ -292,9 +259,9 @@ const handleSearch = () => {
  */
 const handleReset = () => {
   searchForm.keyword = ''
-  searchForm.status = ''
   pagination.page = 1
   loadRoleList()
+  ElMessage.info('搜索条件已重置')
 }
 
 /**
@@ -304,6 +271,7 @@ const handleSizeChange = (newSize) => {
   pagination.size = newSize
   pagination.page = 1
   loadRoleList()
+  ElMessage.info(`页面大小已更改为 ${newSize} 条/页`)
 }
 
 /**
@@ -312,6 +280,7 @@ const handleSizeChange = (newSize) => {
 const handleCurrentChange = (newPage) => {
   pagination.page = newPage
   loadRoleList()
+  ElMessage.info(`正在加载第 ${newPage} 页`)
 }
 
 /**
@@ -320,6 +289,11 @@ const handleCurrentChange = (newPage) => {
 const handleAdd = () => {
   isEdit.value = false
   resetRoleForm()
+  nextTick(() => {
+    if (roleFormRef.value) {
+      roleFormRef.value.clearValidate()
+    }
+  })
   dialogVisible.value = true
 }
 
@@ -330,11 +304,9 @@ const handleEdit = (role) => {
   isEdit.value = true
   Object.assign(roleForm, {
     id: role.id,
-    name: role.name,
-    code: role.code,
-    description: role.description,
-    sort: role.sort,
-    status: role.status
+    roleName: role.roleName,
+    roleCode: role.roleCode,
+    description: role.description
   })
   dialogVisible.value = true
 }
@@ -381,16 +353,13 @@ const handleSave = async () => {
     saving.value = true
     
     const roleData = {
-      roleName: roleForm.name,
-      roleCode: roleForm.code,
-      description: roleForm.description,
-      sort: roleForm.sort,
-      status: roleForm.status === 'active' ? 1 : 0
+      id: roleForm.id,
+      roleName: roleForm.roleName,
+      roleCode: roleForm.roleCode,
+      description: roleForm.description
     }
     
-    const response = isEdit.value 
-      ? await sysRoleApi.update(roleForm.id, roleData)
-      : await sysRoleApi.create(roleData)
+    const response = await sysRoleApi.save(roleData)
     
     if (response !== undefined) {
       ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
@@ -413,11 +382,9 @@ const handleSave = async () => {
 const resetRoleForm = () => {
   Object.assign(roleForm, {
     id: null,
-    name: '',
-    code: '',
-    description: '',
-    sort: 1,
-    status: 'active'
+    roleName: '',
+    roleCode: '',
+    description: ''
   })
   
   if (roleFormRef.value) {
