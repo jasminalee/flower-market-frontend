@@ -70,46 +70,24 @@
 
     <!-- 用户列表 -->
     <el-card class="table-card">
-      <el-table
-          :data="userList"
-          :loading="loading"
-          stripe
-          style="width: 100%"
-          @selection-change="handleSelectionChange"
-      >
+      <el-table :data="userList" :loading="loading" stripe style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55"/>
-
         <el-table-column label="头像" width="80">
           <template #default="{ row }">
-            <el-avatar :size="40" :src="row.avatar">
-              <el-icon>
-                <User/>
-              </el-icon>
-            </el-avatar>
+            <el-avatar :size="40" :src="row.avatar" :icon="User"/>
           </template>
         </el-table-column>
-
         <el-table-column prop="username" label="用户名" min-width="120"/>
-
-        <el-table-column prop="name" label="姓名" min-width="120"/>
-
+        <el-table-column prop="nickname" label="姓名" min-width="120"/>
         <el-table-column prop="email" label="邮箱" min-width="180"/>
-
         <el-table-column prop="phone" label="手机号" min-width="120"/>
-
         <el-table-column label="角色" min-width="120">
           <template #default="{ row }">
-            <el-tag
-                v-for="roleName in row.roles"
-                :key="roleName"
-                size="small"
-                style="margin-right: 4px;"
-            >
+            <el-tag v-for="roleName in row.roles" :key="roleName" size="small" style="margin-right: 4px;">
               {{ roleName }}
             </el-tag>
           </template>
         </el-table-column>
-
         <el-table-column label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
@@ -117,49 +95,13 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" min-width="160"/>
 
-        <el-table-column prop="createdAt" label="创建时间" min-width="160"/>
-
-        <el-table-column label="操作" width="230" fixed="right">
+        <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row }">
-
-              <el-button
-                  type="primary"
-                  size="small"
-                  text
-                  @click="handleView(row)"
-              >
-                <el-icon>
-                  <View/>
-                </el-icon>
-                查看
-              </el-button>
-
-              <el-button
-                  type="warning"
-                  size="small"
-                  text
-                  @click="handleEdit(row)"
-                  v-if="hasPermission('system:user:update')"
-              >
-                <el-icon>
-                  <Edit/>
-                </el-icon>
-                编辑
-              </el-button>
-
-              <el-button
-                  type="danger"
-                  size="small"
-                  text
-                  @click="handleDelete(row)"
-                  v-if="hasPermission('system:user:delete') && row.username !== 'admin'"
-              >
-                <el-icon>
-                  <Delete/>
-                </el-icon>
-                删除
-              </el-button>
+            <el-button type="primary" size="small" text @click="handleView(row)" :icon="View">查看</el-button>
+            <el-button type="warning" size="small" text @click="handleEdit(row)" :icon="Edit" v-if="hasPermission('system:user:update')">编辑</el-button>
+            <el-button type="danger" size="small" text @click="handleDelete(row)" :icon="Delete" v-if="hasPermission('system:user:delete') && row.username !== 'admin'" >删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -252,7 +194,7 @@
                 <el-option
                     v-for="role in roleOptions"
                     :key="role.id"
-                    :label="role.name || role.roleName"
+                    :label="role.roleName"
                     :value="role.id"
                 />
               </el-select>
@@ -388,25 +330,11 @@ const loadUserList = async () => {
       keyword: searchForm.keyword || undefined,
       status: statusParam
     }
-    console.log('params:', params)
     const response = await sysUserApi.page(params)
-    console.log('response:', response)
     // backend returns { records: [...], total }
     if (response) {
       const records = response.data.records || []
-      userList.value = records.map(u => ({
-        id: u.id,
-        username: u.username,
-        name: u.nickname || u.name || u.username,
-        email: u.email,
-        phone: u.phone,
-        addr: u.addr || '',
-        status: Number(u.status) === 1 ? 'active' : 'disabled',
-        createdAt: u.createTime || u.createdAt || '',
-        avatar: u.avatar || '',
-        roleIds: u.roleIds || [],
-        roles: u.roles || u.roleNames || [] // 确保角色名称正确映射
-      }))
+      userList.value = records
       pagination.total = response.total != null ? response.total : (response.count || 0)
       pagination.page = response.current || pagination.page
       pagination.size = response.size || pagination.size
@@ -424,21 +352,12 @@ const loadUserList = async () => {
  */
 const loadRoleOptions = async () => {
   try {
-    const params = {
-      current: 1,
-      size: 100
-    }
-    
-    const response = await sysRoleApi.page(params)
-    if (response) {
-      const records = response.records || []
-      // 确保正确映射角色字段
-      roleOptions.value = records.map(role => ({
-        id: role.id,
-        name: role.roleName || role.name,
-        code: role.roleCode || role.code,
-        status: role.status
-      })).filter(role => role.status === 1)
+    const response = await sysRoleApi.list()
+    if (response && response.code === 200) {
+      const records = response.data || []
+      console.log('log', records)
+      // 统一使用接口定义的字段名
+      roleOptions.value = records
     }
   } catch (error) {
     console.error('加载角色选项失败:', error)
@@ -514,7 +433,7 @@ const handleView = (user) => {
     password: '',
     confirmPassword: ''
   })
-  
+
   // 启用查看模式
   viewMode.value = true
   dialogVisible.value = true
@@ -578,7 +497,7 @@ const handleSave = async () => {
     dialogVisible.value = false
     return
   }
-  
+
   if (!userFormRef.value) return
 
   try {

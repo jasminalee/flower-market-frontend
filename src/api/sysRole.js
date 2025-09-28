@@ -12,6 +12,13 @@ export default {
   },
 
   /**
+   * 查询所有角色列表 (新增)
+   */
+  async list() {
+    return api.get('/sysRole/list')
+  },
+
+  /**
    * 通过 id 查询单条
    */
   async getById(id) {
