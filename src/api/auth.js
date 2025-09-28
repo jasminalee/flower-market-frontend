@@ -6,6 +6,6 @@ export default {
    * data: { username, password }
    */
   async login(data = {}) {
-    return api.post('/auth/login', data)
+    return await api.post('/auth/login', data)
   }
 }

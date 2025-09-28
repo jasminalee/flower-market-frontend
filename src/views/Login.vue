@@ -132,6 +132,7 @@
 <script setup>
 import {ref, reactive} from 'vue'
 import {useRouter, useRoute} from 'vue-router'
+import authApi from '@/api/auth.js'
 import {useAuthStore} from '@/config/store.js'
 import {ElMessage} from 'element-plus'
 import {User, Lock, Management, CircleCheck, ArrowLeft} from '@element-plus/icons-vue'
@@ -167,23 +168,13 @@ const loginRules = {
  * 处理登录
  */
 const handleLogin = async () => {
-  if (!loginFormRef.value) return
-
+  loading.value = true
   try {
-    // 表单验证
-    await loginFormRef.value.validate()
-
-    loading.value = true
-
-    // 执行登录
-    const success = await authStore.login({
-      username: loginForm.username,
-      password: loginForm.password
-    })
-
-    if (success) {
+    const response = await authApi.login(loginForm);
+    if (response && response.code === 200) {
       ElMessage.success('登录成功')
-
+      // 更新认证状态
+      await authStore.login(loginForm)
       // 跳转到目标页面或默认页面
       const redirect = route.query.redirect || '/admin/dashboard'
       router.push(redirect)
@@ -191,8 +182,7 @@ const handleLogin = async () => {
       ElMessage.error('用户名或密码错误')
     }
   } catch (error) {
-    console.error('登录失败:', error)
-    ElMessage.error('登录失败，请重试')
+    ElMessage.error('登录失败: ' + (error.message || '未知错误'))
   } finally {
     loading.value = false
   }

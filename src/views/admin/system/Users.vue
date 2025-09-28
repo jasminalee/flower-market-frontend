@@ -83,8 +83,8 @@
         <el-table-column prop="phone" label="手机号" min-width="120"/>
         <el-table-column label="角色" min-width="120">
           <template #default="{ row }">
-            <el-tag v-for="roleName in row.roles" :key="roleName" size="small" style="margin-right: 4px;">
-              {{ roleName }}
+            <el-tag v-for="role in getRolesByIds([row.roleId])" :key="role.id" size="small" style="margin-right: 4px;">
+              {{ role.roleName }}
             </el-tag>
           </template>
         </el-table-column>
@@ -132,7 +132,6 @@
           :model="userForm"
           :rules="userRules"
           label-width="80px"
-          :disabled="viewMode"
       >
         <el-row :gutter="16">
           <el-col :span="12">
@@ -146,7 +145,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="姓名" prop="name">
-              <el-input v-model="userForm.name" placeholder="请输入姓名"/>
+              <el-input v-model="userForm.name" placeholder="请输入姓名" :disabled="viewMode"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -154,12 +153,12 @@
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item label="邮箱" prop="email">
-              <el-input v-model="userForm.email" placeholder="请输入邮箱"/>
+              <el-input v-model="userForm.email" placeholder="请输入邮箱" :disabled="viewMode"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="手机号" prop="phone">
-              <el-input v-model="userForm.phone" placeholder="请输入手机号"/>
+              <el-input v-model="userForm.phone" placeholder="请输入手机号" :disabled="viewMode"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -202,7 +201,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="状态" prop="status">
-              <el-radio-group v-model="userForm.status">
+              <el-radio-group v-model="userForm.status" :disabled="viewMode">
                 <el-radio label="active">启用</el-radio>
                 <el-radio label="disabled">禁用</el-radio>
               </el-radio-group>
@@ -247,6 +246,7 @@ const selectedUsers = ref([])
 // 用户列表数据
 const userList = ref([])
 const roleOptions = ref([])
+const roleMap = ref(new Map()) // 角色映射，用于通过ID快速查找角色
 
 // 搜索表单
 const searchForm = reactive({
@@ -358,6 +358,12 @@ const loadRoleOptions = async () => {
       console.log('log', records)
       // 统一使用接口定义的字段名
       roleOptions.value = records
+      
+      // 构建角色映射表，便于通过ID查找角色
+      roleMap.value.clear()
+      records.forEach(role => {
+        roleMap.value.set(role.id, role)
+      })
     }
   } catch (error) {
     console.error('加载角色选项失败:', error)
@@ -428,8 +434,8 @@ const handleView = (user) => {
     name: user.name,
     email: user.email,
     phone: user.phone,
-    roleIds: user.roleIds || [],
-    status: user.status,
+    roleIds: user.roleId ? [user.roleId] : [],
+    status: user.status === 1 ? 'active' : 'disabled',
     password: '',
     confirmPassword: ''
   })
@@ -450,11 +456,12 @@ const handleEdit = (user) => {
     name: user.name,
     email: user.email,
     phone: user.phone,
-    roleIds: user.roleIds || [],
-    status: user.status,
+    roleIds: user.roleId ? [user.roleId] : [],
+    status: user.status === 1 ? 'active' : 'disabled',
     password: '',
     confirmPassword: ''
   })
+  viewMode.value = false
   dialogVisible.value = true
 }
 
@@ -559,6 +566,15 @@ const resetUserForm = () => {
   if (userFormRef.value) {
     userFormRef.value.resetFields()
   }
+}
+
+// 根据角色ID获取角色信息
+const getRolesByIds = (roleIds) => {
+  if (!roleIds || roleIds.length === 0) return []
+  
+  return roleIds.map(id => {
+    return roleMap.value.get(id)
+  }).filter(role => role !== undefined)
 }
 
 // 生命周期
