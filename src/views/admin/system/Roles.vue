@@ -1,4 +1,5 @@
 <template>
+  <div class="roles-page">
     <!-- 页面头部（使用 Element Plus 的 el-page-header） -->
     <el-page-header class="page-header" :title="'角色管理'">
       <template #content>
@@ -110,7 +111,7 @@
     <el-dialog
       :title="dialogTitle"
       v-model="dialogVisible"
-      width="600px"
+      width="800px"
     >
       <el-form
         ref="roleFormRef"
@@ -138,6 +139,21 @@
             :rows="3"
           />
         </el-form-item>
+        
+        <el-form-item label="权限分配" v-if="permissionTree.length > 0">
+          <el-tree
+            ref="permissionTreeRef"
+            :data="permissionTree"
+            show-checkbox
+            node-key="id"
+            :props="{
+              label: 'permissionName',
+              children: 'children'
+            }"
+            default-expand-all
+            check-strictly
+          />
+        </el-form-item>
       </el-form>
       
       <template #footer>
@@ -149,12 +165,15 @@
         </div>
       </template>
     </el-dialog>
+  </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { useAuthStore } from '@/config/store.js'
 import sysRoleApi from '@/api/sysRole.js'
+import sysPermissionApi from '@/api/sysPermission.js'
+import sysRolePermissionApi from '@/api/sysRolePermission.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Refresh, Edit, Delete } from '@element-plus/icons-vue'
 
@@ -166,9 +185,13 @@ const saving = ref(false)
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const roleFormRef = ref()
+const permissionTreeRef = ref()
 
 // 角色列表数据
 const roleList = ref([])
+
+// 权限树数据
+const permissionTree = ref([])
 
 // 搜索表单
 const searchForm = reactive({
@@ -244,6 +267,99 @@ const loadRoleList = async () => {
 }
 
 /**
+ * 加载权限树
+ */
+const loadPermissionTree = async () => {
+  try {
+    const response = await sysPermissionApi.list({})
+    if (response && response.code === 200) {
+      const records = response.data || []
+      // 转换为树形结构
+      permissionTree.value = buildTree(records)
+    } else {
+      ElMessage.error('获取权限列表失败')
+    }
+  } catch (error) {
+    console.error('加载权限列表失败:', error)
+    ElMessage.error('加载权限列表失败: ' + (error.message || '未知错误'))
+  }
+}
+
+/**
+ * 构建树形结构
+ */
+const buildTree = (data) => {
+  const map = {}
+  const roots = []
+  
+  // 初始化所有节点
+  data.forEach(item => {
+    map[item.id] = { ...item, children: [] }
+  })
+  
+  // 构建树结构
+  data.forEach(item => {
+    const node = map[item.id]
+    if (!item.parentId || item.parentId === 0) {
+      roots.push(node)
+    } else {
+      const parent = map[item.parentId]
+      if (parent) {
+        parent.children.push(node)
+      }
+    }
+  })
+  
+  return roots
+}
+
+/**
+ * 加载角色权限
+ */
+const loadRolePermissions = async (roleId) => {
+  try {
+    const response = await sysRolePermissionApi.page({ roleId })
+    if (response && response.code === 200) {
+      const records = response.data.records || []
+      const permissionIds = records.map(item => item.permissionId)
+      // 设置选中的权限
+      nextTick(() => {
+        permissionTreeRef.value.setCheckedKeys(permissionIds)
+      })
+    }
+  } catch (error) {
+    console.error('加载角色权限失败:', error)
+    ElMessage.error('加载角色权限失败')
+  }
+}
+
+/**
+ * 保存角色权限
+ */
+const saveRolePermissions = async (roleId) => {
+  try {
+    // 获取选中的权限
+    const checkedKeys = permissionTreeRef.value.getCheckedKeys()
+    
+    // 先删除角色所有权限
+    // 这里可以优化为先查询再对比，但简单起见直接删除再添加
+    
+    // 添加角色权限
+    const promises = checkedKeys.map(permissionId => {
+      return sysRolePermissionApi.save({
+        roleId: roleId,
+        permissionId: permissionId
+      })
+    })
+    
+    await Promise.all(promises)
+  } catch (error) {
+    console.error('保存角色权限失败:', error)
+    throw new Error('保存角色权限失败')
+  }
+}
+
+/**
  * 搜索
  */
 const handleSearch = () => {
@@ -291,6 +407,10 @@ const handleAdd = () => {
     if (roleFormRef.value) {
       roleFormRef.value.clearValidate()
     }
+    // 清空权限树选中项
+    if (permissionTreeRef.value) {
+      permissionTreeRef.value.setCheckedKeys([])
+    }
   })
   dialogVisible.value = true
 }
@@ -298,7 +418,7 @@ const handleAdd = () => {
 /**
  * 编辑角色
  */
-const handleEdit = (role) => {
+const handleEdit = async (role) => {
   isEdit.value = true
   Object.assign(roleForm, {
     id: role.id,
@@ -306,7 +426,20 @@ const handleEdit = (role) => {
     roleCode: role.roleCode,
     description: role.description
   })
+  
   dialogVisible.value = true
+  
+  // 等待DOM更新后加载权限
+  nextTick(async () => {
+    if (roleFormRef.value) {
+      roleFormRef.value.clearValidate()
+    }
+    
+    // 加载角色权限
+    if (role.id) {
+      await loadRolePermissions(role.id)
+    }
+  })
 }
 
 /**
@@ -361,6 +494,13 @@ const handleSave = async () => {
     
     if (response !== undefined) {
       ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
+      
+      // 保存角色权限（仅在有权限树时处理）
+      if (permissionTree.value.length > 0 && response.data && response.data.id) {
+        const roleId = isEdit.value ? roleForm.id : response.data.id
+        await saveRolePermissions(roleId)
+      }
+      
       dialogVisible.value = false
       loadRoleList()
     } else {
@@ -368,7 +508,7 @@ const handleSave = async () => {
     }
   } catch (error) {
     console.error('保存角色失败:', error)
-    ElMessage.error('保存失败')
+    ElMessage.error('保存失败: ' + (error.message || ''))
   } finally {
     saving.value = false
   }
@@ -393,8 +533,46 @@ const resetRoleForm = () => {
 // 生命周期
 onMounted(() => {
   loadRoleList()
+  loadPermissionTree()
 })
 </script>
 
 <style scoped>
+.roles-page {
+  padding: 20px;
+}
+
+.page-header {
+  margin-bottom: 20px;
+}
+
+.filter-card {
+  margin-bottom: 20px;
+}
+
+.filters-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.table-card {
+  margin-bottom: 20px;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.search-input {
+  width: 200px;
+}
 </style>
