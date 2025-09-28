@@ -12,7 +12,7 @@ export default {
   },
 
   /**
-   * 创建或更新用户（包含角色信息）
+   * 保存用户（新增或更新）
    * data: object
    */
   async save(data = {}) {

@@ -31,8 +31,8 @@
 
             <el-form-item label="状态">
               <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
-                <el-option label="启用" value="active"/>
-                <el-option label="禁用" value="disabled"/>
+                <el-option label="启用" value="1"/>
+                <el-option label="禁用" value="0"/>
               </el-select>
             </el-form-item>
 
@@ -55,13 +55,11 @@
 
         <el-col :span="6" style="text-align: right;">
           <el-button
+              :icon="Plus"
               type="primary"
               @click="handleAdd"
               v-if="hasPermission('system:user:create')"
           >
-            <el-icon>
-              <Plus/>
-            </el-icon>
             新增用户
           </el-button>
         </el-col>
@@ -81,17 +79,24 @@
         <el-table-column prop="nickname" label="姓名" min-width="120"/>
         <el-table-column prop="email" label="邮箱" min-width="180"/>
         <el-table-column prop="phone" label="手机号" min-width="120"/>
+        <el-table-column prop="addr" label="地址" min-width="200">
+          <template #default="{ row }">
+            <span v-if="row.addr" class="addr-cell" :title="row.addr">{{ row.addr }}</span>
+            <span v-else>N/A</span>
+          </template>
+        </el-table-column>
         <el-table-column label="角色" min-width="120">
           <template #default="{ row }">
-            <el-tag v-for="role in getRolesByIds([row.roleId])" :key="role.id" size="small" style="margin-right: 4px;">
-              {{ role.roleName }}
+            <el-tag v-if="getRoleById(row.roleId)" size="small" style="margin-right: 4px;">
+              {{ getRoleById(row.roleId).roleName }}
             </el-tag>
+            <span v-else>N/A</span>
           </template>
         </el-table-column>
         <el-table-column label="状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
-              {{ row.status === 'active' ? '启用' : '禁用' }}
+            <el-tag :type="getStatusDisplay(row.status).type">
+              {{ getStatusDisplay(row.status).text }}
             </el-tag>
           </template>
         </el-table-column>
@@ -122,7 +127,7 @@
 
     <!-- 用户表单对话框 -->
     <el-dialog
-        :title="viewMode ? '查看用户' : dialogTitle"
+        :title="dialogTitle"
         v-model="dialogVisible"
         width="600px"
         :close-on-click-modal="false"
@@ -139,13 +144,13 @@
               <el-input
                   v-model="userForm.username"
                   placeholder="请输入用户名"
-                  :disabled="isEdit"
+                  :disabled="formMode === 'edit' || formMode === 'view'"
               />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="姓名" prop="name">
-              <el-input v-model="userForm.name" placeholder="请输入姓名" :disabled="viewMode"/>
+            <el-form-item label="姓名" prop="nickname">
+              <el-input v-model="userForm.nickname" placeholder="请输入姓名" :disabled="isFormDisabled"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -153,17 +158,25 @@
         <el-row :gutter="16">
           <el-col :span="12">
             <el-form-item label="邮箱" prop="email">
-              <el-input v-model="userForm.email" placeholder="请输入邮箱" :disabled="viewMode"/>
+              <el-input v-model="userForm.email" placeholder="请输入邮箱" :disabled="isFormDisabled"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="手机号" prop="phone">
-              <el-input v-model="userForm.phone" placeholder="请输入手机号" :disabled="viewMode"/>
+              <el-input v-model="userForm.phone" placeholder="请输入手机号" :disabled="isFormDisabled"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
+        <el-row :gutter="16">
+          <el-col :span="24">
+            <el-form-item label="地址" prop="addr">
+              <el-input v-model="userForm.addr" placeholder="请输入地址" :disabled="isFormDisabled"/>
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-row :gutter="16" v-if="!isEdit && !viewMode">
+        <el-row :gutter="16" v-if="showPasswordFields">
           <el-col :span="12">
             <el-form-item label="密码" prop="password">
               <el-input
@@ -188,8 +201,8 @@
 
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="角色" prop="roleIds">
-              <el-select v-model="userForm.roleIds" placeholder="选择角色" multiple :disabled="viewMode">
+            <el-form-item label="角色" prop="roleId">
+              <el-select v-model="userForm.roleId" placeholder="选择角色" :disabled="isFormDisabled" clearable>
                 <el-option
                     v-for="role in roleOptions"
                     :key="role.id"
@@ -197,13 +210,16 @@
                     :value="role.id"
                 />
               </el-select>
+              <!-- 调试信息 -->
+              <div v-if="false">Debug: userForm.roleId = {{ userForm.roleId }}</div>
+              <div v-if="false">Debug: roleOptions = {{ roleOptions }}</div>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="状态" prop="status">
-              <el-radio-group v-model="userForm.status" :disabled="viewMode">
-                <el-radio label="active">启用</el-radio>
-                <el-radio label="disabled">禁用</el-radio>
+              <el-radio-group v-model="userForm.status" :disabled="isFormDisabled">
+                <el-radio :label="1">启用</el-radio>
+                <el-radio :label="0">禁用</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -213,7 +229,7 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button v-if="!viewMode" type="primary" @click="handleSave" :loading="saving">
+          <el-button v-if="showSaveButton" type="primary" @click="handleSave" :loading="saving">
             {{ saving ? '保存中...' : '保存' }}
           </el-button>
         </div>
@@ -238,8 +254,7 @@ const authStore = useAuthStore()
 const loading = ref(false)
 const saving = ref(false)
 const dialogVisible = ref(false)
-const isEdit = ref(false)
-const viewMode = ref(false) // 查看模式
+const formMode = ref('create') // 'create', 'edit', 'view'
 const userFormRef = ref()
 const selectedUsers = ref([])
 
@@ -265,18 +280,38 @@ const pagination = reactive({
 const userForm = reactive({
   id: null,
   username: '',
-  name: '',
+  nickname: '',
   email: '',
   phone: '',
+  addr: '',
   password: '',
   confirmPassword: '',
-  roleIds: [],
-  status: 'active'
+  roleId: null,
+  status: 1
 })
 
 // 计算属性
-const dialogTitle = computed(() => isEdit.value ? '编辑用户' : '新增用户')
+const dialogTitle = computed(() => {
+  switch (formMode.value) {
+    case 'edit': return '编辑用户'
+    case 'view': return '查看用户'
+    default: return '新增用户'
+  }
+})
+
+const isFormDisabled = computed(() => formMode.value === 'view')
+const showPasswordFields = computed(() => formMode.value === 'create')
+const showSaveButton = computed(() => formMode.value !== 'view')
+
 const hasPermission = (permission) => authStore.hasPermission(permission)
+
+// 添加状态显示的计算属性
+const getStatusDisplay = computed(() => (status) => {
+  return {
+    type: status === 1 ? 'success' : 'danger',
+    text: status === 1 ? '启用' : '禁用'
+  }
+})
 
 // 验证器：确认密码（提取为顶层函数以避免 linter 警告）
 const validateConfirmPassword = (rule, value) => {
@@ -292,7 +327,7 @@ const userRules = {
     {required: true, message: '请输入用户名', trigger: 'blur'},
     {min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur'}
   ],
-  name: [
+  nickname: [
     {required: true, message: '请输入姓名', trigger: 'blur'},
     {min: 2, max: 50, message: '姓名长度在 2 到 50 个字符', trigger: 'blur'}
   ],
@@ -304,6 +339,10 @@ const userRules = {
     {required: true, message: '请输入手机号', trigger: 'blur'},
     {pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号格式', trigger: 'blur'}
   ],
+  addr: [
+    {required: false, message: '请输入地址', trigger: 'blur'},
+    {max: 200, message: '地址长度不能超过200个字符', trigger: 'blur'}
+  ],
   password: [
     {required: true, message: '请输入密码', trigger: 'blur'},
     {min: 6, max: 20, message: '密码长度在 6 到 20 个字符', trigger: 'blur'}
@@ -312,7 +351,7 @@ const userRules = {
     {required: true, message: '请确认密码', trigger: 'blur'},
     {validator: validateConfirmPassword, trigger: 'blur'}
   ],
-  roleIds: [
+  roleId: [
     {required: true, message: '请选择角色', trigger: 'change'}
   ]
 }
@@ -322,7 +361,13 @@ const loadUserList = async () => {
   loading.value = true
   try {
     // map status to backend expected value (1 active, 0 disabled)
-    const statusParam = searchForm.status === 'active' ? 1 : searchForm.status === 'disabled' ? 0 : undefined
+    let statusParam
+    if (searchForm.status !== '' && searchForm.status != null) {
+      const statusNum = Number(searchForm.status)
+      if (!isNaN(statusNum)) {
+        statusParam = statusNum
+      }
+    }
 
     const params = {
       current: pagination.page,
@@ -334,6 +379,7 @@ const loadUserList = async () => {
     // backend returns { records: [...], total }
     if (response) {
       const records = response.data.records || []
+      console.log('Loaded user records:', records)
       userList.value = records
       pagination.total = response.total != null ? response.total : (response.count || 0)
       pagination.page = response.current || pagination.page
@@ -355,7 +401,7 @@ const loadRoleOptions = async () => {
     const response = await sysRoleApi.list()
     if (response && response.code === 200) {
       const records = response.data || []
-      console.log('log', records)
+      console.log('Loaded role options:', records)
       // 统一使用接口定义的字段名
       roleOptions.value = records
       
@@ -364,6 +410,7 @@ const loadRoleOptions = async () => {
       records.forEach(role => {
         roleMap.value.set(role.id, role)
       })
+      console.log('Role map built:', roleMap.value)
     }
   } catch (error) {
     console.error('加载角色选项失败:', error)
@@ -417,7 +464,7 @@ const handleSelectionChange = (selection) => {
  * 新增用户
  */
 const handleAdd = () => {
-  isEdit.value = false
+  formMode.value = 'create'
   resetUserForm()
   dialogVisible.value = true
 }
@@ -426,42 +473,50 @@ const handleAdd = () => {
  * 查看用户
  */
 const handleView = (user) => {
-  // 填充表单数据用于查看
-  isEdit.value = false
-  Object.assign(userForm, {
-    id: user.id,
-    username: user.username,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    roleIds: user.roleId ? [user.roleId] : [],
-    status: user.status === 1 ? 'active' : 'disabled',
-    password: '',
-    confirmPassword: ''
-  })
-
-  // 启用查看模式
-  viewMode.value = true
-  dialogVisible.value = true
+  formMode.value = 'view'
+  handleOpenForm(user)
 }
 
 /**
  * 编辑用户
  */
 const handleEdit = (user) => {
-  isEdit.value = true
+  formMode.value = 'edit'
+  handleOpenForm(user)
+}
+
+/**
+ * 打开表单（查看/编辑通用方法）
+ */
+const handleOpenForm = (user) => {
+  console.log('User data:', user); // 调试信息
+  
+  // 处理角色ID，兼容不同的数据结构
+  let roleId = null;
+  if (user.roleId !== undefined && user.roleId !== null) {
+    // 直接有 roleId 字段
+    roleId = user.roleId;
+  } else if (user.role && user.role.id !== undefined) {
+    // 有 role 对象，其中包含 id
+    roleId = user.role.id;
+  } else if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
+    // 有 roles 数组，取第一个角色的 id
+    roleId = user.roles[0].id;
+  }
+  
   Object.assign(userForm, {
     id: user.id,
     username: user.username,
-    name: user.name,
+    nickname: user.nickname,
     email: user.email,
     phone: user.phone,
-    roleIds: user.roleId ? [user.roleId] : [],
-    status: user.status === 1 ? 'active' : 'disabled',
+    addr: user.addr || '',
+    roleId: roleId,
+    status: user.status === 1 ? 1 : 0,
     password: '',
     confirmPassword: ''
   })
-  viewMode.value = false
+  console.log('userForm after assignment:', userForm); // 调试信息
   dialogVisible.value = true
 }
 
@@ -471,7 +526,7 @@ const handleEdit = (user) => {
 const handleDelete = async (user) => {
   try {
     await ElMessageBox.confirm(
-        `确定要删除用户 "${user.name}" 吗？`,
+        `确定要删除用户 "${user.nickname}" 吗？`,
         '确认删除',
         {
           confirmButtonText: '确定',
@@ -500,7 +555,7 @@ const handleDelete = async (user) => {
  */
 const handleSave = async () => {
   // 查看模式下不保存
-  if (viewMode.value) {
+  if (formMode.value === 'view') {
     dialogVisible.value = false
     return
   }
@@ -512,25 +567,27 @@ const handleSave = async () => {
 
     saving.value = true
 
+    // 构建用户数据对象
     const userData = {
+      id: userForm.id,
       username: userForm.username,
-      nickname: userForm.name,
+      nickname: userForm.nickname,
       email: userForm.email,
       phone: userForm.phone,
-      roleIds: userForm.roleIds,
-      status: userForm.status === 'active' ? 1 : 0
+      addr: userForm.addr,
+      roleId: userForm.roleId,
+      status: userForm.status === 1 ? 1 : 0
     }
 
-    if (!isEdit.value) {
+    // 如果是新增模式，添加密码
+    if (formMode.value === 'create') {
       userData.password = userForm.password
     }
 
-    const response = isEdit.value
-        ? await sysUserApi.update(userForm.id, userData)
-        : await sysUserApi.create(userData)
+    const response = await sysUserApi.save(userData)
 
     if (response !== undefined) {
-      ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
+      ElMessage.success(formMode.value === 'edit' ? '更新成功' : '创建成功')
       dialogVisible.value = false
       loadUserList()
     } else {
@@ -551,17 +608,15 @@ const resetUserForm = () => {
   Object.assign(userForm, {
     id: null,
     username: '',
-    name: '',
+    nickname: '',
     email: '',
     phone: '',
+    addr: '',
     password: '',
     confirmPassword: '',
-    roleIds: [],
-    status: 'active'
+    roleId: null,
+    status: 1
   })
-
-  // 退出查看模式
-  viewMode.value = false
 
   if (userFormRef.value) {
     userFormRef.value.resetFields()
@@ -569,12 +624,9 @@ const resetUserForm = () => {
 }
 
 // 根据角色ID获取角色信息
-const getRolesByIds = (roleIds) => {
-  if (!roleIds || roleIds.length === 0) return []
-  
-  return roleIds.map(id => {
-    return roleMap.value.get(id)
-  }).filter(role => role !== undefined)
+const getRoleById = (roleId) => {
+  if (!roleId) return null
+  return roleMap.value.get(roleId)
 }
 
 // 生命周期
@@ -585,5 +637,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
+.addr-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  display: block;
+}
 </style>
