@@ -19,7 +19,7 @@ const routes = [
       },
       {
         path: 'products',
-        name: 'Products',
+        name: 'PublicProducts',
         component: () => import('@/views/public/Products.vue'),
         meta: { title: '花卉产品' }
       }
@@ -99,7 +99,7 @@ const routes = [
       // 产品管理模块
       {
         path: 'products',
-        name: 'Products',
+        name: 'AdminProducts',
         meta: { 
           title: '产品管理',
           requiresAuth: true,
