@@ -7,7 +7,7 @@
 
   <el-card class="filter-card">
     <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
-      <el-col :span="18">
+      <el-col :span="23">
         <el-form :model="searchForm" inline>
           <el-form-item label="产品名称">
             <el-input
@@ -55,7 +55,7 @@
         </el-form>
       </el-col>
 
-      <el-col :span="6" style="text-align: right;">
+      <el-col :span="1" style="text-align: right;">
         <el-button type="primary" @click="handleAdd">
           <el-icon><Plus /></el-icon>
           上架产品
@@ -322,9 +322,7 @@ const loadAvailableSkus = async (searchKeyword = '') => {
     
     const response = await productSkuApi.search(params)
     if (response && response.code === 200) {
-      const pageData = response.data || {}
-      const records = pageData.records || []
-      availableSkus.value = records
+      availableSkus.value = response.data
     } else {
       ElMessage.error('加载可上架SKU列表失败: ' + (response?.message || '未知错误'))
     }
@@ -343,6 +341,9 @@ const handleSkuChange = (skuId) => {
     selectedSku.value = sku
     // 同时设置productId
     merchantProductForm.productId = sku.productId
+    // 自动填充价格和库存（可选）
+    merchantProductForm.price = sku.price || 0
+    merchantProductForm.stock = sku.stock || 0
   }
 }
 
@@ -407,14 +408,25 @@ const handleAdd = () => {
 /**
  * 编辑商户产品
  */
-const handleEdit = (row) => {
+const handleEdit = async (row) => {
   isEdit.value = true
   dialogVisible.value = true
-    console.log(row)
   // 填充表单数据
   Object.assign(merchantProductForm, row)
   // 设置选中产品信息
-  selectedSku.value = row.product || {}
+  if (row.skuId) {
+    try {
+      const response = await productSkuApi.getById(row.skuId)
+      if (response && response.code === 200) {
+        selectedSku.value = response.data || {}
+      } else {
+        ElMessage.error('加载SKU信息失败: ' + (response?.message || '未知错误'))
+      }
+    } catch (error) {
+      console.error('加载SKU信息失败:', error)
+      ElMessage.error('加载SKU信息失败: ' + (error.message || '网络错误'))
+    }
+  }
 }
 
 /**
@@ -422,7 +434,7 @@ const handleEdit = (row) => {
  */
 const handleOnShelf = async (row) => {
   try {
-    await merchantProductApi.onShelf({
+    const response = await merchantProductApi.onShelf({
       id: row.id,
       merchantId: row.merchantId,
       productId: row.productId,
@@ -431,8 +443,12 @@ const handleOnShelf = async (row) => {
       stock: row.stock,
       status: 1
     })
-    ElMessage.success('产品上架成功')
-    loadMerchantProductList()
+    if (response && response.code === 200) {
+      ElMessage.success('产品上架成功')
+      loadMerchantProductList()
+    } else {
+      ElMessage.error('产品上架失败: ' + (response?.message || '未知错误'))
+    }
   } catch (error) {
     console.error('产品上架失败:', error)
     ElMessage.error('产品上架失败: ' + (error.message || '未知错误'))
@@ -448,9 +464,13 @@ const handleOffShelf = async (row) => {
       type: 'warning'
     })
     
-    await merchantProductApi.offShelf(row.id)
-    ElMessage.success('产品下架成功')
-    loadMerchantProductList()
+    const response = await merchantProductApi.offShelf(row.id)
+    if (response && response.code === 200) {
+      ElMessage.success('产品下架成功')
+      loadMerchantProductList()
+    } else {
+      ElMessage.error('产品下架失败: ' + (response?.message || '未知错误'))
+    }
   } catch (error) {
     if (error !== 'cancel') {
       console.error('产品下架失败:', error)
@@ -468,9 +488,13 @@ const handleDelete = async (row) => {
       type: 'warning'
     })
     
-    await merchantProductApi.remove(row.id)
-    ElMessage.success('删除成功')
-    loadMerchantProductList()
+    const response = await merchantProductApi.remove(row.id)
+    if (response && response.code === 200) {
+      ElMessage.success('删除成功')
+      loadMerchantProductList()
+    } else {
+      ElMessage.error('删除失败: ' + (response?.message || '未知错误'))
+    }
   } catch (error) {
     if (error !== 'cancel') {
       console.error('删除失败:', error)
@@ -494,16 +518,16 @@ const handleSave = async () => {
       formData.productId = selectedSku.value.id
     }
     
-    await merchantProductApi.save(formData)
-    ElMessage.success(isEdit.value ? '更新成功' : '新增成功')
-    dialogVisible.value = false
-    loadMerchantProductList()
-  } catch (error) {
-    if (error && error.message) {
-      ElMessage.error(error.message)
+    const response = await merchantProductApi.save(formData)
+    if (response && response.code === 200) {
+      ElMessage.success(isEdit.value ? '更新成功' : '新增成功')
+      dialogVisible.value = false
+      loadMerchantProductList()
     } else {
-      ElMessage.error(isEdit.value ? '更新失败' : '新增失败')
+      ElMessage.error(isEdit.value ? '更新失败: ' + (response?.message || '未知错误') : '新增失败: ' + (response?.message || '未知错误'))
     }
+  } catch (error) {
+    ElMessage.error(isEdit.value ? '更新失败: ' + (error.message || '未知错误') : '新增失败: ' + (error.message || '未知错误'))
   } finally {
     saving.value = false
   }

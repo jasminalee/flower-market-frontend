@@ -7,7 +7,7 @@
 
   <el-card class="filter-card">
     <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
-      <el-col :span="18">
+      <el-col :span="23">
         <el-form :model="searchForm" inline>
           <el-form-item label="SKU名称">
             <el-input
@@ -48,7 +48,7 @@
         </el-form>
       </el-col>
 
-      <el-col :span="6" style="text-align: right;">
+      <el-col :span="1" style="text-align: right;">
         <el-button type="primary" @click="handleAdd">
           <el-icon><Plus /></el-icon>
           新增SKU

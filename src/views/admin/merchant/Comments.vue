@@ -7,7 +7,7 @@
 
   <el-card class="filter-card">
     <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
-      <el-col :span="18">
+      <el-col :span="20">
         <el-form :model="searchForm" inline>
           <el-form-item label="来源类型">
             <el-select v-model="searchForm.sourceType" placeholder="选择来源类型" clearable>
@@ -56,6 +56,7 @@
       stripe
       style="width: 100%"
     >
+      <el-table-column prop="id" label="ID" min-width="50" />
       <el-table-column prop="sourceType" label="来源类型" min-width="100">
         <template #default="{ row }">
           <el-tag v-if="row.sourceType === 'product'">产品</el-tag>
@@ -91,7 +92,7 @@
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" min-width="160" />
 
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="操作" width="250" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" size="small" text @click="handleViewDetail(row)">
             <el-icon><View /></el-icon>

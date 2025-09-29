@@ -7,7 +7,7 @@
 
   <el-card class="filter-card">
     <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
-      <el-col :span="18">
+      <el-col :span="22">
         <el-form :model="searchForm" inline>
           <el-form-item label="分类名称">
             <el-input
@@ -50,7 +50,7 @@
         </el-form>
       </el-col>
 
-      <el-col :span="6" style="text-align: right;">
+      <el-col :span="2" style="text-align: right;">
         <el-button type="primary" @click="handleAdd">
           <el-icon><Plus /></el-icon>
           新增分类
