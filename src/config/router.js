@@ -95,6 +95,48 @@ const routes = [
             }
           }
         ]
+      },
+      // 产品管理模块
+      {
+        path: 'products',
+        name: 'Products',
+        meta: { 
+          title: '产品管理',
+          requiresAuth: true,
+          icon: 'el-icon-shopping-cart-full'
+        },
+        children: [
+          {
+            path: 'categories',
+            name: 'ProductCategories',
+            component: () => import('@/views/admin/products/Categories.vue'),
+            meta: { 
+              title: '分类管理',
+              requiresAuth: true,
+              permission: 'product:category:list'
+            }
+          },
+          {
+            path: 'products',
+            name: 'ProductList',
+            component: () => import('@/views/admin/products/Products.vue'),
+            meta: { 
+              title: '产品信息',
+              requiresAuth: true,
+              permission: 'product:list'
+            }
+          },
+          {
+            path: 'skus',
+            name: 'ProductSkus',
+            component: () => import('@/views/admin/products/ProductSkus.vue'),
+            meta: { 
+              title: 'SKU管理',
+              requiresAuth: true,
+              permission: 'productSku:list'
+            }
+          }
+        ]
       }
     ]
   },
@@ -137,7 +179,7 @@ router.beforeEach(async (to, from, next) => {
 
     // 检查是否为admin用户
     const isAdmin = authStore.user && authStore.user.username === 'admin'
-    
+     
     // 检查权限（admin用户跳过权限检查）
     if (to.meta.permission && !isAdmin && !authStore.hasPermission(to.meta.permission)) {
       // 没有权限，重定向到仪表板
