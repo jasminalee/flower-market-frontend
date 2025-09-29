@@ -93,6 +93,10 @@
 
       <el-table-column label="操作" width="200" fixed="right">
         <template #default="{ row }">
+          <el-button type="primary" size="small" text @click="handleViewDetail(row)">
+            <el-icon><View /></el-icon>
+            查看
+          </el-button>
           <el-button v-if="row.status === 1" type="warning" size="small" text @click="handleChangeStatus(row, 0)">
             <el-icon><Hide /></el-icon>
             隐藏
@@ -223,16 +227,19 @@ const loadCommentList = async () => {
     }
 
     const response = await commentApi.page(params)
-    if (response && response.data) {
-      const records = response.data.records || []
+    if (response && response.code === 200) {
+      const pageData = response.data || {}
+      const records = pageData.records || []
       commentList.value = records
-      pagination.total = response.data.total || 0
-      pagination.page = response.data.current || pagination.page
-      pagination.size = response.data.size || pagination.size
+      pagination.total = pageData.total || 0
+      pagination.page = pageData.current || pagination.page
+      pagination.size = pageData.size || pagination.size
+    } else {
+      ElMessage.error('加载评论列表失败: ' + (response?.message || '未知错误'))
     }
   } catch (error) {
     console.error('加载评论列表失败:', error)
-    ElMessage.error('加载评论列表失败')
+    ElMessage.error('加载评论列表失败: ' + (error.message || '网络错误'))
   } finally {
     loading.value = false
   }

@@ -11,7 +11,7 @@ export default {
 
   /**
    * 分页查询商户产品
-   * params: { current, size, merchantId, productId, status, ... }
+   * params: { current, size, merchantId, productId, skuId, price, stock, status, createTime, updateTime, ... }
    */
   async page(params = {}) {
     return api.get('/merchantProduct/page', { params })

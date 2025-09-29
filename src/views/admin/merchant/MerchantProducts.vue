@@ -22,6 +22,19 @@
             </el-input>
           </el-form-item>
 
+          <el-form-item label="SKU ID">
+            <el-input
+              v-model="searchForm.skuId"
+              placeholder="搜索SKU ID"
+              clearable
+              @keyup.enter="handleSearch"
+            >
+              <template #prefix>
+                <el-icon><Search /></el-icon>
+              </template>
+            </el-input>
+          </el-form-item>
+
           <el-form-item label="状态">
             <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
               <el-option label="上架" :value="1" />
@@ -58,8 +71,9 @@
       stripe
       style="width: 100%"
     >
-      <el-table-column prop="product.productName" label="产品名称" min-width="150" />
-      <el-table-column prop="product.productCode" label="产品编码" min-width="120" />
+      <el-table-column prop="productName" label="产品名称" min-width="150" />
+      <el-table-column prop="productCode" label="产品编码" min-width="120" />
+      <el-table-column prop="skuId" label="SKU ID" min-width="100" />
       <el-table-column prop="price" label="商户定价" min-width="100">
         <template #default="{ row }">
           ¥{{ row.price }}
@@ -142,11 +156,15 @@
       </el-form-item>
       
       <el-form-item label="产品名称">
-        <el-input v-model="selectedProduct.productName" disabled />
+        <el-input v-model="merchantProductForm.productName" disabled />
       </el-form-item>
       
       <el-form-item label="产品编码">
-        <el-input v-model="selectedProduct.productCode" disabled />
+        <el-input v-model="merchantProductForm.productCode" disabled />
+      </el-form-item>
+
+      <el-form-item label="SKU ID" prop="skuId">
+        <el-input v-model="merchantProductForm.skuId" placeholder="请输入SKU ID" />
       </el-form-item>
 
       <el-row :gutter="16">
@@ -215,6 +233,7 @@ const selectedProduct = ref({})
 // 搜索表单
 const searchForm = reactive({
   productName: '',
+  skuId: '',
   status: ''
 })
 
@@ -230,6 +249,7 @@ const merchantProductForm = reactive({
   id: null,
   merchantId: 1, // 默认商户ID，实际应该从登录用户获取
   productId: null,
+  skuId: null,
   price: 0,
   stock: 0,
   status: 1
@@ -239,6 +259,9 @@ const merchantProductForm = reactive({
 const merchantProductRules = {
   productId: [
     { required: true, message: '请选择产品', trigger: 'change' }
+  ],
+  skuId: [
+    { required: true, message: '请输入SKU ID', trigger: 'blur' }
   ],
   price: [
     { required: true, message: '请输入商户定价', trigger: 'blur' }
@@ -261,21 +284,25 @@ const loadMerchantProductList = async () => {
       current: pagination.page,
       size: pagination.size,
       productName: searchForm.productName || undefined,
+      skuId: searchForm.skuId || undefined,
       status: searchForm.status !== '' ? searchForm.status : undefined,
       merchantId: merchantProductForm.merchantId
     }
 
     const response = await merchantProductApi.page(params)
-    if (response && response.data) {
-      const records = response.data.records || []
+    if (response && response.code === 200) {
+      const pageData = response.data || {}
+      const records = pageData.records || []
       merchantProductList.value = records
-      pagination.total = response.data.total || 0
-      pagination.page = response.data.current || pagination.page
-      pagination.size = response.data.size || pagination.size
+      pagination.total = pageData.total || 0
+      pagination.page = pageData.current || pagination.page
+      pagination.size = pageData.size || pagination.size
+    } else {
+      ElMessage.error('加载商户产品列表失败: ' + (response?.message || '未知错误'))
     }
   } catch (error) {
     console.error('加载商户产品列表失败:', error)
-    ElMessage.error('加载商户产品列表失败')
+    ElMessage.error('加载商户产品列表失败: ' + (error.message || '网络错误'))
   } finally {
     loading.value = false
   }
@@ -286,16 +313,22 @@ const loadMerchantProductList = async () => {
  */
 const loadAvailableProducts = async () => {
   try {
-    const response = await merchantProductApi.getAvailableProducts({
+    const params = {
       current: 1,
       size: 1000
-    })
-    if (response && response.data) {
-      availableProducts.value = response.data.records || []
+    }
+    
+    const response = await merchantProductApi.getAvailableProducts(params)
+    if (response && response.code === 200) {
+      const pageData = response.data || {}
+      const records = pageData.records || []
+      availableProducts.value = records
+    } else {
+      ElMessage.error('加载可上架产品列表失败: ' + (response?.message || '未知错误'))
     }
   } catch (error) {
     console.error('加载可上架产品列表失败:', error)
-    ElMessage.error('加载可上架产品列表失败')
+    ElMessage.error('加载可上架产品列表失败: ' + (error.message || '网络错误'))
   }
 }
 
@@ -323,6 +356,7 @@ const handleSearch = () => {
  */
 const handleReset = () => {
   searchForm.productName = ''
+  searchForm.skuId = ''
   searchForm.status = ''
   pagination.page = 1
   loadMerchantProductList()
@@ -357,6 +391,7 @@ const handleAdd = () => {
     id: null,
     merchantId: 1, // 默认商户ID，实际应该从登录用户获取
     productId: null,
+    skuId: null,
     price: 0,
     stock: 0,
     status: 1
@@ -376,6 +411,7 @@ const handleEdit = (row) => {
     id: row.id,
     merchantId: row.merchantId,
     productId: row.productId,
+    skuId: row.skuId,
     price: row.price,
     stock: row.stock,
     status: row.status
@@ -393,6 +429,7 @@ const handleOnShelf = async (row) => {
       id: row.id,
       merchantId: row.merchantId,
       productId: row.productId,
+      skuId: row.skuId,
       price: row.price,
       stock: row.stock,
       status: 1
