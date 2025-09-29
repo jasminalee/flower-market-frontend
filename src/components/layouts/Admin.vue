@@ -135,7 +135,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Management, Fold, Expand, User, ArrowDown, Setting, 
   SwitchButton, Monitor, UserFilled, Lock, Sunny, Moon,
-  ShoppingCartFull, Avatar, Tickets, Coin, Folder
+  ShoppingCartFull, Avatar, Tickets, Coin, Files, Folder, Promotion,
+  ChatLineRound
 } from '@element-plus/icons-vue'
 import '@/assets/admin.css'
 
@@ -242,6 +243,42 @@ const userMenus = computed(() => {
     })
   }
 
+  // 商户管理模块 - 根据权限动态添加
+  const merchantMenus = []
+  
+  if (isAdmin || authStore.hasPermission('merchant:dashboard:view')) {
+    merchantMenus.push({
+      path: '/admin/merchant/dashboard',
+      title: '商户仪表板',
+      icon: 'Monitor'
+    })
+  }
+  
+  if (isAdmin || authStore.hasPermission('merchant:product:list')) {
+    merchantMenus.push({
+      path: '/admin/merchant/products',
+      title: '商户产品',
+      icon: 'Tickets'
+    })
+  }
+  
+  if (isAdmin || authStore.hasPermission('merchant:comment:list')) {
+    merchantMenus.push({
+      path: '/admin/merchant/comments',
+      title: '评论管理',
+      icon: 'ChatLineRound'
+    })
+  }
+
+  if (merchantMenus.length > 0) {
+    menus.push({
+      path: '/admin/merchant',
+      title: '商户管理',
+      icon: 'User',
+      children: merchantMenus
+    })
+  }
+
   return menus
 })
 
@@ -279,6 +316,18 @@ const breadcrumbs = computed(() => {
         crumbs.push({ title: 'SKU管理' })
       }
     }
+    else if (paths.includes('merchant')) {
+      crumbs.push({ title: '商户管理' })
+      
+      if (paths.includes('dashboard')) {
+        crumbs.push({ title: '商户仪表板' })
+      } else if (paths.includes('products')) {
+        crumbs.push({ title: '商户产品' })
+      } else if (paths.includes('comments')) {
+        crumbs.push({ title: '评论管理' })
+      }
+    }
+
   }
   
   return crumbs

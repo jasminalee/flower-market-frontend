@@ -137,6 +137,49 @@ const routes = [
             }
           }
         ]
+      },
+      // 商户管理模块
+      {
+        path: 'merchant',
+        name: 'Merchant',
+        redirect: '/admin/merchant/dashboard',
+        meta: { 
+          title: '商户管理',
+          requiresAuth: true,
+          icon: 'el-icon-user'
+        },
+        children: [
+          {
+            path: 'dashboard',
+            name: 'MerchantDashboard',
+            component: () => import('@/views/admin/merchant/MerchantDashboard.vue'),
+            meta: { 
+              title: '商户仪表板',
+              requiresAuth: true,
+              permission: 'merchant:dashboard:view'
+            }
+          },
+          {
+            path: 'products',
+            name: 'MerchantProducts',
+            component: () => import('@/views/admin/merchant/MerchantProducts.vue'),
+            meta: { 
+              title: '商户产品',
+              requiresAuth: true,
+              permission: 'merchant:product:list'
+            }
+          },
+          {
+            path: 'comments',
+            name: 'MerchantComments',
+            component: () => import('@/views/admin/merchant/Comments.vue'),
+            meta: { 
+              title: '评论管理',
+              requiresAuth: true,
+              permission: 'merchant:comment:list'
+            }
+          }
+        ]
       }
     ]
   },
