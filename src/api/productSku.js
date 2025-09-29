@@ -44,5 +44,13 @@ export default {
    */
   async remove(id) {
     return api.delete(`/productSku/${id}`)
+  },
+
+  /**
+   * 搜索SKU（用于商户上架产品时的选择）
+   * params: { skuName, skuCode, ... }
+   */
+  async search(params = {}) {
+    return api.get('/productSku/list', { params })
   }
 }

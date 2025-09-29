@@ -71,6 +71,7 @@
       stripe
       style="width: 100%"
     >
+      <el-table-column prop="id" label="ID" min-width="50" />
       <el-table-column prop="mainImage" label="主图" width="80">
         <template #default="{ row }">
           <el-image 

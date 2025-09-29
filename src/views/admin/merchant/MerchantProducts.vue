@@ -11,7 +11,7 @@
         <el-form :model="searchForm" inline>
           <el-form-item label="产品名称">
             <el-input
-              v-model="searchForm.productName"
+              v-model="searchForm.skuName"
               placeholder="搜索产品名称"
               clearable
               @keyup.enter="handleSearch"
@@ -71,8 +71,9 @@
       stripe
       style="width: 100%"
     >
-      <el-table-column prop="productName" label="产品名称" min-width="150" />
-      <el-table-column prop="productCode" label="产品编码" min-width="120" />
+      <el-table-column prop="id" label="ID" min-width="50" />
+      <el-table-column prop="skuName" label="产品名称" min-width="150" />
+      <el-table-column prop="skuCode" label="产品编码" min-width="120" />
       <el-table-column prop="skuId" label="SKU ID" min-width="100" />
       <el-table-column prop="price" label="商户定价" min-width="100">
         <template #default="{ row }">
@@ -138,33 +139,36 @@
       :rules="merchantProductRules"
       label-width="100px"
     >
-      <el-form-item v-if="!isEdit" label="选择产品" prop="productId">
+      <el-form-item v-if="!isEdit" label="选择SKU" prop="skuId">
         <el-select 
-          v-model="merchantProductForm.productId" 
-          placeholder="请选择产品" 
+          v-model="merchantProductForm.skuId" 
+          placeholder="请选择SKU" 
           style="width: 100%" 
           filterable
-          @change="handleProductChange"
+          remote
+          :remote-method="loadAvailableSkus"
+          :loading="loading"
+          @change="handleSkuChange"
         >
           <el-option
-            v-for="product in availableProducts"
-            :key="product.id"
-            :label="product.productName"
-            :value="product.id"
+            v-for="sku in availableSkus"
+            :key="sku.id"
+            :label="sku.skuName"
+            :value="sku.id"
           />
         </el-select>
       </el-form-item>
       
       <el-form-item label="产品名称">
-        <el-input v-model="merchantProductForm.productName" disabled />
+        <el-input v-model="selectedSku.skuName" disabled />
       </el-form-item>
       
       <el-form-item label="产品编码">
-        <el-input v-model="merchantProductForm.productCode" disabled />
+        <el-input v-model="selectedSku.skuCode" disabled />
       </el-form-item>
 
-      <el-form-item label="SKU ID" prop="skuId">
-        <el-input v-model="merchantProductForm.skuId" placeholder="请输入SKU ID" />
+      <el-form-item label="SKU ID">
+        <el-input v-model="merchantProductForm.skuId" disabled />
       </el-form-item>
 
       <el-row :gutter="16">
@@ -215,7 +219,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import merchantProductApi from '@/api/merchantProduct.js'
-import productApi from '@/api/product.js'
+import productSkuApi from '@/api/productSku.js'
 import { Plus, Search, Refresh, Edit, Delete, Check, Close } from '@element-plus/icons-vue'
 
 // 响应式数据
@@ -227,12 +231,12 @@ const merchantProductFormRef = ref()
 
 // 商户产品列表数据
 const merchantProductList = ref([])
-const availableProducts = ref([])
-const selectedProduct = ref({})
+const availableSkus = ref([])
+const selectedSku = ref({})
 
 // 搜索表单
 const searchForm = reactive({
-  productName: '',
+  skuName: '',
   skuId: '',
   status: ''
 })
@@ -257,11 +261,8 @@ const merchantProductForm = reactive({
 
 // 表单验证规则
 const merchantProductRules = {
-  productId: [
-    { required: true, message: '请选择产品', trigger: 'change' }
-  ],
   skuId: [
-    { required: true, message: '请输入SKU ID', trigger: 'blur' }
+    { required: true, message: '请选择SKU', trigger: 'change' }
   ],
   price: [
     { required: true, message: '请输入商户定价', trigger: 'blur' }
@@ -283,7 +284,7 @@ const loadMerchantProductList = async () => {
     const params = {
       current: pagination.page,
       size: pagination.size,
-      productName: searchForm.productName || undefined,
+      skuName: searchForm.skuName || undefined,
       skuId: searchForm.skuId || undefined,
       status: searchForm.status !== '' ? searchForm.status : undefined,
       merchantId: merchantProductForm.merchantId
@@ -309,36 +310,39 @@ const loadMerchantProductList = async () => {
 }
 
 /**
- * 加载可上架的产品列表
+ * 加载可上架的SKU列表
  */
-const loadAvailableProducts = async () => {
+const loadAvailableSkus = async (searchKeyword = '') => {
   try {
     const params = {
+      skuName: searchKeyword || undefined,
       current: 1,
-      size: 1000
+      size: 100
     }
     
-    const response = await merchantProductApi.getAvailableProducts(params)
+    const response = await productSkuApi.search(params)
     if (response && response.code === 200) {
       const pageData = response.data || {}
       const records = pageData.records || []
-      availableProducts.value = records
+      availableSkus.value = records
     } else {
-      ElMessage.error('加载可上架产品列表失败: ' + (response?.message || '未知错误'))
+      ElMessage.error('加载可上架SKU列表失败: ' + (response?.message || '未知错误'))
     }
   } catch (error) {
-    console.error('加载可上架产品列表失败:', error)
-    ElMessage.error('加载可上架产品列表失败: ' + (error.message || '网络错误'))
+    console.error('加载可上架SKU列表失败:', error)
+    ElMessage.error('加载可上架SKU列表失败: ' + (error.message || '网络错误'))
   }
 }
 
 /**
- * 处理产品选择变化
+ * 处理SKU选择变化
  */
-const handleProductChange = (productId) => {
-  const product = availableProducts.value.find(p => p.id === productId)
-  if (product) {
-    selectedProduct.value = product
+const handleSkuChange = (skuId) => {
+  const sku = availableSkus.value.find(s => s.id === skuId)
+  if (sku) {
+    selectedSku.value = sku
+    // 同时设置productId
+    merchantProductForm.productId = sku.productId
   }
 }
 
@@ -355,7 +359,7 @@ const handleSearch = () => {
  * 重置搜索
  */
 const handleReset = () => {
-  searchForm.productName = ''
+  searchForm.skuName = ''
   searchForm.skuId = ''
   searchForm.status = ''
   pagination.page = 1
@@ -396,8 +400,8 @@ const handleAdd = () => {
     stock: 0,
     status: 1
   })
-  selectedProduct.value = {}
-  loadAvailableProducts()
+  selectedSku.value = {}
+  loadAvailableSkus()
 }
 
 /**
@@ -406,18 +410,11 @@ const handleAdd = () => {
 const handleEdit = (row) => {
   isEdit.value = true
   dialogVisible.value = true
+    console.log(row)
   // 填充表单数据
-  Object.assign(merchantProductForm, {
-    id: row.id,
-    merchantId: row.merchantId,
-    productId: row.productId,
-    skuId: row.skuId,
-    price: row.price,
-    stock: row.stock,
-    status: row.status
-  })
+  Object.assign(merchantProductForm, row)
   // 设置选中产品信息
-  selectedProduct.value = row.product || {}
+  selectedSku.value = row.product || {}
 }
 
 /**
@@ -493,8 +490,8 @@ const handleSave = async () => {
     const formData = { ...merchantProductForm }
     
     // 如果是编辑模式且没有选择产品，则使用当前产品ID
-    if (isEdit.value && !formData.productId && selectedProduct.value.id) {
-      formData.productId = selectedProduct.value.id
+    if (isEdit.value && !formData.productId && selectedSku.value.id) {
+      formData.productId = selectedSku.value.id
     }
     
     await merchantProductApi.save(formData)

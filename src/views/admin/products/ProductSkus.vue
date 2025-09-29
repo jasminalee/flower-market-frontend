@@ -64,6 +64,7 @@
       stripe
       style="width: 100%"
     >
+      <el-table-column prop="id" label="ID" min-width="50" />
       <el-table-column prop="skuName" label="SKU名称" min-width="150" />
       <el-table-column prop="skuCode" label="SKU编码" min-width="120" />
       <el-table-column prop="price" label="价格" min-width="100">
