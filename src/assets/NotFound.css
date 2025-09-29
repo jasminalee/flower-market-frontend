@@ -1,0 +1,49 @@
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .error-container {
+        padding: 40px var(--spacing-large);
+    }
+
+    .error-title {
+        font-size: 4rem;
+    }
+
+    .error-subtitle {
+        font-size: 1.5rem;
+    }
+
+    .error-description {
+        font-size: 1rem;
+    }
+
+    .error-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .error-actions .el-button {
+        width: 200px;
+    }
+
+    .suggestion-links {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .error-page {
+        padding: var(--spacing-medium);
+    }
+
+    .error-container {
+        padding: 32px var(--spacing-large);
+    }
+
+    .error-title {
+        font-size: 3rem;
+    }
+
+    .error-icon .el-icon {
+        font-size: 80px !important;
+    }
+}
