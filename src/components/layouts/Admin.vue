@@ -135,7 +135,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Management, Fold, Expand, User, ArrowDown, Setting, 
   SwitchButton, Monitor, UserFilled, Lock, Sunny, Moon,
-  ShoppingCartFull
+  ShoppingCartFull, Avatar, Tickets, Coin, Folder
 } from '@element-plus/icons-vue'
 import '@/assets/admin.css'
 
@@ -177,7 +177,7 @@ const userMenus = computed(() => {
     systemMenus.push({
       path: '/admin/system/users',
       title: '用户管理',
-      icon: 'UserFilled'
+      icon: 'User'  // Changed from UserFilled to User
     })
   }
   
@@ -185,7 +185,7 @@ const userMenus = computed(() => {
     systemMenus.push({
       path: '/admin/system/roles',
       title: '角色管理',
-      icon: 'UserFilled'
+      icon: 'Avatar'  // Changed from UserFilled to Avatar
     })
   }
   
@@ -213,7 +213,7 @@ const userMenus = computed(() => {
     productMenus.push({
       path: '/admin/products/categories',
       title: '分类管理',
-      icon: 'ShoppingCartFull'
+      icon: 'Folder'  // Changed from ShoppingCartFull to Folder
     })
   }
   
@@ -221,7 +221,7 @@ const userMenus = computed(() => {
     productMenus.push({
       path: '/admin/products/products',
       title: '产品信息',
-      icon: 'ShoppingCartFull'
+      icon: 'Tickets'  // Changed from ShoppingCartFull to Tickets
     })
   }
   
@@ -229,7 +229,7 @@ const userMenus = computed(() => {
     productMenus.push({
       path: '/admin/products/skus',
       title: 'SKU管理',
-      icon: 'ShoppingCartFull'
+      icon: 'Coin'  // Changed from ShoppingCartFull to Coin
     })
   }
 
