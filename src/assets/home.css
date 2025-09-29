@@ -194,11 +194,6 @@
   font-weight: 500;
 }
 
-/* 为避免与common.css中的stat-card冲突，增加特定命名空间 */
-.stats-section .stat-item {
-  /* 特定于首页stats-section中的stat-item样式 */
-}
-
 /* 响应式设计 - 使用 common.css 中的通用媒体查询 */
 @media (min-width: 1600px) {
   .hero-section .container {

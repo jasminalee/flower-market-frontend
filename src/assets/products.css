@@ -1,13 +1,40 @@
-/*
-  注：已将本文件中页面实际使用的关键样式合并到 `src/assets/common.css`。
-  为了安全起见，此文件暂时保留为备份，后续可在确认无问题后删除或归档。
-*/
-
 /* 产品页面专用样式 */
 
 .products {
   min-height: 100vh;
   background-color: var(--bg-color-page);
+}
+
+/* 产品标签样式 */
+.product-tags {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-small);
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+.tag-new {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.tag-hot {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.tag-discount {
+  background-color: var(--warning-color);
+  color: white;
 }
 
 /* 产品卡片特有样式 */
