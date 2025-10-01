@@ -115,10 +115,7 @@
 
       <el-table-column label="操作" width="250" fixed="right">
         <template #default="{ row }">
-          <el-button type="primary" size="small" text @click="handleView(row)">
-            <el-icon>
-              <View/>
-            </el-icon>
+          <el-button :icon="View" type="primary" size="small" text @click="handleView(row)">
             查看
           </el-button>
           <el-button type="warning" size="small" text @click="handleEdit(row)">
@@ -551,10 +548,8 @@ const handleView = async (product) => {
     // 调用详情接口获取完整的产品信息，包括富文本内容
     const response = await productApi.getDetail(product.id)
     if (response && response.code === 200) {
-      // 修复数据访问路径 - 直接使用 response.data 而不是 response.data.product
-      const detailData = response.data
+      const detailData = response.data.product
       console.log('Product detail data:', detailData) // 调试信息
-      
       // 处理详情中的blob URL，替换为正确的图片路径
       let detailContent = detailData.detail || '';
       if (detailContent) {
