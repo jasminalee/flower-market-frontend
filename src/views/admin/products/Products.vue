@@ -237,9 +237,6 @@
         </el-col>
       </el-row>
 
-
-
-
       <el-form-item label="产品详情" prop="detail">
         <div class="editor-container" v-if="isEdit">
           <Toolbar
