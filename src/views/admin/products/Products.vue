@@ -338,7 +338,7 @@ const productForm = reactive({
   status: 1,
   productType: 1
 })
-const uploadUrl = "";
+const uploadUrl = API_BASE_URL + "/api/upload/image";
 // 编辑器模式
 const mode = 'default'
 
@@ -749,9 +749,12 @@ const handleAvatarSuccess = (response, uploadFile) => {
     productForm.mainImage = response.data
     ElMessage.success('图片上传成功')
   } else {
+    // 如果上传失败，移除预览图片
+    productForm.mainImage = ''
     ElMessage.error('图片上传失败')
   }
 }
+
 
 /**
  * 上传前检查
@@ -772,15 +775,19 @@ const beforeAvatarUpload = (rawFile) => {
  */
 const handleAvatarChange = (file) => {
   // 创建预览URL
-  console.log('file:', previewUrl)
-
   const previewUrl = URL.createObjectURL(file.raw)
+  console.log('file:', file)
   console.log('previewUrl:', previewUrl)
 
-  productForm.mainImage = previewUrl
-  // 保存预览URL用于后续清理
+  // 只用于预览，不直接设置到productForm.mainImage
   previewUrls.push(previewUrl)
+
+  // 为了预览效果，我们可以临时设置预览URL，但会在上传成功后替换
+  if (!productForm.mainImage || productForm.mainImage.startsWith('blob:')) {
+    productForm.mainImage = previewUrl
+  }
 }
+
 
 // 生命周期
 onMounted(() => {
