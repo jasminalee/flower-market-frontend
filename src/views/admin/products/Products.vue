@@ -141,6 +141,7 @@
     v-model="dialogVisible"
     width="800px"
     :close-on-click-modal="false"
+    class="product-dialog"
   >
     <el-form
       ref="productFormRef"
@@ -185,27 +186,8 @@
         </el-col>
       </el-row>
 
-      <el-row :gutter="16">
+      <el-row :gutter="12">
         <el-col :span="12">
-          <el-form-item label="产品类型" prop="productType">
-            <el-select v-model="productForm.productType" placeholder="请选择产品类型">
-              <el-option label="实物商品" :value="1" />
-              <el-option label="虚拟商品" :value="2" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="状态" prop="status">
-            <el-radio-group v-model="productForm.status">
-              <el-radio :label="1">上架</el-radio>
-              <el-radio :label="0">下架</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <el-row :gutter="16">
-        <el-col :span="8">
           <el-form-item label="主图" prop="mainImage">
             <el-upload
                 class="avatar-uploader"
@@ -220,7 +202,27 @@
             </el-upload>
           </el-form-item>
         </el-col>
-        <el-col :span="16">
+
+        <el-col :span="12">
+          <el-col >
+            <el-form-item label="产品类型" prop="productType">
+              <el-select v-model="productForm.productType" placeholder="请选择产品类型">
+                <el-option label="实物商品" :value="1" />
+                <el-option label="虚拟商品" :value="2" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col>
+            <el-form-item label="状态" prop="status">
+              <el-radio-group v-model="productForm.status">
+                <el-radio :label="1">上架</el-radio>
+                <el-radio :label="0">下架</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-col>
+
+        <el-col :span="24">
           <el-form-item label="产品描述" prop="description">
             <el-input
                 v-model="productForm.description"
@@ -231,6 +233,8 @@
           </el-form-item>
         </el-col>
       </el-row>
+
+
 
 
       <el-form-item label="产品详情" prop="detail">
@@ -274,6 +278,7 @@ import fileApi from '@/api/file.js'
 import { Plus, Search, Refresh, View, Edit, Delete } from '@element-plus/icons-vue'
 import '@wangeditor/editor/dist/css/style.css'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import '@/assets/products.css'
 
 // 响应式数据
 const loading = ref(false)
@@ -314,13 +319,7 @@ const productForm = reactive({
   status: 1,
   productType: 1
 })
-
-// 上传URL
-const uploadUrl = import.meta.env.VITE_API_BASE_URL + '/api/upload/image'
-
-// API基础URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:18091'
-
+const uploadUrl = "";
 // 编辑器模式
 const mode = 'default'
 
@@ -772,16 +771,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.product-image {
-  width: 50px;
-  height: 50px;
-  border-radius: 4px;
-}
-
-.avatar-uploader .avatar {
-  width: 120px;
-  height: 120px;
-  display: block;
-}
-
+/* 所有样式已移至 src/assets/products.css 文件中 */
 </style>

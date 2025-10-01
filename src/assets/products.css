@@ -1,0 +1,136 @@
+/* 产品管理页面样式 */
+
+/* 产品图片样式 */
+.product-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+}
+
+/* 表格操作列样式 */
+.table-card .el-table .el-button--small {
+  padding: 6px 10px;
+  margin: 0 2px;
+}
+
+/* 表单对话框样式 */
+.product-dialog .el-dialog__body {
+  padding: 20px;
+}
+
+.product-dialog .el-form {
+  margin-top: 10px;
+}
+
+/* 表单行间距 */
+.product-dialog .el-row {
+  margin-bottom: 15px;
+}
+
+/* 表单项标签 */
+.product-dialog .el-form-item__label {
+  font-weight: 500;
+}
+
+/* 主图上传区域 */
+.avatar-uploader {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.avatar-uploader:hover {
+  border-color: #409eff;
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 120px;
+  height: 120px;
+  text-align: center;
+  line-height: 120px;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  display: block;
+  object-fit: cover;
+}
+
+/* 富文本编辑器容器 */
+.editor-container {
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+}
+
+.editor-toolbar {
+  border-bottom: 1px solid #dcdfe6;
+  background-color: #f5f7fa;
+}
+
+.editor-content {
+  min-height: 300px;
+  background-color: #fff;
+}
+
+/* 产品详情查看模式 */
+.product-detail-view {
+  min-height: 300px;
+  padding: 10px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  background-color: #f5f7fa;
+  overflow-y: auto;
+}
+
+/* 对话框底部按钮 */
+.dialog-footer {
+  text-align: right;
+  padding: 15px 20px 0;
+  border-top: 1px solid #ebeef5;
+  margin-top: 10px;
+}
+
+/* 分页容器 */
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 过滤器卡片 */
+.filter-card {
+  margin-bottom: 20px;
+}
+
+/* 过滤器栏 */
+.filters-bar {
+  flex-wrap: wrap;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .product-dialog .el-dialog {
+    width: 95% !important;
+  }
+  
+  .avatar-uploader-icon,
+  .avatar {
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+  }
+  
+  .editor-content {
+    min-height: 200px;
+  }
+  
+  .product-detail-view {
+    min-height: 200px;
+  }
+}
