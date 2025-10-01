@@ -11,44 +11,52 @@
         <el-form :model="searchForm" inline>
           <el-form-item label="产品名称">
             <el-input
-              v-model="searchForm.productName"
-              placeholder="搜索产品名称"
-              clearable
-              @keyup.enter="handleSearch"
+                v-model="searchForm.productName"
+                placeholder="搜索产品名称"
+                clearable
+                @keyup.enter="handleSearch"
             >
               <template #prefix>
-                <el-icon><Search /></el-icon>
+                <el-icon>
+                  <Search/>
+                </el-icon>
               </template>
             </el-input>
           </el-form-item>
 
           <el-form-item label="产品编码">
             <el-input
-              v-model="searchForm.productCode"
-              placeholder="搜索产品编码"
-              clearable
-              @keyup.enter="handleSearch"
+                v-model="searchForm.productCode"
+                placeholder="搜索产品编码"
+                clearable
+                @keyup.enter="handleSearch"
             >
               <template #prefix>
-                <el-icon><Search /></el-icon>
+                <el-icon>
+                  <Search/>
+                </el-icon>
               </template>
             </el-input>
           </el-form-item>
 
           <el-form-item label="状态">
             <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
-              <el-option label="上架" :value="1" />
-              <el-option label="下架" :value="0" />
+              <el-option label="上架" :value="1"/>
+              <el-option label="下架" :value="0"/>
             </el-select>
           </el-form-item>
 
           <el-form-item>
             <el-button type="primary" @click="handleSearch">
-              <el-icon><Search /></el-icon>
+              <el-icon>
+                <Search/>
+              </el-icon>
               搜索
             </el-button>
             <el-button @click="handleReset">
-              <el-icon><Refresh /></el-icon>
+              <el-icon>
+                <Refresh/>
+              </el-icon>
               重置
             </el-button>
           </el-form-item>
@@ -57,7 +65,9 @@
 
       <el-col :span="1" style="text-align: right;">
         <el-button type="primary" @click="handleAdd">
-          <el-icon><Plus /></el-icon>
+          <el-icon>
+            <Plus/>
+          </el-icon>
           新增产品
         </el-button>
       </el-col>
@@ -66,26 +76,26 @@
 
   <el-card class="table-card">
     <el-table
-      :data="productList"
-      :loading="loading"
-      stripe
-      style="width: 100%"
+        :data="productList"
+        :loading="loading"
+        stripe
+        style="width: 100%"
     >
-      <el-table-column prop="id" label="ID" min-width="50" />
+      <el-table-column prop="id" label="ID" min-width="50"/>
       <el-table-column prop="mainImage" label="主图" width="80">
         <template #default="{ row }">
-          <el-image 
-            :src="row.mainImage" 
-            class="product-image" 
-            :preview-src-list="[row.mainImage]"
-            preview-teleported
-            fit="cover"
+          <el-image
+              :src="row.mainImage"
+              class="product-image"
+              :preview-src-list="[row.mainImage]"
+              preview-teleported
+              fit="cover"
           />
         </template>
       </el-table-column>
-      <el-table-column prop="productName" label="产品名称" min-width="150" />
-      <el-table-column prop="productCode" label="产品编码" min-width="120" />
-      <el-table-column prop="brand" label="品牌" min-width="100" />
+      <el-table-column prop="productName" label="产品名称" min-width="150"/>
+      <el-table-column prop="productCode" label="产品编码" min-width="120"/>
+      <el-table-column prop="brand" label="品牌" min-width="100"/>
       <el-table-column label="分类" min-width="120">
         <template #default="{ row }">
           <span v-if="getCategoryById(row.categoryId)">
@@ -101,20 +111,26 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" min-width="160" />
+      <el-table-column prop="createTime" label="创建时间" min-width="160"/>
 
       <el-table-column label="操作" width="250" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" size="small" text @click="handleView(row)">
-            <el-icon><View /></el-icon>
+            <el-icon>
+              <View/>
+            </el-icon>
             查看
           </el-button>
           <el-button type="warning" size="small" text @click="handleEdit(row)">
-            <el-icon><Edit /></el-icon>
+            <el-icon>
+              <Edit/>
+            </el-icon>
             编辑
           </el-button>
           <el-button type="danger" size="small" text @click="handleDelete(row)">
-            <el-icon><Delete /></el-icon>
+            <el-icon>
+              <Delete/>
+            </el-icon>
             删除
           </el-button>
         </template>
@@ -124,43 +140,43 @@
     <!-- 分页 -->
     <div class="pagination-container">
       <el-pagination
-        v-model:current-page="pagination.page"
-        v-model:page-size="pagination.size"
-        :page-sizes="[10, 20, 50, 100]"
-        :total="pagination.total"
-        layout="total, sizes, prev, pager, next, jumper"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
+          v-model:current-page="pagination.page"
+          v-model:page-size="pagination.size"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="pagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
       />
     </div>
   </el-card>
 
   <!-- 产品表单对话框 -->
   <el-dialog
-    :title="dialogTitle"
-    v-model="dialogVisible"
-    width="800px"
-    :close-on-click-modal="false"
-    class="product-dialog"
+      :title="dialogTitle"
+      v-model="dialogVisible"
+      width="800px"
+      :close-on-click-modal="false"
+      class="product-dialog"
   >
     <el-form
-      ref="productFormRef"
-      :model="productForm"
-      :rules="productRules"
-      label-width="100px"
+        ref="productFormRef"
+        :model="productForm"
+        :rules="productRules"
+        label-width="100px"
     >
       <el-row :gutter="16">
         <el-col :span="12">
           <el-form-item label="产品名称" prop="productName">
-            <el-input v-model="productForm.productName" placeholder="请输入产品名称" :disabled="!isEdit" />
+            <el-input v-model="productForm.productName" placeholder="请输入产品名称" :disabled="!isEdit"/>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="产品编码" prop="productCode">
-            <el-input 
-              v-model="productForm.productCode" 
-              placeholder="请输入产品编码"
-              :disabled="!isEdit || !!productForm.id"
+            <el-input
+                v-model="productForm.productCode"
+                placeholder="请输入产品编码"
+                :disabled="!isEdit || !!productForm.id"
             />
           </el-form-item>
         </el-col>
@@ -169,19 +185,19 @@
       <el-row :gutter="16">
         <el-col :span="12">
           <el-form-item label="品牌" prop="brand">
-            <el-input v-model="productForm.brand" placeholder="请输入品牌" :disabled="!isEdit" />
+            <el-input v-model="productForm.brand" placeholder="请输入品牌" :disabled="!isEdit"/>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="分类" prop="categoryId">
             <el-cascader
-              v-model="productForm.categoryId"
-              :options="categoryTree"
-              :props="{ value: 'id', label: 'categoryName', children: 'children', emitPath: false }"
-              placeholder="请选择分类"
-              style="width: 100%"
-              clearable
-              :disabled="!isEdit"
+                v-model="productForm.categoryId"
+                :options="categoryTree"
+                :props="{ value: 'id', label: 'categoryName', children: 'children', emitPath: false }"
+                placeholder="请选择分类"
+                style="width: 100%"
+                clearable
+                :disabled="!isEdit"
             />
           </el-form-item>
         </el-col>
@@ -199,18 +215,20 @@
                 :on-change="handleAvatarChange"
                 :disabled="!isEdit"
             >
-              <img v-if="productForm.mainImage" :src="productForm.mainImage" class="avatar" />
-              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+              <img v-if="productForm.mainImage" :src="productForm.mainImage" class="avatar"/>
+              <el-icon v-else class="avatar-uploader-icon">
+                <Plus/>
+              </el-icon>
             </el-upload>
           </el-form-item>
         </el-col>
 
         <el-col :span="12">
-          <el-col >
+          <el-col>
             <el-form-item label="产品类型" prop="productType">
               <el-select v-model="productForm.productType" placeholder="请选择产品类型" :disabled="!isEdit">
-                <el-option label="实物商品" :value="1" />
-                <el-option label="虚拟商品" :value="2" />
+                <el-option label="实物商品" :value="1"/>
+                <el-option label="虚拟商品" :value="2"/>
               </el-select>
             </el-form-item>
           </el-col>
@@ -240,18 +258,18 @@
       <el-form-item label="产品详情" prop="detail">
         <div class="editor-container" v-if="isEdit">
           <Toolbar
-            class="editor-toolbar"
-            :editor="editorRef"
-            :defaultConfig="toolbarConfig"
-            :mode="mode"
+              class="editor-toolbar"
+              :editor="editorRef"
+              :defaultConfig="toolbarConfig"
+              :mode="mode"
           />
           <Editor
-            class="editor-content"
-            v-model="productForm.detail"
-            :defaultConfig="editorConfig"
-            :mode="mode"
-            @onCreated="handleEditorCreated"
-            @onChange="handleEditorChange"
+              class="editor-content"
+              v-model="productForm.detail"
+              :defaultConfig="editorConfig"
+              :mode="mode"
+              @onCreated="handleEditorCreated"
+              @onChange="handleEditorChange"
           />
         </div>
         <div class="product-detail-view" v-else v-html="productForm.detail"></div>
@@ -270,14 +288,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
 import productApi from '@/api/product.js'
 import productCategoryApi from '@/api/productCategory.js'
 import fileApi from '@/api/file.js'
-import { Plus, Search, Refresh, View, Edit, Delete } from '@element-plus/icons-vue'
+import {Plus, Search, Refresh, View, Edit, Delete} from '@element-plus/icons-vue'
 import '@wangeditor/editor/dist/css/style.css'
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
 import '@/assets/products.css'
 
 // 响应式数据
@@ -342,20 +360,17 @@ const editorConfig = reactive({
       maxFileSize: 5 * 1024 * 1024, // 5M
       base64LimitSize: 0, // 禁用base64，强制使用上传
       // 自定义上传图片
+
       async customUpload(file, insertFn) {
         try {
-          // 先插入本地预览URL
-          const localUrl = URL.createObjectURL(file);
-          insertFn(localUrl, '', '')
-          
-          // 然后上传到服务器
           const formData = new FormData()
           formData.append('file', file)
-          
+
           const response = await fileApi.uploadImage(formData)
-          
+
           if (response && response.code === 200) {
-            // 注意：wangEditor会自动替换预览URL为最终URL，无需手动处理
+            // 直接插入服务器URL
+            insertFn(response.data, '', '')
             ElMessage.success('图片上传成功')
           } else {
             ElMessage.error('图片上传失败: ' + (response?.message || '未知错误'))
@@ -371,21 +386,21 @@ const editorConfig = reactive({
 // 表单验证规则
 const productRules = {
   productName: [
-    { required: true, message: '请输入产品名称', trigger: 'blur' },
-    { min: 2, max: 100, message: '产品名称长度在 2 到 100 个字符', trigger: 'blur' }
+    {required: true, message: '请输入产品名称', trigger: 'blur'},
+    {min: 2, max: 100, message: '产品名称长度在 2 到 100 个字符', trigger: 'blur'}
   ],
   productCode: [
-    { required: true, message: '请输入产品编码', trigger: 'blur' },
-    { min: 2, max: 50, message: '产品编码长度在 2 到 50 个字符', trigger: 'blur' }
+    {required: true, message: '请输入产品编码', trigger: 'blur'},
+    {min: 2, max: 50, message: '产品编码长度在 2 到 50 个字符', trigger: 'blur'}
   ],
   brand: [
-    { max: 50, message: '品牌长度不能超过 50 个字符', trigger: 'blur' }
+    {max: 50, message: '品牌长度不能超过 50 个字符', trigger: 'blur'}
   ],
   categoryId: [
-    { required: true, message: '请选择分类', trigger: 'change' }
+    {required: true, message: '请选择分类', trigger: 'change'}
   ],
   productType: [
-    { required: true, message: '请选择产品类型', trigger: 'change' }
+    {required: true, message: '请选择产品类型', trigger: 'change'}
   ]
 }
 
@@ -444,7 +459,7 @@ const loadCategoryTree = async () => {
     const response = await productCategoryApi.getTree()
     if (response && response.code === 200) {
       categoryTree.value = response.data || []
-      
+
       // 构建分类映射表，便于通过ID查找分类
       const buildMap = (categories) => {
         categories.forEach(category => {
@@ -527,7 +542,7 @@ const handleAdd = () => {
  */
 const handleView = async (product) => {
   isEdit.value = false // 查看模式，禁用编辑功能
-  
+
   try {
     // 调用详情接口获取完整的产品信息，包括富文本内容
     const response = await productApi.getDetail(product.id)
@@ -555,7 +570,7 @@ const handleView = async (product) => {
     ElMessage.error('获取产品详情失败: ' + (error.message || '未知错误'))
     return
   }
-  
+
   dialogVisible.value = true
 }
 
@@ -564,14 +579,14 @@ const handleView = async (product) => {
  */
 const handleEdit = (product) => {
   isEdit.value = true // 编辑模式
-  
+
   // 处理详情中的blob URL，替换为正确的图片路径
   let detailContent = product.detail || '';
   if (detailContent) {
     // 移除blob URL，避免无效链接
     detailContent = detailContent.replace(/src="blob:http[^"]*"/g, 'src=""');
   }
-  
+
   Object.assign(productForm, {
     id: product.id,
     productName: product.productName,
@@ -593,13 +608,13 @@ const handleEdit = (product) => {
 const handleDelete = async (product) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除产品 "${product.productName}" 吗？`,
-      '确认删除',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
+        `确定要删除产品 "${product.productName}" 吗？`,
+        '确认删除',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
     )
 
     const response = await productApi.remove(product.id)
@@ -680,18 +695,18 @@ const resetProductForm = () => {
     status: 1,
     productType: 1
   })
-  
+
   console.log('Product form reset to:', productForm) // 调试信息
 
   if (productFormRef.value) {
     productFormRef.value.resetFields()
   }
-  
+
   // 重置编辑器内容
   if (editorRef.value) {
     editorRef.value.clear()
   }
-  
+
   // 清理预览URL对象
   if (previewUrls.length > 0) {
     previewUrls.forEach(url => URL.revokeObjectURL(url))
@@ -761,6 +776,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-/* 所有样式已移至 src/assets/products.css 文件中 */
-</style>
+<style scoped></style>
