@@ -202,6 +202,7 @@
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload"
+              :on-change="handleAvatarChange"
             >
               <img v-if="productForm.mainImage" :src="productForm.mainImage" class="avatar" />
               <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
@@ -324,6 +325,9 @@ const mode = 'default'
 // 编辑器实例，必须用 shallowRef
 const editorRef = shallowRef()
 
+// 预览URL数组，用于清理
+let previewUrls = []
+
 // 工具栏配置
 const toolbarConfig = {}
 
@@ -339,6 +343,11 @@ const editorConfig = reactive({
       // 自定义上传图片
       async customUpload(file, insertFn) {
         try {
+          // 先插入本地预览URL
+          const localUrl = URL.createObjectURL(file);
+          insertFn(localUrl, '', '')
+          
+          // 然后上传到服务器
           const formData = new FormData()
           formData.append('file', file)
           
@@ -347,8 +356,7 @@ const editorConfig = reactive({
           if (response && response.code === 200) {
             // 处理图片URL，将相对路径转换为绝对路径
             const imageUrl = response.data.startsWith('/') ? API_BASE_URL + response.data : response.data;
-            // 插入图片到编辑器
-            insertFn(imageUrl, '', '')
+            // 注意：wangEditor会自动替换预览URL为最终URL，无需手动处理
             ElMessage.success('图片上传成功')
           } else {
             ElMessage.error('图片上传失败: ' + (response?.message || '未知错误'))
@@ -695,6 +703,12 @@ const resetProductForm = () => {
   if (editorRef.value) {
     editorRef.value.clear()
   }
+  
+  // 清理预览URL对象
+  if (previewUrls.length > 0) {
+    previewUrls.forEach(url => URL.revokeObjectURL(url))
+    previewUrls = []
+  }
 }
 
 // 组件销毁前清理编辑器
@@ -702,6 +716,11 @@ onBeforeUnmount(() => {
   if (editorRef.value) {
     editorRef.value.destroy()
     editorRef.value = null
+  }
+  // 清理预览URL对象
+  if (previewUrls.length > 0) {
+    previewUrls.forEach(url => URL.revokeObjectURL(url))
+    previewUrls = []
   }
 })
 
@@ -729,6 +748,17 @@ const beforeAvatarUpload = (rawFile) => {
     return false
   }
   return true
+}
+
+/**
+ * 处理主图预览
+ */
+const handleAvatarChange = (file) => {
+  // 创建预览URL
+  const previewUrl = URL.createObjectURL(file.raw)
+  productForm.mainImage = previewUrl
+  // 保存预览URL用于后续清理
+  previewUrls.push(previewUrl)
 }
 
 // 生命周期
