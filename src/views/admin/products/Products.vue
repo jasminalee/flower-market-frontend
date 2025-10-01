@@ -335,7 +335,7 @@ const editorConfig = reactive({
       server: uploadUrl,
       fieldName: 'file',
       maxFileSize: 5 * 1024 * 1024, // 5M
-      base64LimitSize: 5 * 1024 * 1024,
+      base64LimitSize: 0, // 禁用base64，强制使用上传
       // 自定义上传图片
       async customUpload(file, insertFn) {
         try {
@@ -345,8 +345,10 @@ const editorConfig = reactive({
           const response = await fileApi.uploadImage(formData)
           
           if (response && response.code === 200) {
+            // 处理图片URL，将相对路径转换为绝对路径
+            const imageUrl = response.data.startsWith('/') ? API_BASE_URL + response.data : response.data;
             // 插入图片到编辑器
-            insertFn(response.data, '', '')
+            insertFn(imageUrl, '', '')
             ElMessage.success('图片上传成功')
           } else {
             ElMessage.error('图片上传失败: ' + (response?.message || '未知错误'))
@@ -414,6 +416,13 @@ const loadProductList = async () => {
       const processedRecords = records.map(record => {
         if (record.mainImage && record.mainImage.startsWith('/')) {
           record.mainImage = API_BASE_URL + record.mainImage
+        }
+        // 同样处理产品详情中的图片URL
+        if (record.detail) {
+          // 使用正则表达式替换详情中的相对图片路径
+          record.detail = record.detail.replace(/src="(\/images\/uploads\/[^"]+)"/g, (match, p1) => {
+            return `src="${API_BASE_URL}${p1}"`;
+          });
         }
         return record
       })
@@ -518,20 +527,49 @@ const handleAdd = () => {
 /**
  * 查看产品
  */
-const handleView = (product) => {
+const handleView = async (product) => {
   isEdit.value = false // 查看模式
-  Object.assign(productForm, {
-    id: product.id,
-    productName: product.productName,
-    productCode: product.productCode,
-    brand: product.brand,
-    categoryId: product.categoryId,
-    mainImage: product.mainImage,
-    description: product.description,
-    detail: product.detail,
-    status: product.status,
-    productType: product.productType
-  })
+  
+  try {
+    // 调用详情接口获取完整的产品信息，包括富文本内容
+    const response = await productApi.getDetail(product.id)
+    if (response && response.code === 200) {
+      const detailData = response.data
+      // 处理图片URL
+      if (detailData.mainImage && detailData.mainImage.startsWith('/')) {
+        detailData.mainImage = API_BASE_URL + detailData.mainImage
+      }
+      
+      // 处理详情中的图片URL
+      if (detailData.detail) {
+        // 使用正则表达式替换详情中的相对图片路径
+        detailData.detail = detailData.detail.replace(/src="(\/images\/uploads\/[^"]+)"/g, (match, p1) => {
+          return `src="${API_BASE_URL}${p1}"`;
+        });
+      }
+      
+      Object.assign(productForm, {
+        id: detailData.id,
+        productName: detailData.productName,
+        productCode: detailData.productCode,
+        brand: detailData.brand,
+        categoryId: detailData.categoryId,
+        mainImage: detailData.mainImage,
+        description: detailData.description,
+        detail: detailData.detail,
+        status: detailData.status,
+        productType: detailData.productType
+      })
+    } else {
+      ElMessage.error('获取产品详情失败')
+      return
+    }
+  } catch (error) {
+    console.error('获取产品详情失败:', error)
+    ElMessage.error('获取产品详情失败: ' + (error.message || '未知错误'))
+    return
+  }
+  
   dialogVisible.value = true
 }
 
