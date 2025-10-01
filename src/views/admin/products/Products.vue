@@ -155,7 +155,6 @@
   <el-dialog
       :title="dialogTitle"
       v-model="dialogVisible"
-      width="800px"
       :close-on-click-modal="false"
       class="product-dialog"
   >

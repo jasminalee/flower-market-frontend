@@ -1,165 +1,792 @@
+# API文档
 
 
-现在我已经完成了图片上传接口的开发，让我为您解释一下如何配合富文本存储使用：
+**HOST**:localhost:18091
 
-# 图片上传接口与富文本存储配合使用说明
+**联系人**:
 
-## 1. 已实现的功能
+**Version**:1.0
 
-### 1.1 图片上传接口
-- 接口地址：`POST /api/upload/image`
-- 功能：接收图片文件并保存到服务器，返回可访问的URL
-
-### 1.2 图片访问接口
-- 接口地址：`GET /images/uploads/**`
-- 功能：提供对上传图片的访问支持
-
-## 2. 富文本中图片的处理流程
-
-### 2.1 前端上传流程
-1. 用户在富文本编辑器中选择插入图片
-2. 前端调用图片上传接口：
-   ```
-   POST /api/upload/image
-   Content-Type: multipart/form-data
-   Body: file=[图片文件]
-   ```
-
-3. 后端接收并保存图片，返回访问URL：
-   ```json
-   {
-     "code": 200,
-     "message": "上传成功",
-     "data": "/images/uploads/2025/10/01/abc123def456.png",
-     "timestamp": 1638456789012
-   }
-   ```
-
-4. 前端将URL插入到富文本内容中：
-   ```html
-   <img src="/images/uploads/2025/10/01/abc123def456.png" alt="图片描述" style="max-width:100%;">
-   ```
+**接口路径**:/v2/api-docs
 
 
-### 2.2 后端存储流程
-1. 富文本内容（包含图片URL）作为整体存储到[Product](file:///E:/IdeaProjects/flower-market-backend/src/main/java/vtc/xueqing/flower/entity/Product.java)实体的[detail](file:///E:/IdeaProjects/flower-market-backend/src/main/java/vtc/xueqing/flower/entity/Product.java#L46-L46)字段中
-2. 当需要展示产品详情时，直接从[detail](file:///E:/IdeaProjects/flower-market-backend/src/main/java/vtc/xueqing/flower/entity/Product.java#L46-L46)字段读取富文本内容
-3. 前端渲染时，图片URL会自动解析并显示图片
+[TOC]
 
-## 3. 接口详细说明
 
-### 3.1 图片上传接口
+# 产品信息表对象功能接口
 
-**请求URL**: `POST /api/upload/image`
 
-**请求方式**: `multipart/form-data`
+## 新增-更新数据
+
+
+**接口地址**:`/product`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "brand": "",
+  "categoryId": 0,
+  "createTime": "",
+  "description": "",
+  "detail": "",
+  "id": 0,
+  "mainImage": "",
+  "productCode": "",
+  "productName": "",
+  "productType": 0,
+  "status": 0,
+  "subImages": "",
+  "updateTime": ""
+}
+```
+
 
 **请求参数**:
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| file | MultipartFile | 是 | 图片文件 |
+
+
+| 参数名称                | 参数说明                             | 请求类型 | 是否必须 | 数据类型          | schema   |
+| ----------------------- | ------------------------------------ | -------- | -------- | ----------------- | -------- |
+| product                 | product                              | body     | true     | 产品信息          | 产品信息 |
+| &emsp;&emsp;brand       | 品牌                                 |          | false    | string            |          |
+| &emsp;&emsp;categoryId  | 分类ID（逻辑关联product_category表） |          | false    | integer(int64)    |          |
+| &emsp;&emsp;createTime  | 创建时间                             |          | false    | string(date-time) |          |
+| &emsp;&emsp;description | 产品描述                             |          | false    | string            |          |
+| &emsp;&emsp;detail      | 产品详情                             |          | false    | string            |          |
+| &emsp;&emsp;id          | 产品ID                               |          | false    | integer(int64)    |          |
+| &emsp;&emsp;mainImage   | 主图URL                              |          | false    | string            |          |
+| &emsp;&emsp;productCode | 产品编码                             |          | false    | string            |          |
+| &emsp;&emsp;productName | 产品名称                             |          | false    | string            |          |
+| &emsp;&emsp;productType | 产品类型（1-花卉，2-第三方产品）     |          | false    | integer(int32)    |          |
+| &emsp;&emsp;status      | 状态（0-下架，1-上架）               |          | false    | integer(int32)    |          |
+| &emsp;&emsp;subImages   | 子图URL集合，JSON格式存储            |          | false    | string            |          |
+| &emsp;&emsp;updateTime  | 更新时间                             |          | false    | string(date-time) |          |
+
+
+**响应状态**:
+
+
+| 状态码 | 说明         | schema                  |
+| ------ | ------------ | ----------------------- |
+| 200    | OK           | ResponseResult«boolean» |
+| 201    | Created      |                         |
+| 401    | Unauthorized |                         |
+| 403    | Forbidden    |                         |
+| 404    | Not Found    |                         |
+
+
+**响应参数**:
+
+
+| 参数名称  | 参数说明 | 类型           | schema         |
+| --------- | -------- | -------------- | -------------- |
+| code      |          | integer(int32) | integer(int32) |
+| data      |          | boolean        |                |
+| message   |          | string         |                |
+| timestamp |          | integer(int64) | integer(int64) |
+
 
 **响应示例**:
-```json
+
+```javascript
+{
+	"code": 0,
+	"data": true,
+	"message": "",
+	"timestamp": 0
+}
+```
+
+
+## 获取产品详情包括SKU信息
+
+
+**接口地址**:`/product/detail/{id}`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型 | 是否必须 | 数据类型       | schema |
+| -------- | -------- | -------- | -------- | -------------- | ------ |
+| id       | 产品ID   | path     | true     | integer(int64) |        |
+
+
+**响应状态**:
+
+
+| 状态码 | 说明         | schema                     |
+| ------ | ------------ | -------------------------- |
+| 200    | OK           | ResponseResult«产品详情VO» |
+| 401    | Unauthorized |                            |
+| 403    | Forbidden    |                            |
+| 404    | Not Found    |                            |
+
+
+**响应参数**:
+
+
+| 参数名称                               | 参数说明                             | 类型           | schema         |
+| -------------------------------------- | ------------------------------------ | -------------- | -------------- |
+| code                                   |                                      | integer(int32) | integer(int32) |
+| data                                   |                                      | 产品详情VO     | 产品详情VO     |
+| &emsp;&emsp;product                    | 产品基本信息                         | 产品信息       | 产品信息       |
+| &emsp;&emsp;&emsp;&emsp;brand          | 品牌                                 | string         |                |
+| &emsp;&emsp;&emsp;&emsp;categoryId     | 分类ID（逻辑关联product_category表） | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;createTime     | 创建时间                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;description    | 产品描述                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;detail         | 产品详情                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;id             | 产品ID                               | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;mainImage      | 主图URL                              | string         |                |
+| &emsp;&emsp;&emsp;&emsp;productCode    | 产品编码                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;productName    | 产品名称                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;productType    | 产品类型（1-花卉，2-第三方产品）     | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;status         | 状态（0-下架，1-上架）               | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;subImages      | 子图URL集合，JSON格式存储            | string         |                |
+| &emsp;&emsp;&emsp;&emsp;updateTime     | 更新时间                             | string         |                |
+| &emsp;&emsp;skus                       | 产品SKU列表                          | array          | 产品SKU信息    |
+| &emsp;&emsp;&emsp;&emsp;createTime     | 创建时间                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;id             | SKU ID                               | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;price          | 价格                                 | number         |                |
+| &emsp;&emsp;&emsp;&emsp;productId      | 产品ID（逻辑关联product表）          | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;skuCode        | SKU编码                              | string         |                |
+| &emsp;&emsp;&emsp;&emsp;skuName        | SKU名称（如：红色-L）                | string         |                |
+| &emsp;&emsp;&emsp;&emsp;specifications | 规格描述，JSON格式存储               | string         |                |
+| &emsp;&emsp;&emsp;&emsp;status         | 状态（0-无效，1-有效）               | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;stock          | 库存数量                             | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;updateTime     | 更新时间                             | string         |                |
+| message                                |                                      | string         |                |
+| timestamp                              |                                      | integer(int64) | integer(int64) |
+
+
+**响应示例**:
+
+```javascript
+{
+	"code": 0,
+	"data": {
+		"product": {
+			"brand": "",
+			"categoryId": 0,
+			"createTime": "",
+			"description": "",
+			"detail": "",
+			"id": 0,
+			"mainImage": "",
+			"productCode": "",
+			"productName": "",
+			"productType": 0,
+			"status": 0,
+			"subImages": "",
+			"updateTime": ""
+		},
+		"skus": [
+			{
+				"createTime": "",
+				"id": 0,
+				"price": 0,
+				"productId": 0,
+				"skuCode": "",
+				"skuName": "",
+				"specifications": "",
+				"status": 0,
+				"stock": 0,
+				"updateTime": ""
+			}
+		]
+	},
+	"message": "",
+	"timestamp": 0
+}
+```
+
+
+## 主页商品列表（支持分类和搜索）
+
+
+**接口地址**:`/product/homepage`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称   | 参数说明   | 请求类型 | 是否必须 | 数据类型       | schema |
+| ---------- | ---------- | -------- | -------- | -------------- | ------ |
+| categoryId | 分类ID     | query    | false    | integer(int64) |        |
+| current    | 页码       | query    | false    | integer(int64) |        |
+| keyword    | 搜索关键字 | query    | false    | string         |        |
+| size       | 每页数量   | query    | false    | integer(int64) |        |
+
+
+**响应状态**:
+
+
+| 状态码 | 说明         | schema                         |
+| ------ | ------------ | ------------------------------ |
+| 200    | OK           | ResponseResult«Page«产品信息»» |
+| 401    | Unauthorized |                                |
+| 403    | Forbidden    |                                |
+| 404    | Not Found    |                                |
+
+
+**响应参数**:
+
+
+| 参数名称                            | 参数说明                             | 类型           | schema         |
+| ----------------------------------- | ------------------------------------ | -------------- | -------------- |
+| code                                |                                      | integer(int32) | integer(int32) |
+| data                                |                                      | Page«产品信息» | Page«产品信息» |
+| &emsp;&emsp;countId                 |                                      | string         |                |
+| &emsp;&emsp;current                 |                                      | integer(int64) |                |
+| &emsp;&emsp;maxLimit                |                                      | integer(int64) |                |
+| &emsp;&emsp;optimizeCountSql        |                                      | boolean        |                |
+| &emsp;&emsp;orders                  |                                      | array          | OrderItem      |
+| &emsp;&emsp;&emsp;&emsp;asc         |                                      | boolean        |                |
+| &emsp;&emsp;&emsp;&emsp;column      |                                      | string         |                |
+| &emsp;&emsp;pages                   |                                      | integer(int64) |                |
+| &emsp;&emsp;records                 |                                      | array          | 产品信息       |
+| &emsp;&emsp;&emsp;&emsp;brand       | 品牌                                 | string         |                |
+| &emsp;&emsp;&emsp;&emsp;categoryId  | 分类ID（逻辑关联product_category表） | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;createTime  | 创建时间                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;description | 产品描述                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;detail      | 产品详情                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;id          | 产品ID                               | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;mainImage   | 主图URL                              | string         |                |
+| &emsp;&emsp;&emsp;&emsp;productCode | 产品编码                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;productName | 产品名称                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;productType | 产品类型（1-花卉，2-第三方产品）     | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;status      | 状态（0-下架，1-上架）               | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;subImages   | 子图URL集合，JSON格式存储            | string         |                |
+| &emsp;&emsp;&emsp;&emsp;updateTime  | 更新时间                             | string         |                |
+| &emsp;&emsp;searchCount             |                                      | boolean        |                |
+| &emsp;&emsp;size                    |                                      | integer(int64) |                |
+| &emsp;&emsp;total                   |                                      | integer(int64) |                |
+| message                             |                                      | string         |                |
+| timestamp                           |                                      | integer(int64) | integer(int64) |
+
+
+**响应示例**:
+
+```javascript
+{
+	"code": 0,
+	"data": {
+		"countId": "",
+		"current": 0,
+		"maxLimit": 0,
+		"optimizeCountSql": true,
+		"orders": [
+			{
+				"asc": true,
+				"column": ""
+			}
+		],
+		"pages": 0,
+		"records": [
+			{
+				"brand": "",
+				"categoryId": 0,
+				"createTime": "",
+				"description": "",
+				"detail": "",
+				"id": 0,
+				"mainImage": "",
+				"productCode": "",
+				"productName": "",
+				"productType": 0,
+				"status": 0,
+				"subImages": "",
+				"updateTime": ""
+			}
+		],
+		"searchCount": true,
+		"size": 0,
+		"total": 0
+	},
+	"message": "",
+	"timestamp": 0
+}
+```
+
+
+## 列表查询
+
+
+**接口地址**:`/product/list`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称    | 参数说明                             | 请求类型 | 是否必须 | 数据类型          | schema |
+| ----------- | ------------------------------------ | -------- | -------- | ----------------- | ------ |
+| categoryId  | 分类ID（逻辑关联product_category表） | query    | true     | integer(int64)    |        |
+| productCode | 产品编码                             | query    | true     | string            |        |
+| productName | 产品名称                             | query    | true     | string            |        |
+| productType | 产品类型（1-花卉，2-第三方产品）     | query    | true     | integer(int32)    |        |
+| status      | 状态（0-下架，1-上架）               | query    | true     | integer(int32)    |        |
+| brand       | 品牌                                 | query    | false    | string            |        |
+| createTime  | 创建时间                             | query    | false    | string(date-time) |        |
+| description | 产品描述                             | query    | false    | string            |        |
+| detail      | 产品详情                             | query    | false    | string            |        |
+| id          | 产品ID                               | query    | false    | integer(int64)    |        |
+| mainImage   | 主图URL                              | query    | false    | string            |        |
+| subImages   | 子图URL集合，JSON格式存储            | query    | false    | string            |        |
+| updateTime  | 更新时间                             | query    | false    | string(date-time) |        |
+
+
+**响应状态**:
+
+
+| 状态码 | 说明         | schema                         |
+| ------ | ------------ | ------------------------------ |
+| 200    | OK           | ResponseResult«List«产品信息»» |
+| 401    | Unauthorized |                                |
+| 403    | Forbidden    |                                |
+| 404    | Not Found    |                                |
+
+
+**响应参数**:
+
+
+| 参数名称                | 参数说明                             | 类型              | schema         |
+| ----------------------- | ------------------------------------ | ----------------- | -------------- |
+| code                    |                                      | integer(int32)    | integer(int32) |
+| data                    |                                      | array             | 产品信息       |
+| &emsp;&emsp;brand       | 品牌                                 | string            |                |
+| &emsp;&emsp;categoryId  | 分类ID（逻辑关联product_category表） | integer(int64)    |                |
+| &emsp;&emsp;createTime  | 创建时间                             | string(date-time) |                |
+| &emsp;&emsp;description | 产品描述                             | string            |                |
+| &emsp;&emsp;detail      | 产品详情                             | string            |                |
+| &emsp;&emsp;id          | 产品ID                               | integer(int64)    |                |
+| &emsp;&emsp;mainImage   | 主图URL                              | string            |                |
+| &emsp;&emsp;productCode | 产品编码                             | string            |                |
+| &emsp;&emsp;productName | 产品名称                             | string            |                |
+| &emsp;&emsp;productType | 产品类型（1-花卉，2-第三方产品）     | integer(int32)    |                |
+| &emsp;&emsp;status      | 状态（0-下架，1-上架）               | integer(int32)    |                |
+| &emsp;&emsp;subImages   | 子图URL集合，JSON格式存储            | string            |                |
+| &emsp;&emsp;updateTime  | 更新时间                             | string(date-time) |                |
+| message                 |                                      | string            |                |
+| timestamp               |                                      | integer(int64)    | integer(int64) |
+
+
+**响应示例**:
+
+```javascript
+{
+	"code": 0,
+	"data": [
+		{
+			"brand": "",
+			"categoryId": 0,
+			"createTime": "",
+			"description": "",
+			"detail": "",
+			"id": 0,
+			"mainImage": "",
+			"productCode": "",
+			"productName": "",
+			"productType": 0,
+			"status": 0,
+			"subImages": "",
+			"updateTime": ""
+		}
+	],
+	"message": "",
+	"timestamp": 0
+}
+```
+
+
+## 分页查询
+
+
+**接口地址**:`/product/page`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称    | 参数说明                             | 请求类型 | 是否必须 | 数据类型          | schema |
+| ----------- | ------------------------------------ | -------- | -------- | ----------------- | ------ |
+| categoryId  | 分类ID（逻辑关联product_category表） | query    | true     | integer(int64)    |        |
+| productCode | 产品编码                             | query    | true     | string            |        |
+| productName | 产品名称                             | query    | true     | string            |        |
+| productType | 产品类型（1-花卉，2-第三方产品）     | query    | true     | integer(int32)    |        |
+| status      | 状态（0-下架，1-上架）               | query    | true     | integer(int32)    |        |
+| brand       | 品牌                                 | query    | false    | string            |        |
+| createTime  | 创建时间                             | query    | false    | string(date-time) |        |
+| current     | 页码                                 | query    | false    | integer(int64)    |        |
+| description | 产品描述                             | query    | false    | string            |        |
+| detail      | 产品详情                             | query    | false    | string            |        |
+| id          | 产品ID                               | query    | false    | integer(int64)    |        |
+| mainImage   | 主图URL                              | query    | false    | string            |        |
+| size        | 每页数量                             | query    | false    | integer(int64)    |        |
+| subImages   | 子图URL集合，JSON格式存储            | query    | false    | string            |        |
+| updateTime  | 更新时间                             | query    | false    | string(date-time) |        |
+
+
+**响应状态**:
+
+
+| 状态码 | 说明         | schema                         |
+| ------ | ------------ | ------------------------------ |
+| 200    | OK           | ResponseResult«Page«产品信息»» |
+| 401    | Unauthorized |                                |
+| 403    | Forbidden    |                                |
+| 404    | Not Found    |                                |
+
+
+**响应参数**:
+
+
+| 参数名称                            | 参数说明                             | 类型           | schema         |
+| ----------------------------------- | ------------------------------------ | -------------- | -------------- |
+| code                                |                                      | integer(int32) | integer(int32) |
+| data                                |                                      | Page«产品信息» | Page«产品信息» |
+| &emsp;&emsp;countId                 |                                      | string         |                |
+| &emsp;&emsp;current                 |                                      | integer(int64) |                |
+| &emsp;&emsp;maxLimit                |                                      | integer(int64) |                |
+| &emsp;&emsp;optimizeCountSql        |                                      | boolean        |                |
+| &emsp;&emsp;orders                  |                                      | array          | OrderItem      |
+| &emsp;&emsp;&emsp;&emsp;asc         |                                      | boolean        |                |
+| &emsp;&emsp;&emsp;&emsp;column      |                                      | string         |                |
+| &emsp;&emsp;pages                   |                                      | integer(int64) |                |
+| &emsp;&emsp;records                 |                                      | array          | 产品信息       |
+| &emsp;&emsp;&emsp;&emsp;brand       | 品牌                                 | string         |                |
+| &emsp;&emsp;&emsp;&emsp;categoryId  | 分类ID（逻辑关联product_category表） | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;createTime  | 创建时间                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;description | 产品描述                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;detail      | 产品详情                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;id          | 产品ID                               | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;mainImage   | 主图URL                              | string         |                |
+| &emsp;&emsp;&emsp;&emsp;productCode | 产品编码                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;productName | 产品名称                             | string         |                |
+| &emsp;&emsp;&emsp;&emsp;productType | 产品类型（1-花卉，2-第三方产品）     | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;status      | 状态（0-下架，1-上架）               | integer        |                |
+| &emsp;&emsp;&emsp;&emsp;subImages   | 子图URL集合，JSON格式存储            | string         |                |
+| &emsp;&emsp;&emsp;&emsp;updateTime  | 更新时间                             | string         |                |
+| &emsp;&emsp;searchCount             |                                      | boolean        |                |
+| &emsp;&emsp;size                    |                                      | integer(int64) |                |
+| &emsp;&emsp;total                   |                                      | integer(int64) |                |
+| message                             |                                      | string         |                |
+| timestamp                           |                                      | integer(int64) | integer(int64) |
+
+
+**响应示例**:
+
+```javascript
+{
+	"code": 0,
+	"data": {
+		"countId": "",
+		"current": 0,
+		"maxLimit": 0,
+		"optimizeCountSql": true,
+		"orders": [
+			{
+				"asc": true,
+				"column": ""
+			}
+		],
+		"pages": 0,
+		"records": [
+			{
+				"brand": "",
+				"categoryId": 0,
+				"createTime": "",
+				"description": "",
+				"detail": "",
+				"id": 0,
+				"mainImage": "",
+				"productCode": "",
+				"productName": "",
+				"productType": 0,
+				"status": 0,
+				"subImages": "",
+				"updateTime": ""
+			}
+		],
+		"searchCount": true,
+		"size": 0,
+		"total": 0
+	},
+	"message": "",
+	"timestamp": 0
+}
+```
+
+
+## 通过ID查询单条数据
+
+
+**接口地址**:`/product/{id}`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型 | 是否必须 | 数据类型       | schema |
+| -------- | -------- | -------- | -------- | -------------- | ------ |
+| id       | 产品ID   | path     | true     | integer(int64) |        |
+
+
+**响应状态**:
+
+
+| 状态码 | 说明         | schema                   |
+| ------ | ------------ | ------------------------ |
+| 200    | OK           | ResponseResult«产品信息» |
+| 401    | Unauthorized |                          |
+| 403    | Forbidden    |                          |
+| 404    | Not Found    |                          |
+
+
+**响应参数**:
+
+
+| 参数名称                | 参数说明                             | 类型              | schema         |
+| ----------------------- | ------------------------------------ | ----------------- | -------------- |
+| code                    |                                      | integer(int32)    | integer(int32) |
+| data                    |                                      | 产品信息          | 产品信息       |
+| &emsp;&emsp;brand       | 品牌                                 | string            |                |
+| &emsp;&emsp;categoryId  | 分类ID（逻辑关联product_category表） | integer(int64)    |                |
+| &emsp;&emsp;createTime  | 创建时间                             | string(date-time) |                |
+| &emsp;&emsp;description | 产品描述                             | string            |                |
+| &emsp;&emsp;detail      | 产品详情                             | string            |                |
+| &emsp;&emsp;id          | 产品ID                               | integer(int64)    |                |
+| &emsp;&emsp;mainImage   | 主图URL                              | string            |                |
+| &emsp;&emsp;productCode | 产品编码                             | string            |                |
+| &emsp;&emsp;productName | 产品名称                             | string            |                |
+| &emsp;&emsp;productType | 产品类型（1-花卉，2-第三方产品）     | integer(int32)    |                |
+| &emsp;&emsp;status      | 状态（0-下架，1-上架）               | integer(int32)    |                |
+| &emsp;&emsp;subImages   | 子图URL集合，JSON格式存储            | string            |                |
+| &emsp;&emsp;updateTime  | 更新时间                             | string(date-time) |                |
+| message                 |                                      | string            |                |
+| timestamp               |                                      | integer(int64)    | integer(int64) |
+
+
+**响应示例**:
+
+```javascript
+{
+	"code": 0,
+	"data": {
+		"brand": "",
+		"categoryId": 0,
+		"createTime": "",
+		"description": "",
+		"detail": "",
+		"id": 0,
+		"mainImage": "",
+		"productCode": "",
+		"productName": "",
+		"productType": 0,
+		"status": 0,
+		"subImages": "",
+		"updateTime": ""
+	},
+	"message": "",
+	"timestamp": 0
+}
+```
+
+
+## 通过主键删除数据
+
+
+**接口地址**:`/product/{id}`
+
+
+**请求方式**:`DELETE`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型 | 是否必须 | 数据类型       | schema |
+| -------- | -------- | -------- | -------- | -------------- | ------ |
+| id       | 产品ID   | path     | true     | integer(int64) |        |
+
+
+**响应状态**:
+
+
+| 状态码 | 说明         | schema                  |
+| ------ | ------------ | ----------------------- |
+| 200    | OK           | ResponseResult«boolean» |
+| 204    | No Content   |                         |
+| 401    | Unauthorized |                         |
+| 403    | Forbidden    |                         |
+
+
+**响应参数**:
+
+
+| 参数名称  | 参数说明 | 类型           | schema         |
+| --------- | -------- | -------------- | -------------- |
+| code      |          | integer(int32) | integer(int32) |
+| data      |          | boolean        |                |
+| message   |          | string         |                |
+| timestamp |          | integer(int64) | integer(int64) |
+
+
+**响应示例**:
+
+```javascript
+{
+	"code": 0,
+	"data": true,
+	"message": "",
+	"timestamp": 0
+}
+```
+
+
+# 文件上传接口
+
+
+## 上传图片
+
+
+**接口地址**:`/api/upload/image`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`multipart/form-data`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:<p>上传图片文件，支持jpg、png、gif格式，文件大小不超过5MB</p>
+
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型 | 是否必须 | 数据类型 | schema |
+| -------- | -------- | -------- | -------- | -------- | ------ |
+| file     |          | formData | false    | file     |        |
+
+
+**响应状态**:
+
+
+| 状态码 | 说明         | schema                 |
+| ------ | ------------ | ---------------------- |
+| 200    | OK           | ResponseResult«string» |
+| 201    | Created      |                        |
+| 401    | Unauthorized |                        |
+| 403    | Forbidden    |                        |
+| 404    | Not Found    |                        |
+
+
+**响应参数**:
+
+
+| 参数名称  | 参数说明 | 类型           | schema         |
+| --------- | -------- | -------------- | -------------- |
+| code      |          | integer(int32) | integer(int32) |
+| data      |          | string         |                |
+| message   |          | string         |                |
+| timestamp |          | integer(int64) | integer(int64) |
+
+**响应示例**: data为url后缀, 前端需要附带上服务器的地址再拼接这个data才对例如
+
+http://localhost:18091/images/uploads/2025/10/01/bf6632b94e9e4fb6b6cc7c8b2dd30a4a.jpg
+
+```javascript
 {
   "code": 200,
   "message": "上传成功",
-  "data": "/images/uploads/2025/10/01/abc123def456.png",
-  "timestamp": 1638456789012
+  "data": "/images/uploads/2025/10/01/bf6632b94e9e4fb6b6cc7c8b2dd30a4a.jpg",
+  "timestamp": 1759314456887
 }
 ```
-
-
-**错误响应示例**:
-```json
-{
-  "code": 400,
-  "message": "只支持图片格式文件",
-  "data": null,
-  "timestamp": 1638456789012
-}
-```
-
-
-### 3.2 图片访问接口
-
-**请求URL**: `GET /images/uploads/{年}/{月}/{日}/{文件名}`
-
-**示例**: `GET /images/uploads/2025/10/01/abc123def456.png`
-
-## 4. 使用示例
-
-### 4.1 前端JavaScript示例（使用axios）
-```javascript
-// 上传图片
-const uploadImage = async (file) => {
-  const formData = new FormData();
-  formData.append('file', file);
-  
-  try {
-    const response = await axios.post('/api/upload/image', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
-    if (response.data.code === 200) {
-      // 获取图片URL
-      const imageUrl = response.data.data;
-      // 将图片插入到富文本编辑器中
-      insertImageToEditor(imageUrl);
-    } else {
-      console.error('上传失败:', response.data.message);
-    }
-  } catch (error) {
-    console.error('上传出错:', error);
-  }
-};
-
-// 将图片插入到富文本编辑器中
-const insertImageToEditor = (imageUrl) => {
-  const imgHtml = `<img src="${imageUrl}" style="max-width:100%;"/>`;
-  // 这里根据使用的富文本编辑器进行具体实现
-  editor.insertContent(imgHtml);
-};
-```
-
-
-### 4.2 富文本内容存储示例
-```html
-<!-- 存储在Product实体的detail字段中的富文本内容 -->
-<div>
-  <h2>产品介绍</h2>
-  <p>这是一款高品质的红玫瑰，产自云南昆明。</p>
-  <img src="/images/uploads/2025/10/01/abc123def456.png" style="max-width:100%;">
-  <ul>
-    <li>新鲜采摘</li>
-    <li>保证质量</li>
-    <li>快速配送</li>
-  </ul>
-</div>
-```
-
-
-## 5. 技术特点
-
-1. **安全性**：
-   - 文件类型检查，只允许图片格式
-   - 文件大小限制（5MB）
-   - 文件名随机化，避免冲突
-
-2. **组织性**：
-   - 按日期组织文件目录结构
-   - 使用UUID生成唯一文件名
-
-3. **可访问性**：
-   - 提供统一的图片访问接口
-   - 支持多种图片格式（jpg、png、gif等）
-
-## 6. 部署注意事项
-
-1. 上传的图片存储在项目目录中，如果使用jar包部署，需要额外配置静态资源访问路径
-2. 在生产环境中，建议将图片存储到专门的文件服务器或云存储服务
-3. 可以根据需要调整文件大小限制和存储路径
-
-通过以上实现，富文本编辑器中的图片可以顺利上传、存储和展示，为用户提供完整的富文本编辑体验。

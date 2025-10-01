@@ -22,6 +22,11 @@
   margin-top: 10px;
 }
 
+.product-dialog {
+  width: 1200px;
+  margin-top: 4vh;
+}
+
 /* 表单行间距 */
 .product-dialog .el-row {
   margin-bottom: 15px;
