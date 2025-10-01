@@ -160,7 +160,7 @@
             <el-input 
               v-model="productForm.productCode" 
               placeholder="请输入产品编码"
-              :disabled="!isEdit"
+              :disabled="!isEdit || !!productForm.id"
             />
           </el-form-item>
         </el-col>
@@ -569,7 +569,7 @@ const handleEdit = (product) => {
   let detailContent = product.detail || '';
   if (detailContent) {
     // 移除blob URL，避免无效链接
-    detailContent = detailContent.replace(/src="blob:http[^']*"/g, '');
+    detailContent = detailContent.replace(/src="blob:http[^"]*"/g, 'src=""');
   }
   
   Object.assign(productForm, {
