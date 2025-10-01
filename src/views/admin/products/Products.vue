@@ -360,7 +360,6 @@ const editorConfig = reactive({
       maxFileSize: 5 * 1024 * 1024, // 5M
       base64LimitSize: 0, // 禁用base64，强制使用上传
       // 自定义上传图片
-
       async customUpload(file, insertFn) {
         try {
           const formData = new FormData()
@@ -370,7 +369,9 @@ const editorConfig = reactive({
 
           if (response && response.code === 200) {
             // 直接插入服务器URL
-            insertFn(response.data, '', '')
+            // 修复：确保使用正确的数据字段
+            const imageUrl = response.data.url || response.data.imageUrl || response.data;
+            insertFn(imageUrl, '', '')
             ElMessage.success('图片上传成功')
           } else {
             ElMessage.error('图片上传失败: ' + (response?.message || '未知错误'))
@@ -547,8 +548,17 @@ const handleView = async (product) => {
     // 调用详情接口获取完整的产品信息，包括富文本内容
     const response = await productApi.getDetail(product.id)
     if (response && response.code === 200) {
-      const detailData = response.data.product
+      // 修复数据访问路径 - 直接使用 response.data 而不是 response.data.product
+      const detailData = response.data
       console.log('Product detail data:', detailData) // 调试信息
+      
+      // 处理详情中的blob URL，替换为正确的图片路径
+      let detailContent = detailData.detail || '';
+      if (detailContent) {
+        // 移除blob URL，避免无效链接
+        detailContent = detailContent.replace(/src="blob:http[^"]*"/g, 'src=""');
+      }
+
       Object.assign(productForm, {
         id: detailData.id,
         productName: detailData.productName,
@@ -557,7 +567,7 @@ const handleView = async (product) => {
         categoryId: detailData.categoryId,
         mainImage: detailData.mainImage,
         description: detailData.description,
-        detail: detailData.detail,
+        detail: detailContent,
         status: detailData.status,
         productType: detailData.productType
       })
