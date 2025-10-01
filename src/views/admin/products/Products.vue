@@ -195,24 +195,6 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="主图" prop="mainImage">
-            <el-upload
-              class="avatar-uploader"
-              :action="uploadUrl"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload"
-              :on-change="handleAvatarChange"
-            >
-              <img v-if="productForm.mainImage" :src="productForm.mainImage" class="avatar" />
-              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-            </el-upload>
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <el-row :gutter="16">
-        <el-col :span="12">
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="productForm.status">
               <el-radio :label="1">上架</el-radio>
@@ -222,14 +204,34 @@
         </el-col>
       </el-row>
 
-      <el-form-item label="产品描述" prop="description">
-        <el-input 
-          v-model="productForm.description" 
-          type="textarea"
-          placeholder="请输入产品描述"
-          :rows="3"
-        />
-      </el-form-item>
+      <el-row :gutter="16">
+        <el-col :span="8">
+          <el-form-item label="主图" prop="mainImage">
+            <el-upload
+                class="avatar-uploader"
+                :action="uploadUrl"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload"
+                :on-change="handleAvatarChange"
+            >
+              <img v-if="productForm.mainImage" :src="productForm.mainImage" class="avatar" />
+              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            </el-upload>
+          </el-form-item>
+        </el-col>
+        <el-col :span="16">
+          <el-form-item label="产品描述" prop="description">
+            <el-input
+                v-model="productForm.description"
+                type="textarea"
+                placeholder="请输入产品描述"
+                :rows="3"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+
 
       <el-form-item label="产品详情" prop="detail">
         <div class="editor-container" v-if="isEdit">
@@ -543,6 +545,7 @@ const handleView = async (product) => {
     const response = await productApi.getDetail(product.id)
     if (response && response.code === 200) {
       const detailData = response.data
+      console.log('Product detail data:', detailData) // 调试信息
       // 处理图片URL
       if (detailData.mainImage && detailData.mainImage.startsWith('/')) {
         detailData.mainImage = API_BASE_URL + detailData.mainImage
