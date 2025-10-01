@@ -421,21 +421,8 @@ const loadProductList = async () => {
     const response = await productApi.page(params)
     if (response) {
       const records = response.data.records || []
-      // 处理图片URL，将相对路径转换为绝对路径
-      const processedRecords = records.map(record => {
-        if (record.mainImage && record.mainImage.startsWith('/')) {
-          record.mainImage = API_BASE_URL + record.mainImage
-        }
-        // 同样处理产品详情中的图片URL
-        if (record.detail) {
-          // 使用正则表达式替换详情中的相对图片路径
-          record.detail = record.detail.replace(/src="(\/images\/uploads\/[^"]+)"/g, (match, p1) => {
-            return `src="${API_BASE_URL}${p1}"`;
-          });
-        }
-        return record
-      })
-      productList.value = processedRecords
+      console.log('productList:', records)
+      productList.value = records
       pagination.total = response.total != null ? response.total : (response.count || 0)
       pagination.page = response.current || pagination.page
       pagination.size = response.size || pagination.size
@@ -588,6 +575,14 @@ const handleView = async (product) => {
  */
 const handleEdit = (product) => {
   isEdit.value = true // 编辑模式
+  
+  // 处理详情中的blob URL，替换为正确的图片路径
+  let detailContent = product.detail || '';
+  if (detailContent) {
+    // 移除blob URL，避免无效链接
+    detailContent = detailContent.replace(/src="blob:http[^']*"/g, '');
+  }
+  
   Object.assign(productForm, {
     id: product.id,
     productName: product.productName,
@@ -596,7 +591,7 @@ const handleEdit = (product) => {
     categoryId: product.categoryId,
     mainImage: product.mainImage,
     description: product.description,
-    detail: product.detail,
+    detail: detailContent,
     status: product.status,
     productType: product.productType
   })
@@ -731,6 +726,7 @@ onBeforeUnmount(() => {
  */
 const handleAvatarSuccess = (response, uploadFile) => {
   if (response && response.code === 200) {
+    console.log('图片上传成功:', response)
     productForm.mainImage = response.data
     ElMessage.success('图片上传成功')
   } else {
@@ -757,7 +753,11 @@ const beforeAvatarUpload = (rawFile) => {
  */
 const handleAvatarChange = (file) => {
   // 创建预览URL
+  console.log('file:', previewUrl)
+
   const previewUrl = URL.createObjectURL(file.raw)
+  console.log('previewUrl:', previewUrl)
+
   productForm.mainImage = previewUrl
   // 保存预览URL用于后续清理
   previewUrls.push(previewUrl)
