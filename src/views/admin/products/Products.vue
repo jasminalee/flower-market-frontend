@@ -315,6 +315,9 @@ const productForm = reactive({
 // 上传URL
 const uploadUrl = import.meta.env.VITE_API_BASE_URL + '/api/upload/image'
 
+// API基础URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:18091'
+
 // 编辑器模式
 const mode = 'default'
 
@@ -407,7 +410,14 @@ const loadProductList = async () => {
     const response = await productApi.page(params)
     if (response) {
       const records = response.data.records || []
-      productList.value = records
+      // 处理图片URL，将相对路径转换为绝对路径
+      const processedRecords = records.map(record => {
+        if (record.mainImage && record.mainImage.startsWith('/')) {
+          record.mainImage = API_BASE_URL + record.mainImage
+        }
+        return record
+      })
+      productList.value = processedRecords
       pagination.total = response.total != null ? response.total : (response.count || 0)
       pagination.page = response.current || pagination.page
       pagination.size = response.size || pagination.size
