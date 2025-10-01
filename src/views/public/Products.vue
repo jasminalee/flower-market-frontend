@@ -407,4 +407,4 @@ onMounted(async () => {
 </script>
 
 <!-- 引入产品页面专用样式 -->
-<style src="@/assets/products.css"></style>
+<style src="@/assets/publicProducts.css"></style>
