@@ -292,10 +292,12 @@ import {ElMessage, ElMessageBox} from 'element-plus'
 import productApi from '@/api/product.js'
 import productCategoryApi from '@/api/productCategory.js'
 import fileApi from '@/api/file.js'
+import apiClient from '@/api/apiClient.js'
 import {Plus, Search, Refresh, View, Edit, Delete} from '@element-plus/icons-vue'
 import '@wangeditor/editor/dist/css/style.css'
 import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
 import '@/assets/products.css'
+const API_BASE_URL = apiClient.raw.defaults.baseURL || 'http://localhost:18091'
 
 // 响应式数据
 const loading = ref(false)
@@ -369,8 +371,10 @@ const editorConfig = reactive({
           if (response && response.code === 200) {
             // 直接插入服务器URL
             // 修复：确保使用正确的数据字段
-            const imageUrl = response.data.url || response.data.imageUrl || response.data;
-            insertFn(imageUrl, '', '')
+            const imageUrl = API_BASE_URL + response.data;
+            console.log('图片上传成功:', imageUrl)
+            // 修复图片回显问题，正确调用insertFn
+            insertFn(imageUrl, 'image.png', '图片加载中...')
             ElMessage.success('图片上传成功')
           } else {
             ElMessage.error('图片上传失败: ' + (response?.message || '未知错误'))
@@ -554,7 +558,7 @@ const handleView = async (product) => {
       // 处理详情中的blob URL，替换为正确的图片路径
       let detailContent = detailData.detail || '';
       if (detailContent) {
-        // 移除blob URL，避免无效链接
+        // 只移除真正的blob URL，保留正常的图片路径
         detailContent = detailContent.replace(/src="blob:http[^"]*"/g, 'src=""');
       }
 
