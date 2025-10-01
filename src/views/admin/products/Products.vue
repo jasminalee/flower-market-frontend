@@ -187,6 +187,14 @@
 
       <el-row :gutter="16">
         <el-col :span="12">
+          <el-form-item label="产品类型" prop="productType">
+            <el-select v-model="productForm.productType" placeholder="请选择产品类型">
+              <el-option label="实物商品" :value="1" />
+              <el-option label="虚拟商品" :value="2" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
           <el-form-item label="主图" prop="mainImage">
             <el-upload
               class="avatar-uploader"
@@ -200,6 +208,9 @@
             </el-upload>
           </el-form-item>
         </el-col>
+      </el-row>
+
+      <el-row :gutter="16">
         <el-col :span="12">
           <el-form-item label="状态" prop="status">
             <el-radio-group v-model="productForm.status">
@@ -220,12 +231,23 @@
       </el-form-item>
 
       <el-form-item label="产品详情" prop="detail">
-        <el-input 
-          v-model="productForm.detail" 
-          type="textarea"
-          placeholder="请输入产品详情"
-          :rows="4"
-        />
+        <div class="editor-container" v-if="isEdit">
+          <Toolbar
+            class="editor-toolbar"
+            :editor="editorRef"
+            :defaultConfig="toolbarConfig"
+            :mode="mode"
+          />
+          <Editor
+            class="editor-content"
+            v-model="productForm.detail"
+            :defaultConfig="editorConfig"
+            :mode="mode"
+            @onCreated="handleEditorCreated"
+            @onChange="handleEditorChange"
+          />
+        </div>
+        <div class="product-detail-view" v-else v-html="productForm.detail"></div>
       </el-form-item>
     </el-form>
 
@@ -241,11 +263,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import productApi from '@/api/product.js'
 import productCategoryApi from '@/api/productCategory.js'
+import fileApi from '@/api/file.js'
 import { Plus, Search, Refresh, View, Edit, Delete } from '@element-plus/icons-vue'
+import '@wangeditor/editor/dist/css/style.css'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 
 // 响应式数据
 const loading = ref(false)
@@ -283,11 +308,53 @@ const productForm = reactive({
   mainImage: '',
   description: '',
   detail: '',
-  status: 1
+  status: 1,
+  productType: 1
 })
 
 // 上传URL
-const uploadUrl = import.meta.env.VITE_API_BASE_URL + '/file/upload'
+const uploadUrl = import.meta.env.VITE_API_BASE_URL + '/api/upload/image'
+
+// 编辑器模式
+const mode = 'default'
+
+// 编辑器实例，必须用 shallowRef
+const editorRef = shallowRef()
+
+// 工具栏配置
+const toolbarConfig = {}
+
+// 富文本编辑器配置
+const editorConfig = reactive({
+  placeholder: '请输入产品详情...',
+  MENU_CONF: {
+    'uploadImage': {
+      server: uploadUrl,
+      fieldName: 'file',
+      maxFileSize: 5 * 1024 * 1024, // 5M
+      base64LimitSize: 5 * 1024 * 1024,
+      // 自定义上传图片
+      async customUpload(file, insertFn) {
+        try {
+          const formData = new FormData()
+          formData.append('file', file)
+          
+          const response = await fileApi.uploadImage(formData)
+          
+          if (response && response.code === 200) {
+            // 插入图片到编辑器
+            insertFn(response.data, '', '')
+            ElMessage.success('图片上传成功')
+          } else {
+            ElMessage.error('图片上传失败: ' + (response?.message || '未知错误'))
+          }
+        } catch (error) {
+          ElMessage.error('图片上传失败: ' + (error.message || '网络错误'))
+        }
+      }
+    }
+  }
+})
 
 // 表单验证规则
 const productRules = {
@@ -304,11 +371,24 @@ const productRules = {
   ],
   categoryId: [
     { required: true, message: '请选择分类', trigger: 'change' }
+  ],
+  productType: [
+    { required: true, message: '请选择产品类型', trigger: 'change' }
   ]
 }
 
 // 计算属性
 const dialogTitle = computed(() => isEdit.value ? '编辑产品' : '新增产品')
+
+// 编辑器创建回调
+const handleEditorCreated = (editor) => {
+  editorRef.value = editor // 记录 editor 实例，重要！
+}
+
+// 编辑器内容变化处理
+const handleEditorChange = (editor) => {
+  productForm.detail = editor.getHtml()
+}
 
 /**
  * 加载产品列表
@@ -429,7 +509,7 @@ const handleAdd = () => {
  * 查看产品
  */
 const handleView = (product) => {
-  isEdit.value = true
+  isEdit.value = false // 查看模式
   Object.assign(productForm, {
     id: product.id,
     productName: product.productName,
@@ -439,7 +519,8 @@ const handleView = (product) => {
     mainImage: product.mainImage,
     description: product.description,
     detail: product.detail,
-    status: product.status
+    status: product.status,
+    productType: product.productType
   })
   dialogVisible.value = true
 }
@@ -448,7 +529,7 @@ const handleView = (product) => {
  * 编辑产品
  */
 const handleEdit = (product) => {
-  isEdit.value = true
+  isEdit.value = true // 编辑模式
   Object.assign(productForm, {
     id: product.id,
     productName: product.productName,
@@ -458,7 +539,8 @@ const handleEdit = (product) => {
     mainImage: product.mainImage,
     description: product.description,
     detail: product.detail,
-    status: product.status
+    status: product.status,
+    productType: product.productType
   })
   dialogVisible.value = true
 }
@@ -519,7 +601,8 @@ const handleSave = async () => {
       mainImage: productForm.mainImage,
       description: productForm.description,
       detail: productForm.detail,
-      status: productForm.status
+      status: productForm.status,
+      productType: productForm.productType
     }
 
     const response = await productApi.save(productData)
@@ -552,13 +635,27 @@ const resetProductForm = () => {
     mainImage: '',
     description: '',
     detail: '',
-    status: 1
+    status: 1,
+    productType: 1
   })
 
   if (productFormRef.value) {
     productFormRef.value.resetFields()
   }
+  
+  // 重置编辑器内容
+  if (editorRef.value) {
+    editorRef.value.clear()
+  }
 }
+
+// 组件销毁前清理编辑器
+onBeforeUnmount(() => {
+  if (editorRef.value) {
+    editorRef.value.destroy()
+    editorRef.value = null
+  }
+})
 
 /**
  * 处理图片上传成功
@@ -606,24 +703,4 @@ onMounted(() => {
   display: block;
 }
 
-.avatar-uploader .el-upload {
-  border: 1px dashed var(--el-border-color);
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: var(--el-transition-duration-fast);
-}
-
-.avatar-uploader .el-upload:hover {
-  border-color: var(--el-color-primary);
-}
-
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 120px;
-  height: 120px;
-  text-align: center;
-}
 </style>
