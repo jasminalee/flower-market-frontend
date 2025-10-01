@@ -64,10 +64,7 @@
       </el-col>
 
       <el-col :span="1" style="text-align: right;">
-        <el-button type="primary" @click="handleAdd">
-          <el-icon>
-            <Plus/>
-          </el-icon>
+        <el-button :icon="Plus" type="primary" @click="handleAdd">
           新增产品
         </el-button>
       </el-col>
@@ -284,7 +281,7 @@
 </template>
 
 <script setup>
-import {ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef} from 'vue'
+import {ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef, nextTick} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import productApi from '@/api/product.js'
 import productCategoryApi from '@/api/productCategory.js'
@@ -535,7 +532,11 @@ const handleAdd = () => {
   isEdit.value = true // 新增模式下也需要编辑功能
   resetProductForm()
   console.log('Product form after reset:', productForm) // 调试信息
-  dialogVisible.value = true
+  
+  // 使用nextTick确保表单重置完成后再打开对话框
+  nextTick(() => {
+    dialogVisible.value = true
+  })
 }
 
 /**
@@ -720,6 +721,9 @@ const resetProductForm = () => {
     previewUrls.forEach(url => URL.revokeObjectURL(url))
     previewUrls = []
   }
+  
+  // 确保主图也重置
+  productForm.mainImage = ''
 }
 
 // 组件销毁前清理编辑器
