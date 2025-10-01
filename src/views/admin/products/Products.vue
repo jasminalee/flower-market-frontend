@@ -746,7 +746,12 @@ onBeforeUnmount(() => {
 const handleAvatarSuccess = (response, uploadFile) => {
   if (response && response.code === 200) {
     console.log('图片上传成功:', response)
-    productForm.mainImage = response.data
+    // 检查返回的是否是完整URL，如果不是则拼接基础URL
+    if (response.data && response.data.startsWith('http')) {
+      productForm.mainImage = response.data
+    } else {
+      productForm.mainImage = API_BASE_URL + response.data
+    }
     ElMessage.success('图片上传成功')
   } else {
     // 如果上传失败，移除预览图片
