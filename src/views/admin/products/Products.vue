@@ -152,7 +152,7 @@
       <el-row :gutter="16">
         <el-col :span="12">
           <el-form-item label="产品名称" prop="productName">
-            <el-input v-model="productForm.productName" placeholder="请输入产品名称" />
+            <el-input v-model="productForm.productName" placeholder="请输入产品名称" :disabled="!isEdit" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -160,7 +160,7 @@
             <el-input 
               v-model="productForm.productCode" 
               placeholder="请输入产品编码"
-              :disabled="isEdit"
+              :disabled="!isEdit"
             />
           </el-form-item>
         </el-col>
@@ -169,7 +169,7 @@
       <el-row :gutter="16">
         <el-col :span="12">
           <el-form-item label="品牌" prop="brand">
-            <el-input v-model="productForm.brand" placeholder="请输入品牌" />
+            <el-input v-model="productForm.brand" placeholder="请输入品牌" :disabled="!isEdit" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -181,6 +181,7 @@
               placeholder="请选择分类"
               style="width: 100%"
               clearable
+              :disabled="!isEdit"
             />
           </el-form-item>
         </el-col>
@@ -196,6 +197,7 @@
                 :on-success="handleAvatarSuccess"
                 :before-upload="beforeAvatarUpload"
                 :on-change="handleAvatarChange"
+                :disabled="!isEdit"
             >
               <img v-if="productForm.mainImage" :src="productForm.mainImage" class="avatar" />
               <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
@@ -206,7 +208,7 @@
         <el-col :span="12">
           <el-col >
             <el-form-item label="产品类型" prop="productType">
-              <el-select v-model="productForm.productType" placeholder="请选择产品类型">
+              <el-select v-model="productForm.productType" placeholder="请选择产品类型" :disabled="!isEdit">
                 <el-option label="实物商品" :value="1" />
                 <el-option label="虚拟商品" :value="2" />
               </el-select>
@@ -214,7 +216,7 @@
           </el-col>
           <el-col>
             <el-form-item label="状态" prop="status">
-              <el-radio-group v-model="productForm.status">
+              <el-radio-group v-model="productForm.status" :disabled="!isEdit">
                 <el-radio :label="1">上架</el-radio>
                 <el-radio :label="0">下架</el-radio>
               </el-radio-group>
@@ -229,6 +231,7 @@
                 type="textarea"
                 placeholder="请输入产品描述"
                 :rows="3"
+                :disabled="!isEdit"
             />
           </el-form-item>
         </el-col>
@@ -261,7 +264,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSave" :loading="saving">
+        <el-button v-if="isEdit" type="primary" @click="handleSave" :loading="saving">
           {{ saving ? '保存中...' : '保存' }}
         </el-button>
       </div>
@@ -355,8 +358,6 @@ const editorConfig = reactive({
           const response = await fileApi.uploadImage(formData)
           
           if (response && response.code === 200) {
-            // 处理图片URL，将相对路径转换为绝对路径
-            const imageUrl = response.data.startsWith('/') ? API_BASE_URL + response.data : response.data;
             // 注意：wangEditor会自动替换预览URL为最终URL，无需手动处理
             ElMessage.success('图片上传成功')
           } else {
@@ -392,7 +393,10 @@ const productRules = {
 }
 
 // 计算属性
-const dialogTitle = computed(() => isEdit.value ? '编辑产品' : '新增产品')
+const dialogTitle = computed(() => {
+  if (!isEdit.value) return '查看产品'
+  return productForm.id ? '编辑产品' : '新增产品'
+})
 
 // 编辑器创建回调
 const handleEditorCreated = (editor) => {
@@ -515,8 +519,9 @@ const handleCurrentChange = (newPage) => {
  * 新增产品
  */
 const handleAdd = () => {
-  isEdit.value = false
+  isEdit.value = true // 新增模式下也需要编辑功能
   resetProductForm()
+  console.log('Product form after reset:', productForm) // 调试信息
   dialogVisible.value = true
 }
 
@@ -524,27 +529,14 @@ const handleAdd = () => {
  * 查看产品
  */
 const handleView = async (product) => {
-  isEdit.value = false // 查看模式
+  isEdit.value = false // 查看模式，禁用编辑功能
   
   try {
     // 调用详情接口获取完整的产品信息，包括富文本内容
     const response = await productApi.getDetail(product.id)
     if (response && response.code === 200) {
-      const detailData = response.data
+      const detailData = response.data.product
       console.log('Product detail data:', detailData) // 调试信息
-      // 处理图片URL
-      if (detailData.mainImage && detailData.mainImage.startsWith('/')) {
-        detailData.mainImage = API_BASE_URL + detailData.mainImage
-      }
-      
-      // 处理详情中的图片URL
-      if (detailData.detail) {
-        // 使用正则表达式替换详情中的相对图片路径
-        detailData.detail = detailData.detail.replace(/src="(\/images\/uploads\/[^"]+)"/g, (match, p1) => {
-          return `src="${API_BASE_URL}${p1}"`;
-        });
-      }
-      
       Object.assign(productForm, {
         id: detailData.id,
         productName: detailData.productName,
@@ -661,7 +653,7 @@ const handleSave = async () => {
     const response = await productApi.save(productData)
 
     if (response !== undefined) {
-      ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
+      ElMessage.success(productForm.id ? '更新成功' : '创建成功')
       dialogVisible.value = false
       loadProductList()
     } else {
@@ -691,6 +683,8 @@ const resetProductForm = () => {
     status: 1,
     productType: 1
   })
+  
+  console.log('Product form reset to:', productForm) // 调试信息
 
   if (productFormRef.value) {
     productFormRef.value.resetFields()

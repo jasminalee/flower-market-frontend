@@ -86,6 +86,8 @@
   border-radius: 4px;
   background-color: #f5f7fa;
   overflow-y: auto;
+  /* 移除可能限制内容显示的属性 */
+  max-height: none;
 }
 
 /* 对话框底部按钮 */
