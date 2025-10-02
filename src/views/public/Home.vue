@@ -121,6 +121,7 @@ import {
 
 // 引入样式文件
 import '@/assets/home.css'
+import '@/assets/productCard.css'
 
 // import local images to avoid external network requests
 import heroImage from '@/assets/placeholders/beautiful-flowers.svg'

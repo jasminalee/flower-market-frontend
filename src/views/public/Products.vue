@@ -408,3 +408,4 @@ onMounted(async () => {
 
 <!-- 引入产品页面专用样式 -->
 <style src="@/assets/publicProducts.css"></style>
+<style src="@/assets/productCard.css"></style>

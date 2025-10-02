@@ -37,29 +37,6 @@
   color: white;
 }
 
-/* 产品卡片特有样式 */
-.product-card .product-category {
-  margin-bottom: var(--spacing-small);
-}
-
-.product-card .product-rating {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-small);
-  margin-bottom: var(--spacing-base);
-}
-
-.product-card .sales-count {
-  font-size: var(--font-size-small);
-  color: var(--text-color-regular);
-}
-
-.product-card .product-actions {
-  display: flex;
-  gap: var(--spacing-small);
-  justify-content: space-between;
-}
-
 /* 响应式规则 */
 @media (max-width: 480px) {
   .product-page-header h1 {
@@ -76,11 +53,6 @@
   
   .pagination-container {
     margin-top: var(--spacing-medium);
-  }
-  
-  .product-card .product-actions {
-    flex-direction: column;
-    gap: var(--spacing-small);
   }
 }
 
