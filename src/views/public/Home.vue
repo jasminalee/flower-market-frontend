@@ -80,6 +80,12 @@
                 <div class="product-price">
                   <span class="current-price">¥{{ product.price || 0 }}</span>
                 </div>
+                <div class="product-meta">
+                  <div class="product-rating">
+                    <el-rate v-model="product.rating" disabled show-score />
+                  </div>
+                  <div class="sales-count">(已售{{ product.salesCount }})</div>
+                </div>
               </div>
             </div>
           </el-card>
@@ -203,7 +209,7 @@ const fetchFeaturedProducts = async () => {
       current: 1,
       size: 4
     })
-    console.log('response', response)
+    
     if (response.code === 200) {
       // 从API响应中提取产品数据
       featuredProducts.value = response.data.records.map(product => ({
@@ -212,10 +218,12 @@ const fetchFeaturedProducts = async () => {
         price: 0 // 实际应用中应从SKU中获取价格
       }))
       
-      // 为每个产品添加一个模拟价格（实际应用中应从SKU中获取）
+      // 为每个产品添加模拟的销售数量和评分（实际应用中应从API获取）
       featuredProducts.value.forEach(product => {
         // 简化处理，实际应从SKU中获取最低价格
         product.price = Math.floor(Math.random() * 300) + 100
+        product.salesCount = Math.floor(Math.random() * 2000) + 500
+        product.rating = (Math.random() * 4 + 1).toFixed(1) // 1-5之间的评分
       })
     } else {
       ElMessage.error(response.message || '获取产品数据失败')
