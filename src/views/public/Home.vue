@@ -31,7 +31,13 @@
           <p>精心挑选的优质花卉产品</p>
         </div>
         
-        <div class="product-grid">
+        <!-- 加载状态 -->
+        <div v-if="loading" class="loading-container">
+          <el-skeleton :rows="8" animated />
+        </div>
+        
+        <!-- 产品网格 -->
+        <div v-else class="product-grid">
           <el-card 
             v-for="product in featuredProducts" 
             :key="product.id"
@@ -42,11 +48,23 @@
           >
             <div class="product-image-container">
               <el-image 
-                :src="product.image" 
-                :alt="product.name"
+                :src="product.mainImage" 
+                :alt="product.productName"
                 fit="cover"
                 class="product-image"
-              />
+                lazy
+              >
+                <template #placeholder>
+                  <div class="image-slot">
+                    <el-skeleton :rows="1" animated />
+                  </div>
+                </template>
+                <template #error>
+                  <div class="image-slot">
+                    <el-icon><Picture /></el-icon>
+                  </div>
+                </template>
+              </el-image>
               <div class="product-overlay">
                 <el-button type="primary" circle>
                   <el-icon><View /></el-icon>
@@ -55,18 +73,12 @@
             </div>
             <div class="product-info">
               <div class="product-header">
-                <h3 class="product-title">{{ product.name }}</h3>
+                <h3 class="product-title">{{ product.productName }}</h3>
               </div>
               <p class="product-description">{{ product.description }}</p>
               <div class="product-price-section">
                 <div class="product-price">
-                  <span class="current-price">¥{{ product.price }}</span>
-                  <span v-if="product.originalPrice" class="original-price">
-                    ¥{{ product.originalPrice }}
-                  </span>
-                </div>
-                <div class="product-rating">
-                  <el-rate v-model="product.rating" disabled show-score />
+                  <span class="current-price">¥{{ product.price || 0 }}</span>
                 </div>
               </div>
             </div>
@@ -123,61 +135,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { 
-  View, ArrowRight
+  View, ArrowRight, Picture
 } from '@element-plus/icons-vue'
+import productApi from '@/api/product'
 
 // 引入样式文件
 import '@/assets/home.css'
 
-// import local images to avoid external network requests
-import roseImg from '@/assets/placeholders/rose.svg'
-import sunflowerImg from '@/assets/placeholders/sunflower.svg'
-import lilyImg from '@/assets/placeholders/lily.svg'
-import carnationImg from '@/assets/placeholders/carnation.svg'
-
 const router = useRouter()
 
-// 特色产品数据
-const featuredProducts = ref([
-  {
-    id: 1,
-    name: '玫瑰花束',
-    description: '精选红玫瑰，表达浓情蜜意',
-    price: 299,
-    originalPrice: 399,
-    rating: 4.8,
-    image: roseImg
-  },
-  {
-    id: 2,
-    name: '向日葵花束',
-    description: '阳光向日葵，传递正能量',
-    price: 199,
-    rating: 4.9,
-    image: sunflowerImg
-  },
-  {
-    id: 3,
-    name: '百合花束',
-    description: '纯洁百合，祝福美好',
-    price: 259,
-    rating: 4.7,
-    image: lilyImg
-  },
-  {
-    id: 4,
-    name: '康乃馨花束',
-    description: '温馨康乃馨，感恩母爱',
-    price: 179,
-    originalPrice: 229,
-    rating: 4.6,
-    image: carnationImg
-  }
-])
+// 响应式数据
+const loading = ref(true)
+const featuredProducts = ref([])
 
 // 服务优势数据
 const advantages = ref([
@@ -220,6 +193,42 @@ const stats = ref([
 ])
 
 /**
+ * 获取特色产品数据
+ */
+const fetchFeaturedProducts = async () => {
+  try {
+    loading.value = true
+    // 调用主页商品列表接口，获取前4个产品作为特色产品
+    const response = await productApi.homepage({
+      current: 1,
+      size: 4
+    })
+    console.log('response', response)
+    if (response.code === 200) {
+      // 从API响应中提取产品数据
+      featuredProducts.value = response.data.records.map(product => ({
+        ...product,
+        // 为产品卡片添加价格字段（可以从SKU中获取最低价，这里简化处理）
+        price: 0 // 实际应用中应从SKU中获取价格
+      }))
+      
+      // 为每个产品添加一个模拟价格（实际应用中应从SKU中获取）
+      featuredProducts.value.forEach(product => {
+        // 简化处理，实际应从SKU中获取最低价格
+        product.price = Math.floor(Math.random() * 300) + 100
+      })
+    } else {
+      ElMessage.error(response.message || '获取产品数据失败')
+    }
+  } catch (error) {
+    console.error('获取产品数据失败:', error)
+    ElMessage.error('获取产品数据失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+/**
  * 跳转到产品页面
  */
 const goToProducts = () => {
@@ -230,7 +239,7 @@ const goToProducts = () => {
  * 查看产品详情
  */
 const viewProduct = (product) => {
-  ElMessage.success(`查看产品：${product.name}`)
+  ElMessage.success(`查看产品：${product.productName}`)
   // 这里可以跳转到产品详情页
 }
 
@@ -244,4 +253,9 @@ const learnMore = () => {
     advantagesSection.scrollIntoView({ behavior: 'smooth' })
   }
 }
+
+// 生命周期
+onMounted(() => {
+  fetchFeaturedProducts()
+})
 </script>

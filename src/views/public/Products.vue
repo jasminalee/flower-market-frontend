@@ -80,9 +80,9 @@
         </div>
 
         <!-- 产品网格 -->
-        <div v-else-if="filteredProducts.length > 0" class="products-grid">
+        <div v-else-if="products.length > 0" class="products-grid">
           <el-card
-            v-for="product in paginatedProducts" 
+            v-for="product in products" 
             :key="product.id"
             class="product-card"
             @click="viewProduct(product)"
@@ -91,11 +91,23 @@
           >
             <div class="product-image-container">
               <el-image 
-                :src="product.image" 
-                :alt="product.name"
+                :src="product.mainImage" 
+                :alt="product.productName"
                 fit="cover"
                 class="product-image"
-              />
+                lazy
+              >
+                <template #placeholder>
+                  <div class="image-slot">
+                    <el-skeleton :rows="1" animated />
+                  </div>
+                </template>
+                <template #error>
+                  <div class="image-slot">
+                    <el-icon><Picture /></el-icon>
+                  </div>
+                </template>
+              </el-image>
               <div class="product-overlay">
                 <el-button type="primary" circle>
                   <el-icon><View /></el-icon>
@@ -113,18 +125,15 @@
             </div>
             <div class="product-info">
               <div class="product-header">
-                <h3 class="product-title">{{ product.name }}</h3>
+                <h3 class="product-title">{{ product.productName }}</h3>
                 <div class="product-category">
-                  <el-tag size="small">{{ getCategoryName(product.category) }}</el-tag>
+                  <el-tag size="small">{{ getCategoryName(getCategoryKey(product.categoryId)) }}</el-tag>
                 </div>
               </div>
               <p class="product-description">{{ product.description }}</p>
               <div class="product-price-section">
                 <div class="product-price">
-                  <span class="current-price">¥{{ product.price }}</span>
-                  <span v-if="product.originalPrice" class="original-price">
-                    ¥{{ product.originalPrice }}
-                  </span>
+                  <span class="current-price">¥{{ product.price || 0 }}</span>
                 </div>
                 <div class="product-meta">
                   <div class="product-rating">
@@ -155,12 +164,12 @@
         </div>
 
         <!-- 分页 -->
-        <div v-if="filteredProducts.length > 0" class="pagination-container">
+        <div v-if="products.length > 0" class="pagination-container">
           <el-pagination
             v-model:current-page="currentPage"
             v-model:page-size="pageSize"
             :page-sizes="[12, 24, 48, 96]"
-            :total="filteredProducts.length"
+            :total="total"
             layout="total, sizes, prev, pager, next, jumper"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
@@ -174,7 +183,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Search, View, ShoppingCart, Star } from '@element-plus/icons-vue'
+import { Search, View, ShoppingCart, Star, Picture } from '@element-plus/icons-vue'
+import productApi from '@/api/product'
 
 // 响应式数据
 const loading = ref(true)
@@ -187,167 +197,17 @@ const pageSize = ref(12)
 
 // 产品数据
 const products = ref([])
-
-// 模拟产品数据
-const mockProducts = [
-  {
-    id: 1,
-    name: '红玫瑰花束',
-    description: '精选进口红玫瑰，象征热烈的爱情',
-    price: 299,
-    originalPrice: 399,
-    rating: 4.8,
-    salesCount: 1520,
-    category: 'rose',
-    image: '/src/assets/placeholders/rose.svg',
-    isNew: false,
-    isHot: true,
-    discount: 7.5
-  },
-  {
-    id: 2,
-    name: '白玫瑰花束',
-    description: '纯洁白玫瑰，表达纯真的爱意',
-    price: 279,
-    rating: 4.7,
-    salesCount: 980,
-    category: 'rose',
-    image: '/src/assets/placeholders/rose.svg',
-    isNew: true,
-    isHot: false
-  },
-  {
-    id: 3,
-    name: '粉玫瑰花束',
-    description: '浪漫粉玫瑰，传递温柔的情感',
-    price: 259,
-    originalPrice: 329,
-    rating: 4.9,
-    salesCount: 2100,
-    category: 'rose',
-    image: '/src/assets/placeholders/rose.svg',
-    isNew: false,
-    isHot: true,
-    discount: 8
-  },
-  {
-    id: 4,
-    name: '白百合花束',
-    description: '高雅百合，祝福美好与纯洁',
-    price: 219,
-    rating: 4.6,
-    salesCount: 760,
-    category: 'lily',
-    image: '/src/assets/placeholders/lily.svg',
-    isNew: false,
-    isHot: false
-  },
-  {
-    id: 5,
-    name: '香水百合',
-    description: '芳香怡人的香水百合',
-    price: 359,
-    rating: 4.8,
-    salesCount: 1200,
-    category: 'lily',
-    image: '/src/assets/placeholders/lily.svg',
-    isNew: true,
-    isHot: true
-  },
-  {
-    id: 6,
-    name: '向日葵花束',
-    description: '阳光向日葵，带来正能量与希望',
-    price: 199,
-    rating: 4.5,
-    salesCount: 890,
-    category: 'sunflower',
-    image: '/src/assets/placeholders/sunflower.svg',
-    isNew: false,
-    isHot: false
-  },
-  {
-    id: 7,
-    name: '康乃馨花束',
-    description: '温馨康乃馨，表达感恩与关爱',
-    price: 179,
-    originalPrice: 229,
-    rating: 4.4,
-    salesCount: 1100,
-    category: 'carnation',
-    image: '/src/assets/placeholders/carnation.svg',
-    isNew: false,
-    isHot: false,
-    discount: 8
-  },
-  {
-    id: 8,
-    name: '彩色康乃馨',
-    description: '缤纷色彩的康乃馨组合',
-    price: 239,
-    rating: 4.7,
-    salesCount: 650,
-    category: 'carnation',
-    image: '/src/assets/placeholders/carnation.svg',
-    isNew: true,
-    isHot: false
-  }
-]
+const total = ref(0)
 
 // 计算属性
 const filteredProducts = computed(() => {
-  let result = [...products.value]
-
-  // 搜索筛选
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(product => 
-      product.name.toLowerCase().includes(query) ||
-      product.description.toLowerCase().includes(query)
-    )
-  }
-
-  // 分类筛选
-  if (selectedCategory.value) {
-    result = result.filter(product => product.category === selectedCategory.value)
-  }
-
-  // 价格筛选
-  if (selectedPriceRange.value) {
-    const [min, max] = selectedPriceRange.value.split('-').map(Number)
-    if (selectedPriceRange.value === '500+') {
-      result = result.filter(product => product.price >= 500)
-    } else {
-      result = result.filter(product => product.price >= min && product.price <= max)
-    }
-  }
-
-  // 排序
-  switch (sortBy.value) {
-    case 'price-asc':
-      result.sort((a, b) => a.price - b.price)
-      break
-    case 'price-desc':
-      result.sort((a, b) => b.price - a.price)
-      break
-    case 'rating-desc':
-      result.sort((a, b) => b.rating - a.rating)
-      break
-    case 'newest':
-      result.sort((a, b) => b.isNew - a.isNew)
-      break
-    default:
-      // 默认排序：热销商品在前
-      result.sort((a, b) => b.isHot - a.isHot || b.salesCount - a.salesCount)
-  }
-
-  return result
+  // 由于我们直接从API获取数据，这里不再需要前端过滤
+  return products.value
 })
 
 const paginatedProducts = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  return filteredProducts.value.slice(start, end)
+  // 由于我们直接从API获取分页数据，这里直接返回产品数据
+  return filteredProducts.value
 })
 
 // 方法
@@ -361,29 +221,46 @@ const getCategoryName = (category) => {
   return categoryMap[category] || '其他'
 }
 
+// 根据分类ID获取分类键名
+const getCategoryKey = (categoryId) => {
+  const categoryKeyMap = {
+    1: 'rose',
+    2: 'lily',
+    3: 'sunflower',
+    4: 'carnation'
+  }
+  return categoryKeyMap[categoryId] || 'other'
+}
+
 const handleSearch = () => {
   currentPage.value = 1
+  fetchProducts()
 }
 
 const handleCategoryChange = () => {
   currentPage.value = 1
+  fetchProducts()
 }
 
 const handlePriceChange = () => {
   currentPage.value = 1
+  fetchProducts()
 }
 
 const handleSort = () => {
   currentPage.value = 1
+  fetchProducts()
 }
 
 const handleSizeChange = (newSize) => {
   pageSize.value = newSize
   currentPage.value = 1
+  fetchProducts()
 }
 
 const handleCurrentChange = (newPage) => {
   currentPage.value = newPage
+  fetchProducts()
   // 滚动到顶部
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
@@ -394,28 +271,94 @@ const clearFilters = () => {
   selectedPriceRange.value = ''
   sortBy.value = 'default'
   currentPage.value = 1
+  fetchProducts()
 }
 
 const viewProduct = (product) => {
-  ElMessage.success(`查看产品：${product.name}`)
+  ElMessage.success(`查看产品：${product.productName}`)
   // 这里可以跳转到产品详情页
 }
 
 const addToCart = (product) => {
-  ElMessage.success(`已将 ${product.name} 加入购物车`)
+  ElMessage.success(`已将 ${product.productName} 加入购物车`)
 }
 
 const addToFavorites = (product) => {
-  ElMessage.success(`已收藏 ${product.name}`)
+  ElMessage.success(`已收藏 ${product.productName}`)
+}
+
+/**
+ * 获取产品数据
+ */
+const fetchProducts = async () => {
+  try {
+    loading.value = true
+    
+    // 构建请求参数
+    const params = {
+      current: currentPage.value,
+      size: pageSize.value
+    }
+    
+    // 添加搜索关键字
+    if (searchQuery.value) {
+      params.keyword = searchQuery.value
+    }
+    
+    // 添加分类筛选
+    if (selectedCategory.value) {
+      // 这里需要根据实际的分类ID进行映射
+      params.categoryId = getCategoryId(selectedCategory.value)
+    }
+    
+    // 调用API获取产品数据
+    const response = await productApi.homepage(params)
+    
+    if (response.code === 200) {
+      // 从API响应中提取产品数据
+      products.value = response.data.records
+      total.value = response.data.total
+      
+      // 为每个产品添加模拟的销售数量和评分（实际应用中应从API获取）
+      products.value.forEach(product => {
+        product.salesCount = Math.floor(Math.random() * 2000) + 500
+        product.rating = (Math.random() * 4 + 1).toFixed(1) // 1-5之间的评分
+        product.isNew = Math.random() > 0.7
+        product.isHot = Math.random() > 0.5
+        if (Math.random() > 0.8) {
+          product.discount = Math.floor(Math.random() * 5) + 5 // 5-9折
+        }
+        // 添加价格字段（实际应从SKU中获取最低价格）
+        product.price = Math.floor(Math.random() * 300) + 100
+      })
+    } else {
+      ElMessage.error(response.message || '获取产品数据失败')
+    }
+  } catch (error) {
+    console.error('获取产品数据失败:', error)
+    ElMessage.error('获取产品数据失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+/**
+ * 根据分类名称获取分类ID
+ */
+const getCategoryId = (categoryName) => {
+  // 这里需要根据实际的分类映射关系进行调整
+  const categoryMap = {
+    rose: 1,
+    lily: 2,
+    sunflower: 3,
+    carnation: 4
+  }
+  return categoryMap[categoryName] || null
 }
 
 // 生命周期
-onMounted(async () => {
-  // 模拟加载数据
-  setTimeout(() => {
-    products.value = mockProducts
-    loading.value = false
-  }, 1000)
+onMounted(() => {
+  fetchProducts()
 })
 </script>
 

@@ -18,6 +18,14 @@ export default {
   },
 
   /**
+   * 主页商品列表（支持分类和搜索）
+   * params: { current, size, categoryId, keyword }
+   */
+  async homepage(params = {}) {
+    return api.get('/product/homepage', { params })
+  },
+
+  /**
    * 列表查询产品
    * params: { productName, productCode, productType, status, categoryId, ... }
    */
