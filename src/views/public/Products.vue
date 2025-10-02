@@ -1,21 +1,10 @@
 <template>
-  <el-page-header class="page-header" title="花卉商城" content="花卉产品">
-    <template #content>
-      <div class="page-header-content">
-        <h1>花卉产品</h1>
-        <p>发现我们精心挑选的优质花卉产品</p>
-      </div>
-    </template>
-    
-    <template #extra>
-      <div class="page-header-actions">
-        <el-button type="primary" @click="goToCart">
-          <el-icon><ShoppingCart /></el-icon>
-          购物车
-        </el-button>
-      </div>
-    </template>
-  </el-page-header>
+  <div class="page-header">
+    <div class="page-header-content">
+      <h1>花卉产品</h1>
+      <p>发现我们精心挑选的优质花卉产品</p>
+    </div>
+  </div>
 
   <!-- 筛选和搜索区域 -->
   <div class="filters-section">
