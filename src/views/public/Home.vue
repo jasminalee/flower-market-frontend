@@ -37,58 +37,67 @@
         </div>
         
         <!-- 产品网格 -->
-        <div v-else class="product-grid">
-          <el-card 
-            v-for="product in featuredProducts" 
-            :key="product.id"
-            class="product-card"
-            @click="viewProduct(product)"
-            :body-style="{ padding: '0' }"
-            shadow="hover"
-          >
-            <div class="product-image-container">
-              <el-image 
-                :src="product.mainImage" 
-                :alt="product.productName"
-                fit="cover"
-                class="product-image"
-                lazy
+        <div v-else>
+          <el-row :gutter="20" class="product-grid">
+            <el-col 
+              v-for="product in featuredProducts" 
+              :key="product.id"
+              :xs="24"
+              :sm="12"
+              :md="8"
+              :lg="6"
+            >
+              <el-card 
+                class="product-card"
+                @click="viewProduct(product)"
+                :body-style="{ padding: '0' }"
+                shadow="hover"
               >
-                <template #placeholder>
-                  <div class="image-slot">
-                    <el-skeleton :rows="1" animated />
+                <div class="product-image-container">
+                  <el-image 
+                    :src="product.mainImage" 
+                    :alt="product.productName"
+                    fit="cover"
+                    class="product-image"
+                    lazy
+                  >
+                    <template #placeholder>
+                      <div class="image-slot">
+                        <el-skeleton :rows="1" animated />
+                      </div>
+                    </template>
+                    <template #error>
+                      <div class="image-slot">
+                        <el-icon><Picture /></el-icon>
+                      </div>
+                    </template>
+                  </el-image>
+                  <div class="product-overlay">
+                    <el-button type="primary" circle>
+                      <el-icon><View /></el-icon>
+                    </el-button>
                   </div>
-                </template>
-                <template #error>
-                  <div class="image-slot">
-                    <el-icon><Picture /></el-icon>
-                  </div>
-                </template>
-              </el-image>
-              <div class="product-overlay">
-                <el-button type="primary" circle>
-                  <el-icon><View /></el-icon>
-                </el-button>
-              </div>
-            </div>
-            <div class="product-info">
-              <div class="product-header">
-                <h3 class="product-title">{{ product.productName }}</h3>
-              </div>
-              <p class="product-description">{{ product.description }}</p>
-              <div class="product-price-section">
-                <div class="product-price">
-                  <span class="current-price">¥{{ product.price || 0 }}</span>
                 </div>
-                <div class="product-meta">
-                  <div class="product-rating">
-                    <el-rate v-model="product.rating" disabled show-score />
+                <div class="product-info">
+                  <div class="product-header">
+                    <h3 class="product-title">{{ product.productName }}</h3>
                   </div>
-                  <div class="sales-count">(已售{{ product.salesCount }})</div>
+                  <p class="product-description">{{ product.description }}</p>
+                  <div class="product-price-section">
+                    <div class="product-price">
+                      <span class="current-price">¥{{ product.price || 0 }}</span>
+                    </div>
+                    <div class="product-meta">
+                      <div class="product-rating">
+                        <el-rate v-model="product.rating" disabled show-score />
+                      </div>
+                      <div class="sales-count">(已售{{ product.salesCount }})</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </el-card>
+              </el-card>
+            </el-col>
+          </el-row>
         </div>
 
         <div class="section-footer">
@@ -108,33 +117,44 @@
           <p>专业的服务，优质的产品</p>
         </div>
         
-        <div class="advantages-grid">
-          <div 
+        <el-row :gutter="20" class="advantages-grid">
+          <el-col 
             v-for="advantage in advantages" 
             :key="advantage.id"
-            class="advantage-card"
+            :xs="24"
+            :sm="12"
+            :md="6"
           >
-            <div class="advantage-icon">
-              <span class="emoji-icon" :style="{ color: advantage.color }">
-                {{ advantage.icon }}
-              </span>
+            <div class="advantage-card">
+              <div class="advantage-icon">
+                <span class="emoji-icon" :style="{ color: advantage.color }">
+                  {{ advantage.icon }}
+                </span>
+              </div>
+              <h3>{{ advantage.title }}</h3>
+              <p>{{ advantage.description }}</p>
             </div>
-            <h3>{{ advantage.title }}</h3>
-            <p>{{ advantage.description }}</p>
-          </div>
-        </div>
+          </el-col>
+        </el-row>
       </div>
     </section>
 
     <!-- 统计数据区域 -->
     <section class="stats-section">
       <div class="container">
-        <div class="stats-grid">
-          <div v-for="stat in stats" :key="stat.label" class="stat-item">
-            <div class="stat-number">{{ stat.value }}</div>
-            <div class="stat-label">{{ stat.label }}</div>
-          </div>
-        </div>
+        <el-row :gutter="20" class="stats-grid">
+          <el-col 
+            v-for="stat in stats" 
+            :key="stat.label"
+            :xs="12"
+            :sm="6"
+          >
+            <div class="stat-item">
+              <div class="stat-number">{{ stat.value }}</div>
+              <div class="stat-label">{{ stat.label }}</div>
+            </div>
+          </el-col>
+        </el-row>
       </div>
     </section>
   </div>

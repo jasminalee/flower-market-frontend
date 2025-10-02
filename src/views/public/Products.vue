@@ -1,180 +1,198 @@
 <template>
-  <div class="products">
-    <!-- 页面头部 -->
-    <div class="product-page-header">
-      <div class="container">
+  <el-page-header class="page-header" title="花卉商城" content="花卉产品">
+    <template #content>
+      <div class="page-header-content">
         <h1>花卉产品</h1>
         <p>发现我们精心挑选的优质花卉产品</p>
       </div>
-    </div>
+    </template>
+    
+    <template #extra>
+      <div class="page-header-actions">
+        <el-button type="primary" @click="goToCart">
+          <el-icon><ShoppingCart /></el-icon>
+          购物车
+        </el-button>
+      </div>
+    </template>
+  </el-page-header>
 
-    <!-- 筛选和搜索区域 -->
-    <div class="filters-section">
-      <div class="container">
-        <div class="filters-bar">
-          <!-- 搜索框区域 -->
-          <div class="filters-left">
-            <div class="search-group">
-              <div class="search-box">
-                <el-input
-                  v-model="searchQuery"
-                  placeholder="搜索花卉产品..."
-                  @input="handleSearch"
-                  clearable
-                >
-                  <template #prefix>
-                    <el-icon><Search /></el-icon>
-                  </template>
-                </el-input>
-              </div>
-            </div>
-
-            <!-- 分类筛选 -->
-            <div class="filter-group">
-              <span class="filter-label">分类：</span>
-              <el-radio-group v-model="selectedCategory" @change="handleCategoryChange">
-                <el-radio-button label="">全部</el-radio-button>
-                <el-radio-button label="rose">玫瑰</el-radio-button>
-                <el-radio-button label="lily">百合</el-radio-button>
-                <el-radio-button label="sunflower">向日葵</el-radio-button>
-                <el-radio-button label="carnation">康乃馨</el-radio-button>
-              </el-radio-group>
-            </div>
-
-            <!-- 价格筛选 -->
-            <div class="filter-group">
-              <span class="filter-label">价格：</span>
-              <el-radio-group v-model="selectedPriceRange" @change="handlePriceChange">
-                <el-radio-button label="">全部</el-radio-button>
-                <el-radio-button label="0-100">¥0-100</el-radio-button>
-                <el-radio-button label="100-300">¥100-300</el-radio-button>
-                <el-radio-button label="300-500">¥300-500</el-radio-button>
-                <el-radio-button label="500+">¥500+</el-radio-button>
-              </el-radio-group>
+  <!-- 筛选和搜索区域 -->
+  <div class="filters-section">
+    <div class="container">
+      <div class="filters-bar">
+        <!-- 搜索框区域 -->
+        <div class="filters-left">
+          <div class="search-group">
+            <div class="search-box">
+              <el-input
+                v-model="searchQuery"
+                placeholder="搜索花卉产品..."
+                @input="handleSearch"
+                clearable
+              >
+                <template #prefix>
+                  <el-icon><Search /></el-icon>
+                </template>
+              </el-input>
             </div>
           </div>
 
-          <!-- 排序区域 -->
-          <div class="filters-right">
-            <div class="filter-group">
-              <span class="filter-label">排序：</span>
-              <el-select v-model="sortBy" placeholder="选择排序方式" @change="handleSort">
-                <el-option label="默认" value="default" />
-                <el-option label="价格从低到高" value="price-asc" />
-                <el-option label="价格从高到低" value="price-desc" />
-                <el-option label="评分最高" value="rating-desc" />
-                <el-option label="最新上架" value="newest" />
-              </el-select>
-            </div>
+          <!-- 分类筛选 -->
+          <div class="filter-group">
+            <span class="filter-label">分类：</span>
+            <el-radio-group v-model="selectedCategory" @change="handleCategoryChange">
+              <el-radio-button label="">全部</el-radio-button>
+              <el-radio-button label="rose">玫瑰</el-radio-button>
+              <el-radio-button label="lily">百合</el-radio-button>
+              <el-radio-button label="sunflower">向日葵</el-radio-button>
+              <el-radio-button label="carnation">康乃馨</el-radio-button>
+            </el-radio-group>
+          </div>
+
+          <!-- 价格筛选 -->
+          <div class="filter-group">
+            <span class="filter-label">价格：</span>
+            <el-radio-group v-model="selectedPriceRange" @change="handlePriceChange">
+              <el-radio-button label="">全部</el-radio-button>
+              <el-radio-button label="0-100">¥0-100</el-radio-button>
+              <el-radio-button label="100-300">¥100-300</el-radio-button>
+              <el-radio-button label="300-500">¥300-500</el-radio-button>
+              <el-radio-button label="500+">¥500+</el-radio-button>
+            </el-radio-group>
+          </div>
+        </div>
+
+        <!-- 排序区域 -->
+        <div class="filters-right">
+          <div class="filter-group">
+            <span class="filter-label">排序：</span>
+            <el-select v-model="sortBy" placeholder="选择排序方式" @change="handleSort">
+              <el-option label="默认" value="default" />
+              <el-option label="价格从低到高" value="price-asc" />
+              <el-option label="价格从高到低" value="price-desc" />
+              <el-option label="评分最高" value="rating-desc" />
+              <el-option label="最新上架" value="newest" />
+            </el-select>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- 产品列表区域 -->
-    <div class="products-section">
-      <div class="container">
-        <!-- 加载状态 -->
-        <div v-if="loading" class="loading-container">
-          <el-skeleton :rows="8" animated />
-        </div>
+  <!-- 产品列表区域 -->
+  <div class="products-section">
+    <div class="container">
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-container">
+        <el-skeleton :rows="8" animated />
+      </div>
 
-        <!-- 产品网格 -->
-        <div v-else-if="products.length > 0" class="products-grid">
-          <el-card
+      <!-- 产品网格 -->
+      <div v-else-if="products.length > 0">
+        <el-row :gutter="20" class="products-grid">
+          <el-col 
             v-for="product in products" 
             :key="product.id"
-            class="product-card"
-            @click="viewProduct(product)"
-            :body-style="{ padding: '0' }"
-            shadow="hover"
+            :xs="24"
+            :sm="12"
+            :md="8"
+            :lg="6"
+            :xl="4"
           >
-            <div class="product-image-container">
-              <el-image 
-                :src="product.mainImage" 
-                :alt="product.productName"
-                fit="cover"
-                class="product-image"
-                lazy
-              >
-                <template #placeholder>
-                  <div class="image-slot">
-                    <el-skeleton :rows="1" animated />
-                  </div>
-                </template>
-                <template #error>
-                  <div class="image-slot">
-                    <el-icon><Picture /></el-icon>
-                  </div>
-                </template>
-              </el-image>
-              <div class="product-overlay">
-                <el-button type="primary" circle>
-                  <el-icon><View /></el-icon>
-                </el-button>
-                <el-button type="success" circle>
-                  <el-icon><ShoppingCart /></el-icon>
-                </el-button>
-              </div>
-              <!-- 标签 -->
-              <div class="product-tags">
-                <el-tag v-if="product.isNew" type="success" size="small">新品</el-tag>
-                <el-tag v-if="product.isHot" type="danger" size="small">热销</el-tag>
-                <el-tag v-if="product.discount" type="warning" size="small">{{ product.discount }}折</el-tag>
-              </div>
-            </div>
-            <div class="product-info">
-              <div class="product-header">
-                <h3 class="product-title">{{ product.productName }}</h3>
-                <div class="product-category">
-                  <el-tag size="small">{{ getCategoryName(getCategoryKey(product.categoryId)) }}</el-tag>
+            <el-card
+              class="product-card"
+              @click="viewProduct(product)"
+              :body-style="{ padding: '0' }"
+              shadow="hover"
+            >
+              <div class="product-image-container">
+                <el-image 
+                  :src="product.mainImage" 
+                  :alt="product.productName"
+                  fit="cover"
+                  class="product-image"
+                  lazy
+                >
+                  <template #placeholder>
+                    <div class="image-slot">
+                      <el-skeleton :rows="1" animated />
+                    </div>
+                  </template>
+                  <template #error>
+                    <div class="image-slot">
+                      <el-icon><Picture /></el-icon>
+                    </div>
+                  </template>
+                </el-image>
+                <div class="product-overlay">
+                  <el-button type="primary" circle>
+                    <el-icon><View /></el-icon>
+                  </el-button>
+                  <el-button type="success" circle>
+                    <el-icon><ShoppingCart /></el-icon>
+                  </el-button>
+                </div>
+                <!-- 标签 -->
+                <div class="product-tags">
+                  <el-tag v-if="product.isNew" type="success" size="small">新品</el-tag>
+                  <el-tag v-if="product.isHot" type="danger" size="small">热销</el-tag>
+                  <el-tag v-if="product.discount" type="warning" size="small">{{ product.discount }}折</el-tag>
                 </div>
               </div>
-              <p class="product-description">{{ product.description }}</p>
-              <div class="product-price-section">
-                <div class="product-price">
-                  <span class="current-price">¥{{ product.price || 0 }}</span>
-                </div>
-                <div class="product-meta">
-                  <div class="product-rating">
-                    <el-rate v-model="product.rating" disabled show-score />
+              <div class="product-info">
+                <div class="product-header">
+                  <h3 class="product-title">{{ product.productName }}</h3>
+                  <div class="product-category">
+                    <el-tag size="small">{{ getCategoryName(getCategoryKey(product.categoryId)) }}</el-tag>
                   </div>
-                  <div class="sales-count">(已售{{ product.salesCount }})</div>
+                </div>
+                <p class="product-description">{{ product.description }}</p>
+                <div class="product-price-section">
+                  <div class="product-price">
+                    <span class="current-price">¥{{ product.price || 0 }}</span>
+                  </div>
+                  <div class="product-meta">
+                    <div class="product-rating">
+                      <el-rate v-model="product.rating" disabled show-score />
+                    </div>
+                    <div class="sales-count">(已售{{ product.salesCount }})</div>
+                  </div>
+                </div>
+                <div class="product-actions">
+                  <el-button type="primary" size="small" @click.stop="addToCart(product)">
+                    <el-icon><ShoppingCart /></el-icon>
+                    加入购物车
+                  </el-button>
+                  <el-button size="small" @click.stop="addToFavorites(product)">
+                    <el-icon><Star /></el-icon>
+                    收藏
+                  </el-button>
                 </div>
               </div>
-              <div class="product-actions">
-                <el-button type="primary" size="small" @click.stop="addToCart(product)">
-                  <el-icon><ShoppingCart /></el-icon>
-                  加入购物车
-                </el-button>
-                <el-button size="small" @click.stop="addToFavorites(product)">
-                  <el-icon><Star /></el-icon>
-                  收藏
-                </el-button>
-              </div>
-            </div>
-          </el-card>
-        </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
 
-        <!-- 无结果状态 -->
-        <div v-else class="no-results">
-          <el-empty description="没有找到相关产品">
-            <el-button type="primary" @click="clearFilters">清除筛选条件</el-button>
-          </el-empty>
-        </div>
+      <!-- 无结果状态 -->
+      <div v-else class="no-results">
+        <el-empty description="没有找到相关产品">
+          <el-button type="primary" @click="clearFilters">清除筛选条件</el-button>
+        </el-empty>
+      </div>
 
-        <!-- 分页 -->
-        <div v-if="products.length > 0" class="pagination-container">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="[12, 24, 48, 96]"
-            :total="total"
-            layout="total, sizes, prev, pager, next, jumper"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
-        </div>
+      <!-- 分页 -->
+      <div v-if="products.length > 0" class="pagination-container">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[12, 24, 48, 96]"
+          :total="total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
       </div>
     </div>
   </div>
@@ -285,6 +303,11 @@ const addToCart = (product) => {
 
 const addToFavorites = (product) => {
   ElMessage.success(`已收藏 ${product.productName}`)
+}
+
+const goToCart = () => {
+  ElMessage.info('跳转到购物车页面')
+  // 这里可以跳转到购物车页面
 }
 
 /**

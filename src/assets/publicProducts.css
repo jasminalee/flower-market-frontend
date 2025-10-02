@@ -1,10 +1,5 @@
 /* 产品页面专用样式 */
 
-.products {
-  min-height: 100vh;
-  background-color: var(--bg-color-page);
-}
-
 /* 产品标签样式 */
 .product-tags {
   position: absolute;
@@ -20,6 +15,9 @@
   border-radius: var(--card-border-radius);
   overflow: hidden;
   transition: var(--transition-transform), var(--transition-box-shadow);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card:hover {
@@ -58,6 +56,9 @@
 
 .product-info {
   padding: var(--spacing-medium);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-header {
@@ -82,6 +83,7 @@
   line-height: 1.5;
   margin-bottom: var(--spacing-base);
   min-height: 40px;
+  flex-grow: 1;
 }
 
 .product-price-section {
@@ -135,20 +137,12 @@
   margin-top: var(--spacing-small);
 }
 
+.products-grid {
+  margin-bottom: var(--spacing-extra-large);
+}
+
 /* 响应式规则 */
 @media (max-width: 480px) {
-  .product-page-header h1 {
-    font-size: 2rem;
-  }
-  
-  .product-page-header p {
-    font-size: var(--font-size-base);
-  }
-  
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
-  
   .pagination-container {
     margin-top: var(--spacing-medium);
   }
@@ -181,17 +175,13 @@
 
 /* 大屏调整 */
 @media (min-width: 1200px) {
-  .products-grid {
-    grid-template-columns: repeat(4, 1fr);
+  .product-image-container {
+    height: 220px;
   }
 }
 
 @media (min-width: 1600px) {
-  .products-grid {
-    grid-template-columns: repeat(5, 1fr);
-  }
-  
-  .product-page-header h1 {
-    font-size: 3.5rem;
+  .product-image-container {
+    height: 240px;
   }
 }
