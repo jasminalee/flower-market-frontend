@@ -32,11 +32,13 @@
         </div>
         
         <div class="product-grid">
-          <div 
+          <el-card 
             v-for="product in featuredProducts" 
             :key="product.id"
             class="product-card"
             @click="viewProduct(product)"
+            :body-style="{ padding: '0' }"
+            shadow="hover"
           >
             <div class="product-image">
               <img :src="product.image" :alt="product.name" />
@@ -59,7 +61,7 @@
                 <el-rate v-model="product.rating" disabled show-score />
               </div>
             </div>
-          </div>
+          </el-card>
         </div>
 
         <div class="section-footer">
@@ -121,10 +123,8 @@ import {
 
 // 引入样式文件
 import '@/assets/home.css'
-import '@/assets/productCard.css'
 
 // import local images to avoid external network requests
-import heroImage from '@/assets/placeholders/beautiful-flowers.svg'
 import roseImg from '@/assets/placeholders/rose.svg'
 import sunflowerImg from '@/assets/placeholders/sunflower.svg'
 import lilyImg from '@/assets/placeholders/lily.svg'
@@ -235,7 +235,4 @@ const learnMore = () => {
     advantagesSection.scrollIntoView({ behavior: 'smooth' })
   }
 }
-
-// 修改：确保SVG文件正确导入并使用
-// (已通过 import heroImage 提供 URL，在模板中直接使用，不要重新声明同名变量)
 </script>

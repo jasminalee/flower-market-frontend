@@ -81,11 +81,13 @@
 
         <!-- 产品网格 -->
         <div v-else-if="filteredProducts.length > 0" class="products-grid">
-          <div 
+          <el-card
             v-for="product in paginatedProducts" 
             :key="product.id"
             class="product-card"
             @click="viewProduct(product)"
+            :body-style="{ padding: '0' }"
+            shadow="hover"
           >
             <div class="product-image">
               <img :src="product.image" :alt="product.name" />
@@ -131,7 +133,7 @@
                 </el-button>
               </div>
             </div>
-          </div>
+          </el-card>
         </div>
 
         <!-- 无结果状态 -->
@@ -408,4 +410,3 @@ onMounted(async () => {
 
 <!-- 引入产品页面专用样式 -->
 <style src="@/assets/publicProducts.css"></style>
-<style src="@/assets/productCard.css"></style>
