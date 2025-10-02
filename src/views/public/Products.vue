@@ -312,7 +312,7 @@ const fetchProducts = async () => {
     }
     
     // 调用API获取产品数据
-    const response = await productApi.homepage(params)
+    const response = await productApi.page(params)
     
     if (response.code === 200) {
       // 从API响应中提取产品数据
