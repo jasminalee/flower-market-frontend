@@ -40,8 +40,13 @@
             :body-style="{ padding: '0' }"
             shadow="hover"
           >
-            <div class="product-image">
-              <img :src="product.image" :alt="product.name" />
+            <div class="product-image-container">
+              <el-image 
+                :src="product.image" 
+                :alt="product.name"
+                fit="cover"
+                class="product-image"
+              />
               <div class="product-overlay">
                 <el-button type="primary" circle>
                   <el-icon><View /></el-icon>
@@ -49,16 +54,20 @@
               </div>
             </div>
             <div class="product-info">
-              <h3>{{ product.name }}</h3>
-              <p class="product-description">{{ product.description }}</p>
-              <div class="product-price">
-                <span class="current-price">¥{{ product.price }}</span>
-                <span v-if="product.originalPrice" class="original-price">
-                  ¥{{ product.originalPrice }}
-                </span>
+              <div class="product-header">
+                <h3 class="product-title">{{ product.name }}</h3>
               </div>
-              <div class="product-rating">
-                <el-rate v-model="product.rating" disabled show-score />
+              <p class="product-description">{{ product.description }}</p>
+              <div class="product-price-section">
+                <div class="product-price">
+                  <span class="current-price">¥{{ product.price }}</span>
+                  <span v-if="product.originalPrice" class="original-price">
+                    ¥{{ product.originalPrice }}
+                  </span>
+                </div>
+                <div class="product-rating">
+                  <el-rate v-model="product.rating" disabled show-score />
+                </div>
               </div>
             </div>
           </el-card>

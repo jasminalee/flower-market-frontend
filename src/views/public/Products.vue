@@ -89,8 +89,13 @@
             :body-style="{ padding: '0' }"
             shadow="hover"
           >
-            <div class="product-image">
-              <img :src="product.image" :alt="product.name" />
+            <div class="product-image-container">
+              <el-image 
+                :src="product.image" 
+                :alt="product.name"
+                fit="cover"
+                class="product-image"
+              />
               <div class="product-overlay">
                 <el-button type="primary" circle>
                   <el-icon><View /></el-icon>
@@ -101,26 +106,32 @@
               </div>
               <!-- 标签 -->
               <div class="product-tags">
-                <span v-if="product.isNew" class="tag tag-new">新品</span>
-                <span v-if="product.isHot" class="tag tag-hot">热销</span>
-                <span v-if="product.discount" class="tag tag-discount">{{ product.discount }}折</span>
+                <el-tag v-if="product.isNew" type="success" size="small">新品</el-tag>
+                <el-tag v-if="product.isHot" type="danger" size="small">热销</el-tag>
+                <el-tag v-if="product.discount" type="warning" size="small">{{ product.discount }}折</el-tag>
               </div>
             </div>
             <div class="product-info">
-              <h3>{{ product.name }}</h3>
+              <div class="product-header">
+                <h3 class="product-title">{{ product.name }}</h3>
+                <div class="product-category">
+                  <el-tag size="small">{{ getCategoryName(product.category) }}</el-tag>
+                </div>
+              </div>
               <p class="product-description">{{ product.description }}</p>
-              <div class="product-category">
-                <el-tag size="small">{{ getCategoryName(product.category) }}</el-tag>
-              </div>
-              <div class="product-rating">
-                <el-rate v-model="product.rating" disabled show-score />
-                <span class="sales-count">(已售{{ product.salesCount }})</span>
-              </div>
-              <div class="product-price">
-                <span class="current-price">¥{{ product.price }}</span>
-                <span v-if="product.originalPrice" class="original-price">
-                  ¥{{ product.originalPrice }}
-                </span>
+              <div class="product-price-section">
+                <div class="product-price">
+                  <span class="current-price">¥{{ product.price }}</span>
+                  <span v-if="product.originalPrice" class="original-price">
+                    ¥{{ product.originalPrice }}
+                  </span>
+                </div>
+                <div class="product-meta">
+                  <div class="product-rating">
+                    <el-rate v-model="product.rating" disabled show-score />
+                  </div>
+                  <div class="sales-count">(已售{{ product.salesCount }})</div>
+                </div>
               </div>
               <div class="product-actions">
                 <el-button type="primary" size="small" @click.stop="addToCart(product)">
