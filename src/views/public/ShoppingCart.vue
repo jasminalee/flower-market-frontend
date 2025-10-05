@@ -54,25 +54,13 @@
           </el-table-column>
           
           <!-- 商品名称列 -->
-          <el-table-column prop="productName" label="商品名称" min-width="200">
-            <template #default="{ row }">
-              <div class="product-name">{{ row.productName }}</div>
-            </template>
-          </el-table-column>
+          <el-table-column prop="productName" label="商品名称" min-width="200" />
           
           <!-- SKU信息列 -->
-          <el-table-column prop="skuName" label="SKU信息" min-width="150">
-            <template #default="{ row }">
-              <div class="product-sku">{{ row.skuName }}</div>
-            </template>
-          </el-table-column>
+          <el-table-column prop="skuName" label="SKU信息" min-width="150" />
           
           <!-- 商家列 -->
-          <el-table-column prop="merchantName" label="商家" min-width="150">
-            <template #default="{ row }">
-              <div class="merchant-name">{{ row.merchantName }}</div>
-            </template>
-          </el-table-column>
+          <el-table-column prop="merchantName" label="商家" min-width="150" />
           
           <!-- 单价列 -->
           <el-table-column prop="price" label="单价" width="120" align="center">
