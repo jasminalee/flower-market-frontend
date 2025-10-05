@@ -136,14 +136,18 @@
       label-width="100px"
     >
       <el-form-item label="SKU名称" prop="skuName">
-        <el-input v-model="skuForm.skuName" placeholder="请输入SKU名称" />
+        <el-input 
+          v-model="skuForm.skuName" 
+          placeholder="请输入SKU名称" 
+          :disabled="formMode === 'view'"
+        />
       </el-form-item>
       
       <el-form-item label="SKU编码" prop="skuCode">
         <el-input 
           v-model="skuForm.skuCode" 
           placeholder="请输入SKU编码"
-          :disabled="isEdit"
+          :disabled="formMode === 'view' || formMode === 'edit'"
         />
       </el-form-item>
       
@@ -153,6 +157,7 @@
           placeholder="请选择产品" 
           style="width: 100%" 
           filterable
+          :disabled="formMode === 'view'"
         >
           <el-option
             v-for="product in productList"
@@ -173,6 +178,7 @@
               :min="0" 
               controls-position="right" 
               style="width: 100%" 
+              :disabled="formMode === 'view'"
             />
           </el-form-item>
         </el-col>
@@ -183,6 +189,7 @@
               :min="0" 
               controls-position="right" 
               style="width: 100%" 
+              :disabled="formMode === 'view'"
             />
           </el-form-item>
         </el-col>
@@ -194,11 +201,12 @@
           type="textarea"
           placeholder="请输入规格描述"
           :rows="3"
+          :disabled="formMode === 'view'"
         />
       </el-form-item>
       
       <el-form-item label="状态" prop="status">
-        <el-radio-group v-model="skuForm.status">
+        <el-radio-group v-model="skuForm.status" :disabled="formMode === 'view'">
           <el-radio :label="1">有效</el-radio>
           <el-radio :label="0">无效</el-radio>
         </el-radio-group>
@@ -206,11 +214,14 @@
     </el-form>
 
     <template #footer>
-      <div class="dialog-footer">
+      <div class="dialog-footer" v-if="formMode !== 'view'">
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="handleSave" :loading="saving">
           {{ saving ? '保存中...' : '保存' }}
         </el-button>
+      </div>
+      <div class="dialog-footer" v-else>
+        <el-button @click="dialogVisible = false">关闭</el-button>
       </div>
     </template>
   </el-dialog>
@@ -227,7 +238,7 @@ import { Plus, Search, Refresh, View, Edit, Delete } from '@element-plus/icons-v
 const loading = ref(false)
 const saving = ref(false)
 const dialogVisible = ref(false)
-const isEdit = ref(false)
+const formMode = ref('create') // 'create', 'edit', 'view'
 const skuFormRef = ref()
 
 // SKU列表数据
@@ -282,7 +293,18 @@ const skuRules = {
 }
 
 // 计算属性
-const dialogTitle = computed(() => isEdit.value ? '编辑SKU' : '新增SKU')
+const dialogTitle = computed(() => {
+  switch (formMode.value) {
+    case 'create':
+      return '新增SKU'
+    case 'edit':
+      return '编辑SKU'
+    case 'view':
+      return '查看SKU'
+    default:
+      return 'SKU管理'
+  }
+})
 
 /**
  * 加载SKU列表
@@ -387,7 +409,7 @@ const handleCurrentChange = (newPage) => {
  * 新增SKU
  */
 const handleAdd = () => {
-  isEdit.value = false
+  formMode.value = 'create'
   resetSkuForm()
   dialogVisible.value = true
 }
@@ -396,7 +418,7 @@ const handleAdd = () => {
  * 查看SKU
  */
 const handleView = (sku) => {
-  isEdit.value = true
+  formMode.value = 'view'
   Object.assign(skuForm, {
     id: sku.id,
     skuName: sku.skuName,
@@ -414,7 +436,7 @@ const handleView = (sku) => {
  * 编辑SKU
  */
 const handleEdit = (sku) => {
-  isEdit.value = true
+  formMode.value = 'edit'
   Object.assign(skuForm, {
     id: sku.id,
     skuName: sku.skuName,
@@ -462,8 +484,9 @@ const handleDelete = async (sku) => {
  * 保存SKU
  */
 const handleSave = async () => {
+  console.log('保存SKU...')
   // 查看模式下不保存
-  if (!isEdit.value) {
+  if (formMode.value === 'view') {
     dialogVisible.value = false
     return
   }
@@ -489,7 +512,7 @@ const handleSave = async () => {
     const response = await productSkuApi.save(skuData)
 
     if (response !== undefined) {
-      ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
+      ElMessage.success(formMode.value === 'edit' ? '更新成功' : '创建成功')
       dialogVisible.value = false
       loadSkuList()
     } else {
