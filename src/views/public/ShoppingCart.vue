@@ -19,7 +19,14 @@
       </div>
       
       <div v-else>
-        <el-table :data="cartItems" class="cart-table">
+        <el-table 
+          :data="cartItems" 
+          class="cart-table"
+          @selection-change="handleSelectionChange"
+        >
+          <!-- 选择列 -->
+          <el-table-column type="selection" width="55" align="center" />
+          
           <!-- 图片列 -->
           <el-table-column prop="mainImage" label="商品图片" width="120" align="center">
             <template #default="{ row }">
@@ -106,12 +113,12 @@
         
         <div class="cart-footer">
           <div class="cart-summary">
-            <span>共 {{ totalItems }} 件商品</span>
-            <span class="total-price">总计: ¥{{ totalPrice.toFixed(2) }}</span>
+            <span>已选 {{ selectedItemsCount }} 件商品</span>
+            <span class="total-price">总计: ¥{{ selectedItemsTotal.toFixed(2) }}</span>
           </div>
           <div class="cart-actions">
             <el-button @click="continueShopping">继续购物</el-button>
-            <el-button type="primary" size="large" @click="checkout">
+            <el-button type="primary" size="large" @click="checkout" :disabled="selectedItems.length === 0">
               去结算
             </el-button>
           </div>
@@ -132,6 +139,7 @@ import productApi from '@/api/product.js'
 // 响应式数据
 const loading = ref(false)
 const cartItems = ref([])
+const selectedItems = ref([])
 
 // 路由
 const router = useRouter()
@@ -146,6 +154,23 @@ const totalItems = computed(() => {
 const totalPrice = computed(() => {
   return cartItems.value.reduce((total, item) => total + (item.price * item.quantity), 0)
 })
+
+// 选中商品的数量
+const selectedItemsCount = computed(() => {
+  return selectedItems.value.reduce((total, item) => total + item.quantity, 0)
+})
+
+// 选中商品的总价
+const selectedItemsTotal = computed(() => {
+  return selectedItems.value.reduce((total, item) => total + (item.price * item.quantity), 0)
+})
+
+/**
+ * 处理选择变化
+ */
+const handleSelectionChange = (selection) => {
+  selectedItems.value = selection
+}
 
 /**
  * 加载购物车数据
@@ -243,6 +268,8 @@ const removeItem = (item) => {
   ).then(() => {
     // 这里可以调用接口删除购物车项
     cartItems.value = cartItems.value.filter(cartItem => cartItem.id !== item.id)
+    // 从选中列表中移除
+    selectedItems.value = selectedItems.value.filter(selectedItem => selectedItem.id !== item.id)
     ElMessage.success('删除成功')
   }).catch(() => {
     // 用户取消删除
