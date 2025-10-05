@@ -1,10 +1,11 @@
 <template>
   <div class="shopping-cart-page">
-    <el-page-header class="page-header" title="首页" @back="goToHome">
-      <template #content>
-        <span class="page-title">购物车</span>
-      </template>
-    </el-page-header>
+    <div class="page-header">
+      <div class="page-header-content">
+        <h1>购物车</h1>
+        <p>查看和管理您的购物车商品</p>
+      </div>
+    </div>
 
     <el-card class="cart-card">
       <div v-if="loading" class="loading-container">
@@ -19,24 +20,62 @@
       
       <div v-else>
         <el-table :data="cartItems" class="cart-table">
-          <el-table-column prop="productName" label="商品名称" min-width="200">
+          <!-- 图片列 -->
+          <el-table-column prop="mainImage" label="商品图片" width="120" align="center">
             <template #default="{ row }">
-              <div class="product-info">
-                <div class="product-details">
-                  <div class="product-name">{{ row.productName }}</div>
-                  <div class="product-sku">{{ row.skuName }}</div>
-                </div>
+              <div class="product-image-container">
+                <el-image 
+                  :src="row.mainImage" 
+                  :alt="row.productName"
+                  fit="cover"
+                  class="product-image"
+                  lazy
+                >
+                  <template #placeholder>
+                    <div class="image-slot">
+                      <el-skeleton :rows="1" animated />
+                    </div>
+                  </template>
+                  <template #error>
+                    <div class="image-slot">
+                      <el-icon><Picture /></el-icon>
+                    </div>
+                  </template>
+                </el-image>
               </div>
             </template>
           </el-table-column>
           
-          <el-table-column prop="price" label="单价" width="120">
+          <!-- 商品名称列 -->
+          <el-table-column prop="productName" label="商品名称" min-width="200">
+            <template #default="{ row }">
+              <div class="product-name">{{ row.productName }}</div>
+            </template>
+          </el-table-column>
+          
+          <!-- SKU信息列 -->
+          <el-table-column prop="skuName" label="SKU信息" min-width="150">
+            <template #default="{ row }">
+              <div class="product-sku">{{ row.skuName }}</div>
+            </template>
+          </el-table-column>
+          
+          <!-- 商家列 -->
+          <el-table-column prop="merchantName" label="商家" min-width="150">
+            <template #default="{ row }">
+              <div class="merchant-name">{{ row.merchantName }}</div>
+            </template>
+          </el-table-column>
+          
+          <!-- 单价列 -->
+          <el-table-column prop="price" label="单价" width="120" align="center">
             <template #default="{ row }">
               ¥{{ row.price }}
             </template>
           </el-table-column>
           
-          <el-table-column label="数量" width="150">
+          <!-- 数量列 -->
+          <el-table-column label="数量" width="150" align="center">
             <template #default="{ row }">
               <el-input-number 
                 v-model="row.quantity" 
@@ -48,13 +87,15 @@
             </template>
           </el-table-column>
           
-          <el-table-column prop="subtotal" label="小计" width="120">
+          <!-- 小计列 -->
+          <el-table-column prop="subtotal" label="小计" width="120" align="center">
             <template #default="{ row }">
               ¥{{ (row.price * row.quantity).toFixed(2) }}
             </template>
           </el-table-column>
           
-          <el-table-column label="操作" width="100">
+          <!-- 操作列 -->
+          <el-table-column label="操作" width="100" align="center">
             <template #default="{ row }">
               <el-button type="danger" size="small" text @click="removeItem(row)">
                 删除
@@ -69,6 +110,7 @@
             <span class="total-price">总计: ¥{{ totalPrice.toFixed(2) }}</span>
           </div>
           <div class="cart-actions">
+            <el-button @click="continueShopping">继续购物</el-button>
             <el-button type="primary" size="large" @click="checkout">
               去结算
             </el-button>
@@ -83,7 +125,9 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Picture } from '@element-plus/icons-vue'
 import shoppingCartApi from '@/api/shoppingCart.js'
+import productApi from '@/api/product.js'
 
 // 响应式数据
 const loading = ref(false)
@@ -115,6 +159,8 @@ const loadCartItems = async () => {
 
     if (response && response.code === 200) {
       cartItems.value = response.data || []
+      // 为每个商品添加模拟的图片URL（实际应从API获取）
+      await enhanceCartItemsWithProductDetails()
     } else {
       ElMessage.error('获取购物车数据失败')
     }
@@ -123,6 +169,53 @@ const loadCartItems = async () => {
     ElMessage.error('加载购物车数据失败: ' + (error.message || '未知错误'))
   } finally {
     loading.value = false
+  }
+}
+
+/**
+ * 通过产品API获取更多产品详情（包括图片）
+ */
+const enhanceCartItemsWithProductDetails = async () => {
+  try {
+    // 获取所有唯一的产品ID
+    const productIds = [...new Set(cartItems.value.map(item => item.productId).filter(id => id))]
+    
+    // 批量获取产品详情
+    const productDetails = {}
+    for (const productId of productIds) {
+      try {
+        const productResponse = await productApi.getById(productId)
+        if (productResponse && productResponse.code === 200) {
+          productDetails[productId] = productResponse.data
+        }
+      } catch (error) {
+        console.warn(`获取产品 ${productId} 详情失败:`, error)
+      }
+    }
+    
+    // 将产品详情合并到购物车项中
+    cartItems.value = cartItems.value.map(item => {
+      const productDetail = productDetails[item.productId]
+      if (productDetail) {
+        return {
+          ...item,
+          mainImage: productDetail.mainImage || 'https://via.placeholder.com/200x200?text=Product+Image',
+          description: productDetail.description || ''
+        }
+      } else {
+        return {
+          ...item,
+          mainImage: item.mainImage || 'https://via.placeholder.com/200x200?text=Product+Image'
+        }
+      }
+    })
+  } catch (error) {
+    console.error('增强购物车数据失败:', error)
+    // 如果获取产品详情失败，使用默认图片
+    cartItems.value = cartItems.value.map(item => ({
+      ...item,
+      mainImage: item.mainImage || 'https://via.placeholder.com/200x200?text=Product+Image'
+    }))
   }
 }
 
@@ -165,10 +258,10 @@ const checkout = () => {
 }
 
 /**
- * 返回首页
+ * 继续购物
  */
-const goToHome = () => {
-  router.push('/')
+const continueShopping = () => {
+  router.push('/products')
 }
 
 /**
