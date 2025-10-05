@@ -24,6 +24,9 @@
             <router-link to="/products" class="nav-item" active-class="active">
               产品展示
             </router-link>
+            <router-link to="/shopping-cart" class="nav-item" active-class="active">
+              购物车
+            </router-link>
           </nav>
         </el-col>
 
@@ -64,6 +67,7 @@
             <h4>快速链接</h4>
             <router-link to="/">首页</router-link>
             <router-link to="/products">产品展示</router-link>
+            <router-link to="/shopping-cart">购物车</router-link>
           </div>
         </div>
         <div class="footer-bottom">
@@ -91,5 +95,4 @@ const goToLogin = () => {
 </script>
 
 <style src="@/assets/publicLayout.css" scoped>
-
 </style>
