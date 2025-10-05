@@ -2,38 +2,44 @@
   <div class="public-layout">
     <!-- 顶部导航栏 -->
     <header class="header">
-      <div class="container">
+      <el-row type="flex" justify="space-between" align="middle" :gutter="20" class="header-row">
         <!-- Logo 区域 -->
-        <div class="logo-section">
-          <router-link to="/" class="logo">
-            <el-icon size="32" color="#409eff">
-              <House />
-            </el-icon>
-            <span class="logo-text">花卉市场</span>
-          </router-link>
-        </div>
+        <el-col :span="4">
+          <div class="logo-section">
+            <router-link to="/" class="logo">
+              <el-icon size="32" color="#409eff">
+                <House />
+              </el-icon>
+              <span class="logo-text">花卉市场</span>
+            </router-link>
+          </div>
+        </el-col>
 
         <!-- 导航菜单 -->
-        <nav class="nav-menu">
-          <router-link to="/" class="nav-item" exact-active-class="active">
-            首页
-          </router-link>
-          <router-link to="/products" class="nav-item" active-class="active">
-            产品展示
-          </router-link>
-        </nav>
+        <el-col :span="12">
+          <nav class="nav-menu">
+            <router-link to="/" class="nav-item" exact-active-class="active">
+              首页
+            </router-link>
+            <router-link to="/products" class="nav-item" active-class="active">
+              产品展示
+            </router-link>
+          </nav>
+        </el-col>
 
         <!-- 右侧操作区 -->
-        <div class="header-actions">
-          <!-- 主题切换 -->
-          <ThemeToggle mode="icon" :show-text="false" class="theme-toggle-btn" />
-          
-          <el-button type="primary" @click="goToLogin">
-            <el-icon><User /></el-icon>
-            登录
-          </el-button>
-        </div>
-      </div>
+        <el-col :span="8">
+          <div class="header-actions">
+            <!-- 主题切换 -->
+            <ThemeToggle mode="icon" :show-text="false" class="theme-toggle-btn" />
+            
+            <el-button type="primary" @click="goToLogin">
+              <el-icon><User /></el-icon>
+              登录
+            </el-button>
+          </div>
+        </el-col>
+      </el-row>
     </header>
 
     <!-- 主内容区域 -->
@@ -61,7 +67,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2024 花卉市场. 保留所有权利.</p>
+          <p>&copy; 2025 花卉市场. 保留所有权利.</p>
         </div>
       </div>
     </footer>
@@ -71,6 +77,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { User, House } from '@element-plus/icons-vue'
+import { ElRow, ElCol } from 'element-plus'
 import ThemeToggle from '../ThemeToggle.vue'
 
 const router = useRouter()
@@ -83,194 +90,6 @@ const goToLogin = () => {
 }
 </script>
 
-<style scoped>
-.public-layout {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+<style src="@/assets/publicLayout.css" scoped>
 
-/* 顶部导航栏 */
-.header {
-  background: var(--bg-color);
-  box-shadow: var(--box-shadow-base);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  border-bottom: 1px solid var(--border-color-light);
-}
-
-/* 使用 common.css 中的统一 container 样式 */
-
-.header .container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 70px;
-}
-
-/* Logo 区域 */
-.logo-section {
-  flex-shrink: 0;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: var(--text-color-primary);
-  font-weight: bold;
-  transition: var(--transition-base);
-}
-
-.logo-text {
-  margin-left: 8px;
-  font-size: 24px;
-  background: linear-gradient(135deg, #409eff, #67c23a);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* 导航菜单 */
-.nav-menu {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-}
-
-.nav-item {
-  color: var(--text-color-regular);
-  text-decoration: none;
-  font-size: 16px;
-  padding: 8px 16px;
-  border-radius: var(--border-radius-base);
-  transition: all 0.3s ease;
-}
-
-.nav-item:hover {
-  color: var(--primary-color);
-  background-color: var(--primary-extra-light);
-}
-
-.nav-item.active {
-  color: var(--primary-color);
-  background-color: var(--primary-extra-light);
-  font-weight: 500;
-}
-
-/* 头部操作区 */
-.header-actions {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0 40px 0 0;
-}
-
-.theme-toggle-btn {
-  margin-right: 8px;
-}
-
-/* 主内容区 */
-.main-content {
-  flex: 1;
-  padding: 0;
-  background-color: var(--bg-color-page);
-  width: 100%;
-  min-height: calc(100vh - 70px - 200px); /* 减去 header 和 footer 高度 */
-}
-
-/* 底部 */
-.footer {
-  background: var(--text-color-primary);
-  color: var(--bg-color);
-  margin-top: auto;
-}
-
-.footer-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 40px;
-  padding: 40px 0;
-}
-
-.footer-section h4 {
-  color: var(--primary-color);
-  margin-bottom: 16px;
-  font-size: 18px;
-}
-
-.footer-section p {
-  line-height: 1.6;
-  color: var(--text-color-secondary);
-  margin-bottom: 8px;
-}
-
-.footer-section a {
-  display: block;
-  color: var(--text-color-secondary);
-  text-decoration: none;
-  margin-bottom: 8px;
-  transition: color 0.3s ease;
-}
-
-.footer-section a:hover {
-  color: var(--primary-color);
-}
-
-.footer-bottom {
-  border-top: 1px solid var(--border-color);
-  padding: 20px 0;
-  text-align: center;
-  color: var(--text-color-secondary);
-}
-
-/* 特定响应式样式（使用 common.css 中的通用媒体查询） */
-
-@media (max-width: 768px) {
-  .header .container {
-    flex-wrap: wrap;
-    height: auto;
-    padding: 16px 20px;
-  }
-
-  .nav-menu {
-    order: 3;
-    width: 100%;
-    margin-top: 16px;
-    justify-content: center;
-    gap: 16px;
-  }
-
-  .nav-item {
-    padding: 8px 12px;
-    font-size: 14px;
-  }
-
-  .logo-text {
-    font-size: 20px;
-  }
-
-  .footer-content {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    text-align: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 0 16px;
-  }
-
-  .nav-menu {
-    gap: 8px;
-  }
-
-  .header-actions .el-button {
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-}
 </style>
