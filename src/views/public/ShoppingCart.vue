@@ -1,12 +1,11 @@
 <template>
-  <div class="shopping-cart-page">
-    <div class="page-header">
-      <div class="page-header-content">
-        <h1>购物车</h1>
-        <p>查看和管理您的购物车商品</p>
-      </div>
+      <div class="page-header">
+    <div class="page-header-content">
+      <h1>购物车</h1>
+      <p>查看和管理您的购物车商品</p>
     </div>
-
+  </div>
+  <div class="shopping-cart-page">
     <el-card class="cart-card">
       <div v-if="loading" class="loading-container">
         <el-skeleton :rows="5" animated />
