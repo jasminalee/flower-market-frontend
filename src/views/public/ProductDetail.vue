@@ -223,19 +223,58 @@
         <el-button type="primary" @click="goBack">返回产品列表</el-button>
       </el-empty>
     </div>
+    
+    <!-- 收货地址选择对话框 -->
+    <el-dialog v-model="addressDialogVisible" title="选择收货地址" width="500">
+      <el-table :data="receiverAddresses" style="width: 100%" max-height="300">
+        <el-table-column prop="receiverName" label="收货人" />
+        <el-table-column prop="province" label="地址" >
+          <template #default="scope">
+            {{ scope.row.province }}{{ scope.row.city }}{{ scope.row.district }}{{ scope.row.detailAddress }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template #default="scope">
+            <el-button 
+              type="primary" 
+              size="small" 
+              @click="selectAddress(scope.row)"
+              :disabled="selectedAddress && selectedAddress.id === scope.row.id"
+            >
+              {{ selectedAddress && selectedAddress.id === scope.row.id ? '已选择' : '选择' }}
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="addressDialogVisible = false">取消</el-button>
+          <el-button 
+            type="primary" 
+            @click="confirmPurchase" 
+            :disabled="!selectedAddress"
+            :loading="purchaseLoading"
+          >
+            确认购买
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
   ShoppingCart, Goods, Star, Share, Picture,
   HomeFilled, Document
 } from '@element-plus/icons-vue'
 import merchantProduct from '@/api/merchantProduct'
 import shoppingCartApi from '@/api/shoppingCart'
+import orderApi from '@/api/order'
+import receiverAddressApi from '@/api/receiverAddress'
 import Comment from '@/components/Comment.vue'
 import { useAuthStore } from '@/config/store.js'
 
@@ -250,6 +289,10 @@ const product = ref({})
 const quantity = ref(1)
 const currentImage = ref('')
 const activeTab = ref('detail')
+const receiverAddresses = ref([])  // 收货地址列表
+const selectedAddress = ref(null) // 选中的收货地址
+const addressDialogVisible = ref(false) // 地址选择对话框可见性
+const purchaseLoading = ref(false) // 购买按钮加载状态
 
 // 计算属性 - 产品图片数组
 const productImages = ref([])
@@ -356,9 +399,93 @@ const addToCart = async () => {
 /**
  * 立即购买
  */
-const buyNow = () => {
-  ElMessage.success('立即购买功能开发中...')
-  // 这里可以跳转到订单确认页面
+const buyNow = async () => {
+  try {
+    // 检查用户是否登录
+    if (!authStore.isAuthenticated) {
+      ElMessage.warning('请先登录')
+      router.push('/login')
+      return
+    }
+
+    // 获取当前用户ID
+    const userId = authStore.user?.id || authStore.user?.userId
+    
+    // 获取用户的收货地址
+    const addressResponse = await receiverAddressApi.listByUserId(userId)
+    
+    if (addressResponse.code === 200 && addressResponse.data && addressResponse.data.length > 0) {
+      receiverAddresses.value = addressResponse.data
+      selectedAddress.value = addressResponse.data.find(addr => addr.isDefault === 1) || addressResponse.data[0]
+      
+      // 显示地址选择对话框
+      addressDialogVisible.value = true
+    } else {
+      ElMessageBox.confirm(
+        '您还没有收货地址，是否前往添加？',
+        '提示',
+        {
+          confirmButtonText: '去添加',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      ).then(() => {
+        // 这里可以跳转到地址管理页面
+        router.push('/personal/shipping-address')
+      }).catch(() => {
+        // 用户取消
+      })
+    }
+  } catch (error) {
+    console.error('获取收货地址失败:', error)
+    ElMessage.error('获取收货地址失败: ' + (error.message || '未知错误'))
+  }
+}
+
+/**
+ * 选择收货地址
+ */
+const selectAddress = (address) => {
+  selectedAddress.value = address
+}
+
+/**
+ * 确认购买
+ */
+const confirmPurchase = async () => {
+  if (!selectedAddress.value) {
+    ElMessage.warning('请选择收货地址')
+    return
+  }
+  
+  try {
+    purchaseLoading.value = true
+    
+    // 获取当前用户ID
+    const userId = authStore.user?.id || authStore.user?.userId
+    
+    // 创建订单
+    const orderResponse = await orderApi.createOrderFromDirectPurchase(
+      product.value.id,
+      quantity.value,
+      selectedAddress.value.id,
+      userId
+    )
+    
+    if (orderResponse.code === 200 && orderResponse.data) {
+      ElMessage.success('订单创建成功')
+      addressDialogVisible.value = false
+      // 这里可以跳转到订单详情页面
+      // router.push(`/order/${orderResponse.data.id}`)
+    } else {
+      ElMessage.error(orderResponse.message || '创建订单失败')
+    }
+  } catch (error) {
+    console.error('创建订单失败:', error)
+    ElMessage.error('创建订单失败: ' + (error.message || '未知错误'))
+  } finally {
+    purchaseLoading.value = false
+  }
 }
 
 /**
