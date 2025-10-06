@@ -108,11 +108,6 @@
 
 /* 支付方式管理页面样式 */
 
-/* 表格卡片样式 */
-.table-card {
-  margin-top: 20px;
-}
-
 /* 表格操作列样式 */
 .table-card .el-table .el-button--small {
   padding: 6px 10px;
