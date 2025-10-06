@@ -143,10 +143,12 @@ const authStore = useAuthStore()
  * 跳转到产品详情页
  */
 const goToProductDetail = (merchantProductId) => {
+  console.log('尝试跳转到产品详情页，merchantProductId:', merchantProductId)
   if (merchantProductId) {
     router.push(`/products/${merchantProductId}`)
   } else {
-    ElMessage.warning('无法跳转到产品详情页')
+    ElMessage.warning('无法跳转到产品详情页: 缺少产品ID')
+    console.warn('跳转失败，merchantProductId为空或无效:', merchantProductId)
   }
 }
 
@@ -191,6 +193,8 @@ const loadCartItems = async () => {
 
     if (response && response.code === 200) {
       cartItems.value = response.data || []
+      console.log('response数据:', response.data) // 添加日志查看数据结构
+      console.log('购物车数据:', cartItems.value) // 添加日志查看数据结构
       // Initialize _originalQuantity for each item
       cartItems.value.forEach(item => {
         item._originalQuantity = item.quantity
