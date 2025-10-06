@@ -133,6 +133,51 @@
     min-height: calc(100vh - 64px - 60px);
 }
 
+/* 用户信息下拉菜单 */
+.user-dropdown {
+  cursor: pointer;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-base);
+  transition: var(--transition-base);
+  cursor: pointer;
+}
+
+.user-info:hover {
+  background-color: var(--primary-extra-light);
+}
+
+.username {
+  font-size: 14px;
+  color: var(--text-color-primary);
+  font-weight: 500;
+  margin: 0 8px;
+}
+
+.dropdown-arrow {
+  transition: transform 0.3s ease;
+  font-size: 12px;
+}
+
+.user-dropdown:focus .dropdown-arrow,
+.user-dropdown:hover .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* 暗色主题下的用户信息样式 */
+:global(.dark) .user-info:hover {
+  background-color: #333;
+}
+
+:global(.dark) .username {
+  color: #fff;
+}
+
 /* 底部样式 */
 /* 注意：当前Admin.vue组件中没有使用footer元素，这部分样式为未来可能的实现预留 */
 .admin-footer {
