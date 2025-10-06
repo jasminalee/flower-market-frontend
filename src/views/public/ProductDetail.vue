@@ -8,9 +8,18 @@
     >
       <template #breadcrumb>
         <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item :to="{ path: '/products' }">产品展示</el-breadcrumb-item>
-          <el-breadcrumb-item>{{ product.productName || '产品详情' }}</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/' }">
+            <el-icon><HomeFilled /></el-icon>
+            首页
+          </el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/products' }">
+            <el-icon><Goods /></el-icon>
+            产品展示
+          </el-breadcrumb-item>
+          <el-breadcrumb-item>
+            <el-icon><Document /></el-icon>
+            {{ product.productName || '产品详情' }}
+          </el-breadcrumb-item>
         </el-breadcrumb>
       </template>
     </el-page-header>
@@ -225,7 +234,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { 
-  ShoppingCart, Goods, Star, Share, Picture
+  ShoppingCart, Goods, Star, Share, Picture,
+  HomeFilled, Document
 } from '@element-plus/icons-vue'
 import productApi from '@/api/product'
 

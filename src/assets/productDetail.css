@@ -3,23 +3,58 @@
 .product-detail-page {
   min-height: calc(100vh - var(--header-height) - var(--footer-height));
   background-color: var(--bg-color-page);
-  padding: var(--spacing-large) 0;
 }
 
 /* 面包屑导航 */
 .breadcrumb-container {
-  background: var(--bg-color);
-  padding: var(--spacing-base) 0;
-  border-bottom: 1px solid var(--border-color-light);
+  background: linear-gradient(135deg, var(--primary-color-light), var(--primary-color));
+  padding: var(--spacing-medium) var(--spacing-large);
+  border-radius: var(--border-radius-base);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--spacing-large);
+}
+
+.breadcrumb-container .el-page-header__content {
+  font-size: var(--font-size-large);
+  font-weight: 600;
+  color: white;
 }
 
 .el-page-header {
-  padding: 0 var(--spacing-large);
+  padding: 0;
+  background: transparent;
 }
 
-.el-page-header__content {
-  font-size: var(--font-size-large);
-  font-weight: 600;
+.el-breadcrumb {
+  background: rgba(255, 255, 255, 0.2);
+  padding: var(--spacing-small) var(--spacing-base);
+  border-radius: var(--border-radius-small);
+}
+
+.el-breadcrumb__item,
+.el-breadcrumb__inner,
+.el-breadcrumb__separator {
+  color: white;
+}
+
+.el-breadcrumb__inner:hover {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: underline;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .breadcrumb-container {
+  background: linear-gradient(135deg, var(--primary-color-dark), var(--primary-color));
+}
+
+[data-theme="dark"] .el-breadcrumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .el-breadcrumb__item,
+[data-theme="dark"] .el-breadcrumb__inner,
+[data-theme="dark"] .el-breadcrumb__separator {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* 加载状态 */
@@ -168,6 +203,12 @@
   display: flex;
   gap: var(--spacing-small);
   flex-wrap: wrap;
+  margin-bottom: var(--spacing-large);
+}
+
+.product-tags .el-tag {
+  margin-right: var(--spacing-small);
+  margin-bottom: var(--spacing-small);
 }
 
 .product-description {
