@@ -22,5 +22,14 @@ export default {
    */
   add(shoppingCart) {
     return apiClient.post('/shoppingCart/add', shoppingCart)
+  },
+
+  /**
+   * 更新购物车项
+   * @param {Object} shoppingCart - 购物车信息
+   * @returns {Promise} 返回更新结果
+   */
+  update(shoppingCart) {
+    return apiClient.put('/shoppingCart', shoppingCart)
   }
 }

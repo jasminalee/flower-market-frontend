@@ -174,6 +174,10 @@ const loadCartItems = async () => {
 
     if (response && response.code === 200) {
       cartItems.value = response.data || []
+      // Initialize _originalQuantity for each item
+      cartItems.value.forEach(item => {
+        item._originalQuantity = item.quantity
+      })
       // 为每个商品添加模拟的图片URL（实际应从API获取）
       await enhanceCartItemsWithProductDetails()
     } else {
@@ -237,10 +241,35 @@ const enhanceCartItemsWithProductDetails = async () => {
 /**
  * 处理数量变化
  */
-const handleQuantityChange = (item) => {
-  // 这里可以调用接口更新购物车项数量
-  console.log('更新购物车项数量:', item)
-  ElMessage.success('数量已更新')
+const handleQuantityChange = async (item) => {
+  // Store the original quantity in case we need to revert
+  const originalQuantity = item._originalQuantity !== undefined ? item._originalQuantity : item.quantity;
+  
+  try {
+    // Prepare the shopping cart data according to the API specification
+    const shoppingCartData = {
+      id: item.id,
+      quantity: item.quantity,
+    }
+
+    // Call the API to update the shopping cart item
+    const response = await shoppingCartApi.update(shoppingCartData)
+    
+    if (response && response.code === 200) {
+      // Update successful, store the new quantity as original
+      item._originalQuantity = item.quantity
+      ElMessage.success('数量已更新')
+    } else {
+      ElMessage.error('更新失败: ' + (response?.message || '未知错误'))
+      // Revert the quantity change if the API call failed
+      item.quantity = originalQuantity
+    }
+  } catch (error) {
+    console.error('更新购物车项数量失败:', error)
+    ElMessage.error('更新失败: ' + (error.message || '网络错误'))
+    // Revert the quantity change if the API call failed
+    item.quantity = originalQuantity
+  }
 }
 
 /**
