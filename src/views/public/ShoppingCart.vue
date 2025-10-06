@@ -53,7 +53,13 @@
           </el-table-column>
           
           <!-- 商品名称列 -->
-          <el-table-column prop="productName" label="商品名称" min-width="200" />
+          <el-table-column prop="productName" label="商品名称" min-width="200">
+            <template #default="{ row }">
+              <el-link type="primary" @click="goToProductDetail(row.merchantProductId)">
+                {{ row.productName }}
+              </el-link>
+            </template>
+          </el-table-column>
           
           <!-- SKU信息列 -->
           <el-table-column prop="skuName" label="SKU信息" min-width="150" />
@@ -132,6 +138,17 @@ const selectedItems = ref([])
 // 路由
 const router = useRouter()
 const authStore = useAuthStore()
+
+/**
+ * 跳转到产品详情页
+ */
+const goToProductDetail = (merchantProductId) => {
+  if (merchantProductId) {
+    router.push(`/products/${merchantProductId}`)
+  } else {
+    ElMessage.warning('无法跳转到产品详情页')
+  }
+}
 
 /**
  * 计算属性
