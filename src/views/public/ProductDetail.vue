@@ -475,8 +475,15 @@ const confirmPurchase = async () => {
     if (orderResponse.code === 200 && orderResponse.data) {
       ElMessage.success('订单创建成功')
       addressDialogVisible.value = false
-      // 这里可以跳转到订单详情页面
-      // router.push(`/order/${orderResponse.data.id}`)
+      // 跳转到订单确认页面，并传递产品和数量信息
+      router.push({
+        name: 'OrderConfirmation',
+        params: { id: orderResponse.data.id },
+        query: { 
+          productId: product.value.id,
+          quantity: quantity.value
+        }
+      })
     } else {
       ElMessage.error(orderResponse.message || '创建订单失败')
     }

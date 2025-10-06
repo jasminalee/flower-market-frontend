@@ -35,6 +35,13 @@ const routes = [
         name: 'ShoppingCart',
         component: () => import('@/views/public/ShoppingCart.vue'),
         meta: { title: '购物车' }
+      },
+      {
+        path: 'order-confirmation/:id',
+        name: 'OrderConfirmation',
+        component: () => import('@/views/public/OrderConfirmation.vue'),
+        meta: { title: '订单确认' },
+        props: true
       }
     ]
   },
@@ -229,6 +236,15 @@ const routes = [
             component: () => import('@/views/admin/personal/ShippingAddress.vue'),
             meta: { 
               title: '收货地址',
+              requiresAuth: true
+            }
+          },
+          {
+            path: 'orders',
+            name: 'Orders',
+            component: () => import('@/views/admin/personal/Orders.vue'),
+            meta: { 
+              title: '我的订单',
               requiresAuth: true
             }
           }
