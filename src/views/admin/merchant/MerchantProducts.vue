@@ -801,43 +801,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-.product-image {
-  width: 60px;
-  height: 60px;
-  border-radius: 4px;
-}
-.image-slot {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  background: #f5f7fa;
-  color: #909399;
-}
-</style>
-
-<style scoped>
-.editor-container {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.editor-toolbar {
-  border-bottom: 1px solid #ccc;
-}
-
-.editor-content {
-  height: 300px;
-}
-
-.product-detail-view {
-  padding: 10px;
-  min-height: 200px;
-  border: 1px solid #ebeef5;
-  border-radius: 4px;
-  background-color: #f5f7fa;
-}
-</style>
+<style scoped></style>

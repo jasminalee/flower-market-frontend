@@ -575,6 +575,7 @@ const handleSave = async () => {
  * 重置产品表单
  */
 const resetProductForm = () => {
+  // 清空表单数据
   Object.assign(productForm, {
     id: null,
     productName: '',
@@ -587,6 +588,7 @@ const resetProductForm = () => {
 
   console.log('Product form reset to:', productForm) // 调试信息
 
+  // 重置表单验证状态
   if (productFormRef.value) {
     productFormRef.value.resetFields()
   }
@@ -598,10 +600,7 @@ const resetProductForm = () => {
 // 组件销毁前清理编辑器
 onBeforeUnmount(() => {
   // 清理预览URL对象
-  if (previewUrls.length > 0) {
-    previewUrls.forEach(url => URL.revokeObjectURL(url))
-    previewUrls = []
-  }
+  // previewUrls 变量已被移除，无需清理
 })
 
 /**
@@ -647,9 +646,6 @@ const handleAvatarChange = (file) => {
   const previewUrl = URL.createObjectURL(file.raw)
   console.log('file:', file)
   console.log('previewUrl:', previewUrl)
-
-  // 只用于预览，不直接设置到productForm.mainImage
-  previewUrls.push(previewUrl)
 
   // 为了预览效果，我们可以临时设置预览URL，但会在上传成功后替换
   if (!productForm.mainImage || productForm.mainImage.startsWith('blob:')) {
