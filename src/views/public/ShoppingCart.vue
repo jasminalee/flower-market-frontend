@@ -122,6 +122,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Picture } from '@element-plus/icons-vue'
 import shoppingCartApi from '@/api/shoppingCart.js'
 import productApi from '@/api/product.js'
+import { useAuthStore } from '@/config/store.js'
 
 // 响应式数据
 const loading = ref(false)
@@ -130,6 +131,7 @@ const selectedItems = ref([])
 
 // 路由
 const router = useRouter()
+const authStore = useAuthStore()
 
 /**
  * 计算属性
@@ -165,8 +167,9 @@ const handleSelectionChange = (selection) => {
 const loadCartItems = async () => {
   loading.value = true
   try {
-    // 这里需要传入实际的用户ID
-    const userId = 2 // 临时使用固定ID，实际应该从登录信息中获取
+    // 获取当前登录用户ID
+    const userId = authStore.user?.id || authStore.user?.userId || 2; // 如果没有获取到用户ID，使用默认值2
+    console.log('当前登录用户:', authStore.user)
     const response = await shoppingCartApi.list({ userId })
 
     if (response && response.code === 200) {

@@ -26,6 +26,9 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await authApi.login(credentials)
       
+      // 调试：打印登录响应数据
+      console.log('登录响应数据:', response);
+      
       // 根据OpenAPI文档，响应格式应为ResponseResult对象
       if (response && response.code === 200) {
         // 从响应中提取token和用户信息

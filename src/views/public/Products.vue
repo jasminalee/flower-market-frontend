@@ -193,9 +193,12 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Search, View, ShoppingCart, Star, Picture } from '@element-plus/icons-vue'
 import productApi from '@/api/product'
+import shoppingCartApi from '@/api/shoppingCart'
+import { useAuthStore } from '@/config/store.js'
 
 // 路由
 const router = useRouter()
+const authStore = useAuthStore()
 
 // 响应式数据
 const loading = ref(true)
@@ -293,8 +296,34 @@ const viewProduct = (product) => {
   router.push(`/products/${product.id}`)
 }
 
-const addToCart = (product) => {
-  ElMessage.success(`已将 ${product.productName} 加入购物车`)
+const addToCart = async (product) => {
+  try {
+    // 获取当前登录用户ID
+    const userId = authStore.user?.id || authStore.user?.userId || 2; // 如果没有获取到用户ID，使用默认值2
+    
+    // 构造购物车对象
+    const shoppingCart = {
+      productId: product.id,
+      productName: product.productName,
+      price: product.price || product.minPrice || 0,
+      quantity: 1, // 默认数量为1
+      merchantId: product.merchantId || 1, // 默认商户ID
+      userId: userId,
+      status: 1 // 有效状态
+    }
+    
+    // 调用API添加到购物车
+    const response = await shoppingCartApi.add(shoppingCart)
+    
+    if (response.code === 200) {
+      ElMessage.success(`已将 ${product.productName} 加入购物车`)
+    } else {
+      ElMessage.error(response.message || '添加到购物车失败')
+    }
+  } catch (error) {
+    console.error('添加到购物车失败:', error)
+    ElMessage.error('添加到购物车失败: ' + (error.message || '未知错误'))
+  }
 }
 
 const addToFavorites = (product) => {

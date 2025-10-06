@@ -13,5 +13,14 @@ export default {
    */
   list(params) {
     return apiClient.get('/shoppingCart/list', { params })
+  },
+
+  /**
+   * 添加商品到购物车
+   * @param {Object} shoppingCart - 购物车信息
+   * @returns {Promise} 返回添加结果
+   */
+  add(shoppingCart) {
+    return apiClient.post('/shoppingCart/add', shoppingCart)
   }
 }
