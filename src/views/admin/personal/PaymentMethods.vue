@@ -5,14 +5,18 @@
     </template>
   </el-page-header>
 
-  <div class="payment-methods-page">
-    <el-card class="payment-methods-card">
-
-      <!-- 搜索表单 -->
-      <div class="toolbar">
-        <el-form :model="searchForm" label-width="80px" class="search-form">
+  <el-card class="filter-card">
+    <!-- 搜索表单 -->
+    <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
+      <el-col :span="23">
+        <el-form :model="searchForm" inline>
           <el-form-item label="支付方式">
-            <el-input v-model="searchForm.methodName" placeholder="请输入支付方式名称" />
+            <el-input 
+              v-model="searchForm.methodName" 
+              placeholder="请输入支付方式名称" 
+              clearable
+              @keyup.enter="searchPaymentMethods"
+            />
           </el-form-item>
           <el-form-item label="状态">
             <el-select v-model="searchForm.status" placeholder="请选择状态" clearable>
@@ -21,119 +25,135 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="searchPaymentMethods">搜索</el-button>
-            <el-button @click="resetSearch">重置</el-button>
+            <el-button type="primary" @click="searchPaymentMethods">
+              <el-icon><Search /></el-icon>
+              搜索
+            </el-button>
+            <el-button @click="resetSearch">
+              <el-icon><Refresh /></el-icon>
+              重置
+            </el-button>
           </el-form-item>
         </el-form>
-      </div>
+      </el-col>
+      
+      <el-col :span="1" style="text-align: right;">
+        <el-button type="primary" @click="showAddForm">
+          <el-icon><Plus /></el-icon>
+          新增支付方式
+        </el-button>
+      </el-col>
+    </el-row>
+  </el-card>
 
-      <!-- 支付方式列表 -->
-      <el-table :data="paymentMethods" v-loading="loading" style="width: 100%">
-        <el-table-column prop="methodName" label="支付方式名称" width="150" />
-        <el-table-column prop="methodCode" label="支付方式编码" width="150" />
-        <el-table-column prop="accountName" label="账户名称" width="150" />
-        <el-table-column prop="accountNumber" label="账户号码/卡号" width="200" />
-        <el-table-column prop="bankName" label="银行名称" width="150" />
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="scope">
-            <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
-              {{ scope.row.status === 1 ? '启用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="sort" label="排序" width="80" />
-        <el-table-column label="操作" width="200">
-          <template #default="scope">
-            <el-button size="small" @click="editPaymentMethod(scope.row)">编辑</el-button>
-            <el-button 
-              size="small" 
-              :type="scope.row.status === 1 ? 'warning' : 'success'"
-              @click="toggleStatus(scope.row)"
-            >
-              {{ scope.row.status === 1 ? '禁用' : '启用' }}
-            </el-button>
-            <el-button size="small" type="danger" @click="deletePaymentMethod(scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+  <el-card class="table-card">
+    <!-- 支付方式列表 -->
+    <el-table :data="paymentMethods" v-loading="loading" style="width: 100%">
+      <el-table-column prop="methodName" label="支付方式名称" width="150" />
+      <el-table-column prop="methodCode" label="支付方式编码" width="150" />
+      <el-table-column prop="accountName" label="账户名称" width="150" />
+      <el-table-column prop="accountNumber" label="账户号码/卡号" width="200" />
+      <el-table-column prop="bankName" label="银行名称" width="150" />
+      <el-table-column prop="status" label="状态" width="100">
+        <template #default="scope">
+          <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
+            {{ scope.row.status === 1 ? '启用' : '禁用' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="sort" label="排序" width="80" />
+      <el-table-column label="操作" width="200" fixed="right">
+        <template #default="scope">
+          <el-button size="small" @click="editPaymentMethod(scope.row)">编辑</el-button>
+          <el-button 
+            size="small" 
+            :type="scope.row.status === 1 ? 'warning' : 'success'"
+            @click="toggleStatus(scope.row)"
+          >
+            {{ scope.row.status === 1 ? '禁用' : '启用' }}
+          </el-button>
+          <el-button size="small" type="danger" @click="deletePaymentMethod(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
 
-      <!-- 分页 -->
-      <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="pagination.current"
-          v-model:page-size="pagination.size"
-          :page-sizes="[10, 20, 50]"
-          :total="pagination.total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
+    <!-- 分页 -->
+    <div class="pagination-container">
+      <el-pagination
+        v-model:current-page="pagination.current"
+        v-model:page-size="pagination.size"
+        :page-sizes="[10, 20, 50]"
+        :total="pagination.total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </div>
+  </el-card>
 
-    <!-- 新增/编辑支付方式对话框 -->
-    <el-dialog 
-      :title="dialogTitle" 
-      v-model="dialogVisible" 
-      width="600px"
-      :close-on-click-modal="false"
+  <!-- 新增/编辑支付方式对话框 -->
+  <el-dialog 
+    :title="dialogTitle" 
+    v-model="dialogVisible" 
+    width="600px"
+    :close-on-click-modal="false"
+  >
+    <el-form 
+      :model="paymentMethodForm" 
+      :rules="formRules" 
+      ref="paymentMethodFormRef" 
+      label-width="120px"
+      class="form-card"
     >
-      <el-form 
-        :model="paymentMethodForm" 
-        :rules="formRules" 
-        ref="paymentMethodFormRef" 
-        label-width="120px"
-        class="form-card"
-      >
-        <el-form-item label="支付方式名称" prop="methodName">
-          <el-input v-model="paymentMethodForm.methodName" placeholder="请输入支付方式名称" />
-        </el-form-item>
-        <el-form-item label="支付方式编码" prop="methodCode">
-          <el-input v-model="paymentMethodForm.methodCode" placeholder="请输入支付方式编码" />
-        </el-form-item>
-        <el-form-item label="账户名称" prop="accountName">
-          <el-input v-model="paymentMethodForm.accountName" placeholder="请输入账户名称" />
-        </el-form-item>
-        <el-form-item label="账户号码/卡号" prop="accountNumber">
-          <el-input v-model="paymentMethodForm.accountNumber" placeholder="请输入账户号码/卡号" />
-        </el-form-item>
-        <el-form-item label="银行名称" prop="bankName">
-          <el-input v-model="paymentMethodForm.bankName" placeholder="请输入银行名称" />
-        </el-form-item>
-        <el-form-item label="开户行" prop="bankBranch">
-          <el-input v-model="paymentMethodForm.bankBranch" placeholder="请输入开户行" />
-        </el-form-item>
-        <el-form-item label="排序" prop="sort">
-          <el-input-number v-model="paymentMethodForm.sort" :min="0" :max="999" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="paymentMethodForm.status">
-            <el-radio :label="1">启用</el-radio>
-            <el-radio :label="0">禁用</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="描述" prop="description">
-          <el-input 
-            v-model="paymentMethodForm.description" 
-            type="textarea" 
-            :rows="3" 
-            placeholder="请输入支付方式描述" 
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="savePaymentMethod" :loading="saveLoading">保存</el-button>
-        </div>
-      </template>
-    </el-dialog>
-  </div>
+      <el-form-item label="支付方式名称" prop="methodName">
+        <el-input v-model="paymentMethodForm.methodName" placeholder="请输入支付方式名称" />
+      </el-form-item>
+      <el-form-item label="支付方式编码" prop="methodCode">
+        <el-input v-model="paymentMethodForm.methodCode" placeholder="请输入支付方式编码" />
+      </el-form-item>
+      <el-form-item label="账户名称" prop="accountName">
+        <el-input v-model="paymentMethodForm.accountName" placeholder="请输入账户名称" />
+      </el-form-item>
+      <el-form-item label="账户号码/卡号" prop="accountNumber">
+        <el-input v-model="paymentMethodForm.accountNumber" placeholder="请输入账户号码/卡号" />
+      </el-form-item>
+      <el-form-item label="银行名称" prop="bankName">
+        <el-input v-model="paymentMethodForm.bankName" placeholder="请输入银行名称" />
+      </el-form-item>
+      <el-form-item label="开户行" prop="bankBranch">
+        <el-input v-model="paymentMethodForm.bankBranch" placeholder="请输入开户行" />
+      </el-form-item>
+      <el-form-item label="排序" prop="sort">
+        <el-input-number v-model="paymentMethodForm.sort" :min="0" :max="999" />
+      </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-radio-group v-model="paymentMethodForm.status">
+          <el-radio :label="1">启用</el-radio>
+          <el-radio :label="0">禁用</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="描述" prop="description">
+        <el-input 
+          v-model="paymentMethodForm.description" 
+          type="textarea" 
+          :rows="3" 
+          placeholder="请输入支付方式描述" 
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="savePaymentMethod" :loading="saveLoading">保存</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Search, Refresh, Plus, Edit, Delete, View } from '@element-plus/icons-vue'
 import paymentMethodApi from '@/api/paymentMethod'
 import { useAuthStore } from '@/config/store.js'
 

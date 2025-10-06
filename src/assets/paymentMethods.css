@@ -105,3 +105,58 @@
   display: flex;
   justify-content: flex-end;
 }
+
+/* 支付方式管理页面样式 */
+
+/* 表格卡片样式 */
+.table-card {
+  margin-top: 20px;
+}
+
+/* 表格操作列样式 */
+.table-card .el-table .el-button--small {
+  padding: 6px 10px;
+  margin: 0 2px;
+}
+
+/* 表单对话框样式 */
+.form-card {
+  margin-top: 10px;
+}
+
+/* 表单行间距 */
+.form-card .el-row {
+  margin-bottom: 15px;
+}
+
+/* 表单项标签 */
+.form-card .el-form-item__label {
+  font-weight: 500;
+}
+
+/* 对话框底部按钮 */
+.dialog-footer {
+  text-align: right;
+  padding: 15px 20px 0;
+  border-top: 1px solid #ebeef5;
+  margin-top: 10px;
+}
+
+/* 分页容器 */
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 过滤器栏 */
+.filters-bar {
+  flex-wrap: wrap;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .el-dialog {
+    width: 95% !important;
+  }
+}
