@@ -181,7 +181,7 @@
         </el-select>
       </el-form-item>
       
-      <el-form-item label="SKU ID" v-if="merchantProductForm.skuId">
+      <el-form-item label="SKU ID">
         <el-input v-model="merchantProductForm.skuId" disabled />
       </el-form-item>
       
