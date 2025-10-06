@@ -1,19 +1,19 @@
 <template>
+  <el-page-header class="page-header" title="个人中心">
+    <template #content>
+      我的订单
+    </template>
+  </el-page-header>
   <div class="orders-page">
     <el-card class="orders-card">
-      <template #header>
-        <div class="card-header">
-          <span>我的订单</span>
-        </div>
-      </template>
 
       <div v-if="loading" class="loading-container">
         <el-skeleton :rows="10" animated />
       </div>
 
       <div v-else>
-        <el-table :data="orders" style="width: 100%" v-loading="tableLoading">
-          <el-table-column prop="orderNo" label="订单编号" width="180" />
+        <el-table :data="orders" v-loading="tableLoading">
+          <el-table-column prop="orderNo" label="订单编号" width="220" />
           <el-table-column prop="createTime" label="下单时间" width="180">
             <template #default="scope">
               {{ formatDate(scope.row.createTime) }}
@@ -36,7 +36,7 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="200">
+          <el-table-column label="操作" width="250">
             <template #default="scope">
               <el-button size="small" @click="viewOrder(scope.row)">查看</el-button>
               <el-button 
@@ -223,18 +223,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.orders-page {
-  padding: 20px;
-}
-
-.card-header {
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.pagination-container {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
 </style>

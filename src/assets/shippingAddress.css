@@ -1,6 +1,5 @@
 /* 收货地址管理页面样式 */
 .shipping-address-container {
-  padding: 20px;
   background-color: var(--el-bg-color-page);
   min-height: calc(100vh - 120px);
 }

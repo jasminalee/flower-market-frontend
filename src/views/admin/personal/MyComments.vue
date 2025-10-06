@@ -1,12 +1,12 @@
 <template>
+  <el-page-header class="page-header" title="个人中心">
+    <template #content>
+      我的评论
+    </template>
+  </el-page-header>
+
   <div class="comments-container">
     <el-card class="comments-card">
-      <template #header>
-        <div class="card-header">
-          <span>我的评论</span>
-        </div>
-      </template>
-
       <!-- 评论列表 -->
       <el-table 
         :data="comments" 
@@ -221,25 +221,5 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-@import '@/assets/comment.css';
-
-.comments-container {
-  padding: 20px;
-}
-
-.comments-card {
-  min-height: 500px;
-}
-
-.comment-content {
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-
-.pagination-container {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
+<style src="@/assets/comment.css" scoped>
 </style>

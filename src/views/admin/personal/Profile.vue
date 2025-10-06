@@ -1,11 +1,12 @@
 <template>
+  <el-page-header class="page-header" title="个人中心">
+    <template #content>
+      个人信息
+    </template>
+  </el-page-header>
   <div class="profile-container">
     <el-card class="profile-card">
-      <template #header>
-        <div class="card-header">
-          <span>个人信息</span>
-        </div>
-      </template>
+
       
       <el-form
         ref="profileFormRef"
@@ -282,63 +283,6 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-@import '@/assets/profile.css';
+<style src="@/assets/profile.css" scoped>
 
-.avatar-selection {
-  width: 100%;
-}
-
-.avatar-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.avatar-option {
-  border: 2px solid transparent;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: border-color 0.3s;
-}
-
-.avatar-option:hover {
-  border-color: var(--el-color-primary);
-}
-
-.avatar-option.selected {
-  border-color: var(--el-color-primary);
-  box-shadow: 0 0 0 2px var(--el-color-primary);
-}
-
-.avatar-preview {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-}
-
-.custom-avatar-upload {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.upload-label {
-  font-size: 14px;
-  color: var(--el-text-color-regular);
-}
-
-.current-avatar-preview {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.current-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-}
 </style>

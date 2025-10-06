@@ -1,13 +1,12 @@
 <template>
+  <el-page-header class="page-header" title="个人中心">
+    <template #content>
+      收获地址
+    </template>
+  </el-page-header>
   <div class="shipping-address-container">
     <!-- 地址列表 -->
     <el-card class="shipping-address-card">
-      <template #header>
-        <div class="card-header">
-          <span>收货地址管理</span>
-        </div>
-      </template>
-      
       <div class="address-list">
         <div 
           v-for="address in addressList" 
@@ -390,6 +389,6 @@ onMounted(() => {
 })
 </script>
 
-<style src="@/assets/css/shipping-address.css" scoped>
+<style src="@/assets/shippingAddress.css" scoped>
 
 </style>
