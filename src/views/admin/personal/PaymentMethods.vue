@@ -8,7 +8,7 @@
   <el-card class="filter-card">
     <!-- 搜索表单 -->
     <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
-      <el-col :span="23">
+      <el-col :span="20">
         <el-form :model="searchForm" inline>
           <el-form-item label="支付方式">
             <el-input 
@@ -37,7 +37,7 @@
         </el-form>
       </el-col>
       
-      <el-col :span="1" style="text-align: right;">
+      <el-col :span="4" style="text-align: right;">
         <el-button type="primary" @click="showAddForm">
           <el-icon><Plus /></el-icon>
           新增支付方式
@@ -48,31 +48,44 @@
 
   <el-card class="table-card">
     <!-- 支付方式列表 -->
-    <el-table :data="paymentMethods" v-loading="loading" style="width: 100%">
-      <el-table-column prop="methodName" label="支付方式名称" width="150" />
-      <el-table-column prop="methodCode" label="支付方式编码" width="150" />
-      <el-table-column prop="accountName" label="账户名称" width="150" />
-      <el-table-column prop="accountNumber" label="账户号码/卡号" width="200" />
-      <el-table-column prop="bankName" label="银行名称" width="150" />
-      <el-table-column prop="status" label="状态" width="100">
+    <el-table 
+      :data="paymentMethods" 
+      :loading="loading" 
+      stripe
+      style="width: 100%"
+    >
+      <el-table-column prop="methodName" label="支付方式名称" min-width="150" />
+      <el-table-column prop="methodCode" label="支付方式编码" min-width="150" />
+      <el-table-column prop="accountName" label="账户名称" min-width="150" />
+      <el-table-column prop="accountNumber" label="账户号码/卡号" min-width="200" />
+      <el-table-column prop="bankName" label="银行名称" min-width="150" />
+      <el-table-column prop="status" label="状态" min-width="100">
         <template #default="scope">
           <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
             {{ scope.row.status === 1 ? '启用' : '禁用' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="sort" label="排序" width="80" />
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column prop="sort" label="排序" min-width="80" />
+      <el-table-column label="操作" width="250" fixed="right">
         <template #default="scope">
-          <el-button size="small" @click="editPaymentMethod(scope.row)">编辑</el-button>
+          <el-button type="primary" size="small" text @click="editPaymentMethod(scope.row)">
+            <el-icon><Edit /></el-icon>
+            编辑
+          </el-button>
           <el-button 
             size="small" 
             :type="scope.row.status === 1 ? 'warning' : 'success'"
+            text
             @click="toggleStatus(scope.row)"
           >
+            <el-icon><View v-if="scope.row.status === 0" /><Hide v-else /></el-icon>
             {{ scope.row.status === 1 ? '禁用' : '启用' }}
           </el-button>
-          <el-button size="small" type="danger" @click="deletePaymentMethod(scope.row)">删除</el-button>
+          <el-button size="small" type="danger" text @click="deletePaymentMethod(scope.row)">
+            <el-icon><Delete /></el-icon>
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -82,7 +95,7 @@
       <el-pagination
         v-model:current-page="pagination.current"
         v-model:page-size="pagination.size"
-        :page-sizes="[10, 20, 50]"
+        :page-sizes="[10, 20, 50, 100]"
         :total="pagination.total"
         layout="total, sizes, prev, pager, next, jumper"
         @size-change="handleSizeChange"
@@ -153,7 +166,7 @@
 <script setup>
 import { ref, onMounted, computed, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, Plus, Edit, Delete, View } from '@element-plus/icons-vue'
+import { Search, Refresh, Plus, Edit, Delete, View, Hide } from '@element-plus/icons-vue'
 import paymentMethodApi from '@/api/paymentMethod'
 import { useAuthStore } from '@/config/store.js'
 
@@ -411,6 +424,7 @@ const deletePaymentMethod = (row) => {
 // 分页处理
 const handleSizeChange = (val) => {
   pagination.size = val
+  pagination.current = 1
   fetchPaymentMethods()
 }
 
