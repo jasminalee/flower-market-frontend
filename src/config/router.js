@@ -222,6 +222,15 @@ const routes = [
               title: '我的评论',
               requiresAuth: true
             }
+          },
+          {
+            path: 'shipping-address',
+            name: 'ShippingAddress',
+            component: () => import('@/views/admin/personal/ShippingAddress.vue'),
+            meta: { 
+              title: '收货地址',
+              requiresAuth: true
+            }
           }
         ]
       }

@@ -294,6 +294,11 @@ const userMenus = computed(() => {
         path: '/admin/personal/comments',
         title: '我的评论',
         icon: 'ChatLineRound' // Using the same icon as merchant comments
+      },
+      {
+        path: '/admin/personal/shipping-address',
+        title: '收货地址',
+        icon: 'Files' // Using Files icon for address management
       }
     ]
   })
@@ -353,6 +358,8 @@ const breadcrumbs = computed(() => {
           crumbs.push({ title: '个人信息' })
         } else if (paths.includes('comments')) {
           crumbs.push({ title: '我的评论' })
+        } else if (paths.includes('shipping-address')) {
+          crumbs.push({ title: '收货地址' })
         }
       }
   }
