@@ -185,6 +185,10 @@
         <el-input v-model="selectedSku.merchantName" disabled />
       </el-form-item>
       
+      <el-form-item label="显示名称" prop="merchantName">
+        <el-input v-model="merchantProductForm.merchantName" placeholder="请输入商品显示名称" />
+      </el-form-item>
+      
       <el-form-item label="SKU ID">
         <el-input v-model="merchantProductForm.skuId" disabled />
       </el-form-item>
@@ -213,6 +217,95 @@
           </el-form-item>
         </el-col>
       </el-row>
+      
+      <el-row :gutter="16">
+        <el-col :span="12">
+          <el-form-item label="品牌">
+            <el-input v-model="merchantProductForm.brand" placeholder="请输入品牌" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="最低价格">
+            <el-input-number 
+              v-model="merchantProductForm.minPrice" 
+              :precision="2" 
+              :step="0.1" 
+              :min="0" 
+              controls-position="right" 
+              style="width: 100%" 
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      
+      <el-row :gutter="16">
+        <el-col :span="12">
+          <el-form-item label="总销量">
+            <el-input-number 
+              v-model="merchantProductForm.totalSales" 
+              :min="0" 
+              controls-position="right" 
+              style="width: 100%" 
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="平均评分">
+            <el-input-number 
+              v-model="merchantProductForm.avgRating" 
+              :precision="1" 
+              :step="0.1" 
+              :min="0" 
+              :max="5" 
+              controls-position="right" 
+              style="width: 100%" 
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      
+      <el-row :gutter="16">
+        <el-col :span="12">
+          <el-form-item label="是否热销">
+            <el-switch 
+              v-model="merchantProductForm.isHot" 
+              :active-value="1" 
+              :inactive-value="0"
+              active-text="是" 
+              inactive-text="否" 
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="是否打折">
+            <el-switch 
+              v-model="merchantProductForm.isDiscounted" 
+              :active-value="1" 
+              :inactive-value="0"
+              active-text="是" 
+              inactive-text="否" 
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      
+      <el-form-item label="产品描述">
+        <el-input 
+          v-model="merchantProductForm.description" 
+          type="textarea" 
+          placeholder="请输入产品描述" 
+          :rows="3" 
+        />
+      </el-form-item>
+      
+      <el-form-item label="子图URL">
+        <el-input 
+          v-model="merchantProductForm.subImages" 
+          placeholder="请输入子图URL集合，JSON格式存储" 
+          type="textarea" 
+          :rows="2" 
+        />
+      </el-form-item>
       
       <el-form-item label="产品详情" prop="detail">
         <div class="editor-container" v-if="isEdit">
@@ -341,10 +434,21 @@ const merchantProductForm = reactive({
   merchantId: 1, // 默认商户ID，实际应该从登录用户获取
   productId: null,
   skuId: null,
+  merchantName: '', // 商品名称
   price: 0,
   stock: 0,
   status: 1,
-  detail: '' // 添加产品详情字段
+  detail: '', // 产品详情
+  description: '', // 产品描述
+  brand: '', // 品牌
+  subImages: '', // 子图URL集合
+  avgRating: 0, // 平均评分
+  totalSales: 0, // 总销量
+  minPrice: 0, // 最低价格
+  isHot: 0, // 是否热销
+  isDiscounted: 0, // 是否打折
+  createTime: '', // 创建时间
+  updateTime: '' // 更新时间
 })
 
 // 表单验证规则
@@ -357,6 +461,9 @@ const merchantProductRules = {
   ],
   stock: [
     { required: true, message: '请输入商户库存', trigger: 'blur' }
+  ],
+  merchantName: [
+    { required: true, message: '请输入商品名称', trigger: 'blur' }
   ]
 }
 
@@ -483,9 +590,21 @@ const handleAdd = () => {
     merchantId: 1, // 默认商户ID，实际应该从登录用户获取
     productId: null,
     skuId: null,
+    merchantName: '',
     price: 0,
     stock: 0,
-    status: 1
+    status: 1,
+    detail: '',
+    description: '',
+    brand: '',
+    subImages: '',
+    avgRating: 0,
+    totalSales: 0,
+    minPrice: 0,
+    isHot: 0,
+    isDiscounted: 0,
+    createTime: '',
+    updateTime: ''
   })
   selectedSku.value = {}
   loadAvailableSkus()
@@ -500,7 +619,17 @@ const handleEdit = async (row) => {
   // 填充表单数据
   Object.assign(merchantProductForm, {
     ...row,
-    detail: row.detail || '' // 确保detail字段存在
+    detail: row.detail || '', // 确保detail字段存在
+    description: row.description || '',
+    brand: row.brand || '',
+    subImages: row.subImages || '',
+    avgRating: row.avgRating || 0,
+    totalSales: row.totalSales || 0,
+    minPrice: row.minPrice || 0,
+    isHot: row.isHot || 0,
+    isDiscounted: row.isDiscounted || 0,
+    createTime: row.createTime || '',
+    updateTime: row.updateTime || ''
   })
   // 设置选中产品信息
   if (row.skuId) {
@@ -508,6 +637,10 @@ const handleEdit = async (row) => {
       const response = await productSkuApi.getById(row.skuId)
       if (response && response.code === 200) {
         selectedSku.value = response.data || {}
+        // 同步商品名称
+        if (selectedSku.value.merchantName) {
+          merchantProductForm.merchantName = selectedSku.value.merchantName;
+        }
       } else {
         ElMessage.error('加载SKU信息失败: ' + (response?.message || '未知错误'))
       }
