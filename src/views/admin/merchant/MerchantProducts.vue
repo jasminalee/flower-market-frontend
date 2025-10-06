@@ -11,7 +11,7 @@
         <el-form :model="searchForm" inline>
           <el-form-item label="产品名称">
             <el-input
-              v-model="searchForm.merchantName"
+              v-model="searchForm.productName"
               placeholder="搜索产品名称"
               clearable
               @keyup.enter="handleSearch"
@@ -22,10 +22,10 @@
             </el-input>
           </el-form-item>
 
-          <el-form-item label="SKU ID">
+          <el-form-item label="产品编码">
             <el-input
-              v-model="searchForm.skuId"
-              placeholder="搜索SKU ID"
+              v-model="searchForm.productCode"
+              placeholder="搜索产品编码"
               clearable
               @keyup.enter="handleSearch"
             >
@@ -72,7 +72,26 @@
       style="width: 100%"
     >
       <el-table-column prop="id" label="ID" min-width="50" />
+      <el-table-column label="产品图片" min-width="100">
+        <template #default="{ row }">
+          <el-image
+            :src="getFirstImage(row.subImages)"
+            class="product-image"
+            fit="cover"
+            :preview-src-list="getImageList(row.subImages)"
+            preview-teleported
+          >
+            <template #error>
+              <div class="image-slot">
+                <el-icon><icon-picture /></el-icon>
+              </div>
+            </template>
+          </el-image>
+        </template>
+      </el-table-column>
       <el-table-column prop="merchantName" label="产品名称" min-width="150" />
+      <el-table-column prop="brand" label="品牌" min-width="100" />
+      <el-table-column prop="description" label="产品描述" min-width="200" show-overflow-tooltip />
       <el-table-column prop="skuCode" label="产品编码" min-width="120" />
       <el-table-column prop="skuId" label="SKU ID" min-width="100" />
       <el-table-column prop="price" label="商户定价" min-width="100">
@@ -81,6 +100,22 @@
         </template>
       </el-table-column>
       <el-table-column prop="stock" label="商户库存" min-width="100" />
+      <el-table-column prop="avgRating" label="平均评分" min-width="100" />
+      <el-table-column prop="totalSales" label="总销量" min-width="100" />
+      <el-table-column label="是否热销" min-width="100">
+        <template #default="{ row }">
+          <el-tag :type="row.isHot === 1 ? 'success' : 'info'">
+            {{ row.isHot === 1 ? '是' : '否' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否折扣" min-width="100">
+        <template #default="{ row }">
+          <el-tag :type="row.isDiscounted === 1 ? 'warning' : 'info'">
+            {{ row.isDiscounted === 1 ? '是' : '否' }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="状态" width="100">
         <template #default="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'danger'">
@@ -89,6 +124,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" min-width="160" />
+      <el-table-column prop="updateTime" label="更新时间" min-width="160" />
 
       <el-table-column label="操作" width="250" fixed="right">
         <template #default="{ row }">
@@ -220,7 +256,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import merchantProductApi from '@/api/merchantProduct.js'
 import productSkuApi from '@/api/productSku.js'
-import { Plus, Search, Refresh, Edit, Delete, Check, Close } from '@element-plus/icons-vue'
+import { Plus, Search, Refresh, Edit, Delete, Check, Close, Picture as IconPicture } from '@element-plus/icons-vue'
 
 // 响应式数据
 const loading = ref(false)
@@ -236,8 +272,8 @@ const selectedSku = ref({})
 
 // 搜索表单
 const searchForm = reactive({
-  merchantName: '',
-  skuId: '',
+  productName: '',
+  productCode: '',
   status: ''
 })
 
@@ -284,10 +320,10 @@ const loadMerchantProductList = async () => {
     const params = {
       current: pagination.page,
       size: pagination.size,
-      merchantName: searchForm.merchantName || undefined,
-      skuId: searchForm.skuId || undefined,
-      status: searchForm.status !== '' ? searchForm.status : undefined,
-      merchantId: merchantProductForm.merchantId
+      merchantId: merchantProductForm.merchantId,
+      productName: searchForm.productName || undefined,
+      productCode: searchForm.productCode || undefined,
+      status: searchForm.status !== '' ? searchForm.status : undefined
     }
 
     const response = await merchantProductApi.page(params)
@@ -295,7 +331,7 @@ const loadMerchantProductList = async () => {
       const pageData = response.data || {}
       const records = pageData.records || []
       merchantProductList.value = records
-      pagination.total = pageData.total || 0
+      pagination.total = pageData.total != null ? pageData.total : (pageData.count || 0)
       pagination.page = pageData.current || pagination.page
       pagination.size = pageData.size || pagination.size
     } else {
@@ -360,8 +396,8 @@ const handleSearch = () => {
  * 重置搜索
  */
 const handleReset = () => {
-  searchForm.merchantName = ''
-  searchForm.skuId = ''
+  searchForm.productName = ''
+  searchForm.productCode = ''
   searchForm.status = ''
   pagination.page = 1
   loadMerchantProductList()
@@ -424,7 +460,7 @@ const handleEdit = async (row) => {
       }
     } catch (error) {
       console.error('加载SKU信息失败:', error)
-      ElMessage.error('加载SKU信息失败: ' + (error.message || '网络错误'))
+      ElMessage.error('加载SKU信息失败: ' + (error.message || '未知错误'))
     }
   }
 }
@@ -533,6 +569,29 @@ const handleSave = async () => {
   }
 }
 
+// 添加图片处理方法
+const getFirstImage = (subImages) => {
+  if (!subImages) return ''
+  try {
+    const images = JSON.parse(subImages)
+    return images && images.length > 0 ? images[0] : ''
+  } catch (e) {
+    console.error('解析图片列表失败:', e)
+    return ''
+  }
+}
+
+const getImageList = (subImages) => {
+  if (!subImages) return []
+  try {
+    const images = JSON.parse(subImages)
+    return images || []
+  } catch (e) {
+    console.error('解析图片列表失败:', e)
+    return []
+  }
+}
+
 // 初始化加载
 onMounted(() => {
   loadMerchantProductList()
@@ -544,5 +603,14 @@ onMounted(() => {
   width: 60px;
   height: 60px;
   border-radius: 4px;
+}
+.image-slot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: #f5f7fa;
+  color: #909399;
 }
 </style>
