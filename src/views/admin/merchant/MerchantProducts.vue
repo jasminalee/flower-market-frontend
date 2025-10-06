@@ -304,7 +304,7 @@
       </el-form-item>
       
       <el-form-item label="产品详情" prop="detail">
-        <div class="editor-container" v-if="isEdit">
+        <div class="editor-container">
           <Toolbar
               class="editor-toolbar"
               :editor="editorRef"
@@ -320,7 +320,6 @@
               @onChange="handleEditorChange"
           />
         </div>
-        <div class="product-detail-view" v-else v-html="merchantProductForm.detail"></div>
       </el-form-item>
       
       <el-form-item label="状态" prop="status">
