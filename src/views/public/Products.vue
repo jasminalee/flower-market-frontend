@@ -189,9 +189,13 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Search, View, ShoppingCart, Star, Picture } from '@element-plus/icons-vue'
 import productApi from '@/api/product'
+
+// 路由
+const router = useRouter()
 
 // 响应式数据
 const loading = ref(true)

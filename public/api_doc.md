@@ -1,21 +1,40 @@
 
 
-## 通过ID查询单条数据
+## 添加商品到购物车
 
 
-**接口地址**:`/product/{id}`
+**接口地址**:`/shoppingCart/add`
 
 
-**请求方式**:`GET`
+**请求方式**:`POST`
 
 
-**请求数据类型**:`application/x-www-form-urlencoded`
+**请求数据类型**:`application/json`
 
 
 **响应数据类型**:`*/*`
 
 
 **接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "createTime": "",
+  "id": 0,
+  "merchantId": 0,
+  "price": 0,
+  "productId": 0,
+  "quantity": 0,
+  "skuId": 0,
+  "status": 0,
+  "updateTime": "",
+  "userId": 0
+}
+```
 
 
 **请求参数**:
@@ -26,7 +45,17 @@
 
 | 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
 | -------- | -------- | ----- | -------- | -------- | ------ |
-|id|产品ID|path|true|integer(int64)||
+|shoppingCart|shoppingCart|body|true|购物车信息|购物车信息|
+|        createTime|创建时间||false|string(date-time)||
+|        id|||false|integer(int64)||
+|        merchantId|商户ID（逻辑关联sys_user表）||false|integer(int64)||
+|        price|单价||false|number||
+|        productId|产品ID（逻辑关联product表）||false|integer(int64)||
+|        quantity|数量||false|integer(int32)||
+|        skuId|SKU ID（逻辑关联product_sku表）||false|integer(int64)||
+|        status|状态（0-无效，1-有效）||false|integer(int32)||
+|        updateTime|更新时间||false|string(date-time)||
+|        userId|用户ID（逻辑关联sys_user表）||false|integer(int64)||
 
 
 **响应状态**:
@@ -34,7 +63,8 @@
 
 | 状态码 | 说明 | schema |
 | -------- | -------- | ----- | 
-|200|OK|ResponseResult«产品信息»|
+|200|OK|ResponseResult«购物车信息»|
+|201|Created||
 |401|Unauthorized||
 |403|Forbidden||
 |404|Not Found||
@@ -46,25 +76,17 @@
 | 参数名称 | 参数说明 | 类型 | schema |
 | -------- | -------- | ----- |----- | 
 |code||integer(int32)|integer(int32)|
-|data||产品信息|产品信息|
-|        avgRating|平均评分|number||
-|        brand|品牌|string||
-|        categoryId|分类ID（逻辑关联product_category表）|integer(int64)||
+|data||购物车信息|购物车信息|
 |        createTime|创建时间|string(date-time)||
-|        description|产品描述|string||
-|        detail|产品详情|string||
-|        id|产品ID|integer(int64)||
-|        isDiscounted|是否打折(1:是,0:否)|integer(int32)||
-|        isHot|是否热销(1:是,0:否)|integer(int32)||
-|        mainImage|主图URL|string||
-|        minPrice|最低价格|number||
-|        productCode|产品编码|string||
-|        productName|产品名称|string||
-|        productType|产品类型（1-花卉，2-第三方产品）|integer(int32)||
-|        status|状态（0-下架，1-上架）|integer(int32)||
-|        subImages|子图URL集合，JSON格式存储|string||
-|        totalSales|总销量|integer(int32)||
+|        id||integer(int64)||
+|        merchantId|商户ID（逻辑关联sys_user表）|integer(int64)||
+|        price|单价|number||
+|        productId|产品ID（逻辑关联product表）|integer(int64)||
+|        quantity|数量|integer(int32)||
+|        skuId|SKU ID（逻辑关联product_sku表）|integer(int64)||
+|        status|状态（0-无效，1-有效）|integer(int32)||
 |        updateTime|更新时间|string(date-time)||
+|        userId|用户ID（逻辑关联sys_user表）|integer(int64)||
 |message||string||
 |timestamp||integer(int64)|integer(int64)|
 
@@ -74,24 +96,16 @@
 {
 	"code": 0,
 	"data": {
-		"avgRating": 0,
-		"brand": "",
-		"categoryId": 0,
 		"createTime": "",
-		"description": "",
-		"detail": "",
 		"id": 0,
-		"isDiscounted": 0,
-		"isHot": 0,
-		"mainImage": "",
-		"minPrice": 0,
-		"productCode": "",
-		"productName": "",
-		"productType": 0,
+		"merchantId": 0,
+		"price": 0,
+		"productId": 0,
+		"quantity": 0,
+		"skuId": 0,
 		"status": 0,
-		"subImages": "",
-		"totalSales": 0,
-		"updateTime": ""
+		"updateTime": "",
+		"userId": 0
 	},
 	"message": "",
 	"timestamp": 0
