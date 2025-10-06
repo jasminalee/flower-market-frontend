@@ -231,7 +231,7 @@ import {
   ShoppingCart, Goods, Star, Share, Picture,
   HomeFilled, Document
 } from '@element-plus/icons-vue'
-import productApi from '@/api/product'
+import merchantProduct from '@/api/merchantProduct'
 import shoppingCartApi from '@/api/shoppingCart'
 import { useAuthStore } from '@/config/store.js'
 
@@ -276,7 +276,7 @@ const fetchProductDetail = async () => {
     }
     
     // 调用API获取产品详情
-    const response = await productApi.getById(productId)
+    const response = await merchantProduct.getById(productId)
     
     if (response.code === 200 && response.data) {
       product.value = response.data

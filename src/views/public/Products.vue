@@ -192,9 +192,9 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Search, View, ShoppingCart, Star, Picture } from '@element-plus/icons-vue'
-import productApi from '@/api/product'
+import merchantProduct from '@/api/merchantProduct'
 import shoppingCartApi from '@/api/shoppingCart'
-import { useAuthStore } from '@/config/store.js'
+import { useAuthStore } from '@/config/store'
 
 // 路由
 const router = useRouter()
@@ -360,7 +360,7 @@ const fetchProducts = async () => {
     }
     
     // 调用API获取产品数据
-    const response = await productApi.homepage(params)
+    const response = await merchantProduct.page(params)
     
     if (response.code === 200) {
       // 从API响应中提取产品数据
