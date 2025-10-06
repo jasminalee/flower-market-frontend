@@ -4,7 +4,7 @@
       <template #header>
         <div class="card-header">
           <span>用户评论</span>
-          <el-badge :value="comments.length" type="primary" v-if="comments.length > 0">
+          <el-badge :value="topLevelComments.length" type="primary" v-if="topLevelComments.length > 0">
             <el-button type="text" @click="loadComments">刷新</el-button>
           </el-badge>
         </div>
@@ -62,9 +62,9 @@
       </div>
 
       <!-- 评论列表 -->
-      <div class="comments-list" v-if="comments.length > 0">
+      <div class="comments-list" v-if="topLevelComments.length > 0">
         <div 
-          v-for="comment in comments" 
+          v-for="comment in topLevelComments" 
           :key="comment.id" 
           class="comment-item"
         >
@@ -82,6 +82,7 @@
                 disabled 
                 size="small" 
                 class="comment-rating"
+                v-if="comment.rating"
               />
               <span class="comment-date">{{ formatDate(comment.createTime) }}</span>
             </div>
@@ -97,7 +98,7 @@
             
             <!-- 回复列表 -->
             <div 
-              v-for="reply in comment.replies" 
+              v-for="reply in getReplies(comment.id)" 
               :key="reply.id" 
               class="reply-item"
             >
@@ -109,6 +110,13 @@
                   <span class="reply-date">{{ formatDate(reply.createTime) }}</span>
                 </div>
                 <div class="reply-text">{{ reply.content }}</div>
+                
+                <div class="reply-actions">
+                  <el-button type="text" size="small" @click="replyTo(reply)">
+                    <el-icon><ChatLineSquare /></el-icon>
+                    回复
+                  </el-button>
+                </div>
               </div>
             </div>
           </div>
@@ -123,7 +131,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
+import { ref, reactive, onMounted, defineProps, defineEmits, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { User, ChatLineSquare } from '@element-plus/icons-vue'
@@ -170,6 +178,16 @@ const commentRules = {
   ]
 }
 
+// 计算属性：顶级评论（parentId为0的评论）
+const topLevelComments = computed(() => {
+  return comments.value.filter(comment => comment.parentId === 0 || comment.parentId === null)
+})
+
+// 方法：获取指定评论的回复
+const getReplies = (parentId) => {
+  return comments.value.filter(comment => comment.parentId === parentId)
+}
+
 /**
  * 格式化日期
  */
@@ -192,11 +210,8 @@ const loadComments = async () => {
   try {
     const response = await commentApi.listBySource(props.productId, 'product')
     if (response && response.code === 200) {
-      // 处理评论数据，添加回复字段
-      comments.value = (response.data || []).map(comment => ({
-        ...comment,
-        replies: []
-      }))
+      // 直接使用API返回的数据，包含parentId信息
+      comments.value = response.data || []
     } else {
       ElMessage.error('加载评论失败: ' + (response?.message || '未知错误'))
     }
@@ -222,6 +237,7 @@ const submitComment = async () => {
       sourceId: props.productId,
       sourceType: 'product',
       userId: authStore.user?.id || authStore.user?.userId || 0,
+      parentId: 0, // 顶级评论
       status: 1 // 默认显示
     }
     
@@ -273,10 +289,11 @@ const replyTo = (comment) => {
     try {
       const replyData = {
         content: value,
+        parentId: comment.id, // 设置父评论ID
         sourceId: props.productId,
         sourceType: 'product',
         userId: authStore.user?.id || authStore.user?.userId || 0,
-        isAnonymous: comment.isAnonymous ? 1 : 0,
+        isAnonymous: commentForm.isAnonymous ? 1 : 0, // 使用表单中的匿名设置
         status: 1
       }
       

@@ -23,7 +23,7 @@ export default {
    * sourceType: 来源类型
    * parentId: 父评论ID（可选）
    */
-  async listBySource(sourceId, sourceType, parentId = 0) {
+  async listBySource(sourceId, sourceType, parentId) {
     return api.get('/comment/source', { 
       params: { 
         sourceId, 
