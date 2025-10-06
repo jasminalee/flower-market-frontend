@@ -103,6 +103,7 @@ import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import sysUserApi from '@/api/sysUser.js'
 import apiClient from '@/api/apiClient.js'
+import girlAvatar from '@/assets/images/girl.png'
 
 // 获取认证存储实例
 const authStore = useAuthStore()
@@ -118,16 +119,11 @@ const API_BASE_URL = apiClient.raw.defaults.baseURL || 'http://localhost:18091'
 const uploadUrl = API_BASE_URL + "/api/upload/image"
 
 // 默认头像
-const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+const defaultAvatar = girlAvatar
 
 // 预设头像选项
 const avatarOptions = [
-  'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
-  'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-  'https://cube.elemecdn.com/9/c2/f0ceeef9a0a06c2d67f0fae73a201epng.png',
-  'https://cube.elemecdn.com/0/6f/e424c6a5a2a8b7e2a5c0c2a5a5c0c2a5a5c0c2a5a5c0c2a5a5c0c2a5a5c0c2png.png',
-  'https://cube.elemecdn.com/1/34/19aa2b0c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3png.png',
-  'https://cube.elemecdn.com/2/54/2a54b0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0cpng.png'
+  girlAvatar,
 ]
 
 // 表单数据
