@@ -54,6 +54,7 @@
       stripe
       style="width: 100%"
     >
+      <el-table-column prop="id" label="ID" min-width="50" />
       <el-table-column prop="methodName" label="支付方式名称" min-width="150" />
       <el-table-column prop="methodCode" label="支付方式编码" min-width="150" />
       <el-table-column prop="accountName" label="账户名称" min-width="150" />

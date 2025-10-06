@@ -50,6 +50,8 @@
       stripe
       style="width: 100%"
     >
+      <el-table-column prop="id" label="ID" min-width="50" />
+
       <el-table-column prop="content" label="评论内容" min-width="200">
         <template #default="scope">
           <div class="comment-content">{{ scope.row.content }}</div>

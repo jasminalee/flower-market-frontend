@@ -50,6 +50,7 @@
         stripe
         style="width: 100%"
       >
+        <el-table-column prop="id" label="订单ID" min-width="50" />
         <el-table-column prop="orderNo" label="订单编号" min-width="200" />
         <el-table-column prop="createTime" label="下单时间" min-width="180">
           <template #default="scope">
