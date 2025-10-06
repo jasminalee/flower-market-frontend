@@ -162,5 +162,20 @@ const handleUserCommand = async (command) => {
 }
 </script>
 
-<style src="@/assets/publicLayout.css" scoped>
+<style scoped>
+  /* 添加用户头像样式 */
+  .user-info {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .username {
+    margin: 0 8px;
+    font-size: 14px;
+  }
+  
+  .dropdown-arrow {
+    font-size: 12px;
+  }
 </style>

@@ -15,18 +15,52 @@
         class="profile-form"
       >
         <el-form-item label="头像" prop="avatar">
-          <el-upload
-            class="avatar-uploader"
-            :action="uploadUrl"
-            :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload"
-            :on-change="handleAvatarChange"
-            :disabled="loading"
-          >
-            <img v-if="profileForm.avatar" :src="profileForm.avatar" class="avatar" />
-            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-          </el-upload>
+          <div class="avatar-selection">
+            <!-- 预设头像选择 -->
+            <div class="avatar-options">
+              <div 
+                v-for="avatar in avatarOptions" 
+                :key="avatar"
+                class="avatar-option"
+                :class="{ selected: profileForm.avatar === avatar }"
+                @click="selectAvatar(avatar)"
+              >
+                <el-image 
+                  :src="avatar" 
+                  class="avatar-preview"
+                  fit="cover"
+                  lazy
+                />
+              </div>
+            </div>
+            
+            <!-- 或者上传自定义头像 -->
+            <div class="custom-avatar-upload">
+              <span class="upload-label">或上传自定义头像:</span>
+              <el-upload
+                class="avatar-uploader"
+                :action="uploadUrl"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload"
+                :on-change="handleAvatarChange"
+                :disabled="loading"
+              >
+                <el-button size="small" type="primary">选择文件</el-button>
+              </el-upload>
+            </div>
+            
+            <!-- 当前选中的头像预览 -->
+            <div class="current-avatar-preview">
+              <span>当前头像:</span>
+              <el-image 
+                :src="profileForm.avatar || defaultAvatar" 
+                class="current-avatar"
+                fit="cover"
+                lazy
+              />
+            </div>
+          </div>
         </el-form-item>
         
         <el-form-item label="用户ID" prop="id">
@@ -83,6 +117,19 @@ const loading = ref(false)
 const API_BASE_URL = apiClient.raw.defaults.baseURL || 'http://localhost:18091'
 const uploadUrl = API_BASE_URL + "/api/upload/image"
 
+// 默认头像
+const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+
+// 预设头像选项
+const avatarOptions = [
+  'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+  'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+  'https://cube.elemecdn.com/9/c2/f0ceeef9a0a06c2d67f0fae73a201epng.png',
+  'https://cube.elemecdn.com/0/6f/e424c6a5a2a8b7e2a5c0c2a5a5c0c2a5a5c0c2a5a5c0c2a5a5c0c2a5a5c0c2png.png',
+  'https://cube.elemecdn.com/1/34/19aa2b0c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3c1c3png.png',
+  'https://cube.elemecdn.com/2/54/2a54b0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0cpng.png'
+]
+
 // 表单数据
 const profileForm = reactive({
   id: '',
@@ -109,6 +156,13 @@ const profileRules = {
   phone: [
     { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
   ]
+}
+
+/**
+ * 选择预设头像
+ */
+const selectAvatar = (avatar) => {
+  profileForm.avatar = avatar
 }
 
 /**
@@ -233,30 +287,60 @@ onMounted(() => {
 <style scoped>
 @import '@/assets/profile.css';
 
-.avatar-uploader .avatar {
-  width: 120px;
-  height: 120px;
-  display: block;
+.avatar-selection {
+  width: 100%;
 }
 
-.avatar-uploader .el-upload {
-  border: 1px dashed var(--el-border-color);
-  border-radius: 6px;
+.avatar-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.avatar-option {
+  border: 2px solid transparent;
+  border-radius: 50%;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: var(--el-transition-duration-fast);
+  transition: border-color 0.3s;
 }
 
-.avatar-uploader .el-upload:hover {
+.avatar-option:hover {
   border-color: var(--el-color-primary);
 }
 
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 120px;
-  height: 120px;
-  text-align: center;
+.avatar-option.selected {
+  border-color: var(--el-color-primary);
+  box-shadow: 0 0 0 2px var(--el-color-primary);
+}
+
+.avatar-preview {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.custom-avatar-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.upload-label {
+  font-size: 14px;
+  color: var(--el-text-color-regular);
+}
+
+.current-avatar-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.current-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
 }
 </style>
