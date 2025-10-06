@@ -132,6 +132,7 @@
 }
 
 /* 底部样式 */
+/* 注意：当前Admin.vue组件中没有使用footer元素，这部分样式为未来可能的实现预留 */
 .admin-footer {
     background: white;
     border-top: 1px solid #e8e8e8;
@@ -158,6 +159,8 @@
     background-color: #121212;
 }
 
+/* 暗色主题下的底部样式 */
+/* 注意：当前Admin.vue组件中没有使用footer元素，这部分样式为未来可能的实现预留 */
 :global(.dark) .admin-footer {
     background: #1f1f1f;
     border-top-color: #333;
