@@ -206,12 +206,21 @@ const fetchPaymentMethods = async () => {
   try {
     loading.value = true
     
+    // 构造查询参数，只有当用户输入了内容时才传递相应参数
     const params = {
       userId: getCurrentUserId(),
-      methodName: searchForm.methodName,
-      status: searchForm.status,
       current: pagination.current,
       size: pagination.size
+    }
+    
+    // 只有当 methodName 有值时才添加到参数中
+    if (searchForm.methodName && searchForm.methodName.trim() !== '') {
+      params.methodName = searchForm.methodName.trim()
+    }
+    
+    // 只有当 status 有值时才添加到参数中
+    if (searchForm.status !== null && searchForm.status !== undefined) {
+      params.status = searchForm.status
     }
     
     const response = await paymentMethodApi.page(params)
