@@ -152,7 +152,7 @@
   <el-dialog
     :title="dialogTitle"
     v-model="dialogVisible"
-    width="600px"
+    width="800px"
     :close-on-click-modal="false"
   >
     <el-form
@@ -214,6 +214,26 @@
         </el-col>
       </el-row>
       
+      <el-form-item label="产品详情" prop="detail">
+        <div class="editor-container" v-if="isEdit">
+          <Toolbar
+              class="editor-toolbar"
+              :editor="editorRef"
+              :defaultConfig="toolbarConfig"
+              :mode="mode"
+          />
+          <Editor
+              class="editor-content"
+              v-model="merchantProductForm.detail"
+              :defaultConfig="editorConfig"
+              :mode="mode"
+              @onCreated="handleEditorCreated"
+              @onChange="handleEditorChange"
+          />
+        </div>
+        <div class="product-detail-view" v-else v-html="merchantProductForm.detail"></div>
+      </el-form-item>
+      
       <el-form-item label="状态" prop="status">
         <el-radio-group v-model="merchantProductForm.status">
           <el-radio :label="1">上架</el-radio>
@@ -234,11 +254,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import {ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import merchantProductApi from '@/api/merchantProduct.js'
 import productSkuApi from '@/api/productSku.js'
+import fileApi from '@/api/file.js' // 添加文件API导入
 import { Plus, Search, Refresh, Edit, Delete, Check, Close, Picture as IconPicture } from '@element-plus/icons-vue'
+import '@wangeditor/editor/dist/css/style.css'
+import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
+import apiClient from '@/api/apiClient.js'
+
+const API_BASE_URL = apiClient.raw.defaults.baseURL || 'http://localhost:18091'
+const uploadUrl = API_BASE_URL + "/api/upload/image";
 
 // 响应式数据
 const loading = ref(false)
@@ -265,6 +292,49 @@ const pagination = reactive({
   total: 0
 })
 
+const mode = 'default'
+
+// 编辑器实例，必须用 shallowRef
+const editorRef = shallowRef()
+
+// 工具栏配置
+const toolbarConfig = {}
+
+// 富文本编辑器配置
+const editorConfig = reactive({
+  placeholder: '请输入产品详情...',
+  MENU_CONF: {
+    'uploadImage': {
+      server: uploadUrl,
+      fieldName: 'file',
+      maxFileSize: 5 * 1024 * 1024, // 5M
+      base64LimitSize: 0, // 禁用base64，强制使用上传
+      // 自定义上传图片
+      async customUpload(file, insertFn) {
+        try {
+          const formData = new FormData()
+          formData.append('file', file)
+
+          const response = await fileApi.uploadImage(formData)
+
+          if (response && response.code === 200) {
+            // 直接插入服务器URL
+            const imageUrl = API_BASE_URL + response.data;
+            console.log('图片上传成功:', imageUrl)
+            // 插入图片
+            insertFn(imageUrl, 'image.png', '图片加载中...')
+            ElMessage.success('图片上传成功')
+          } else {
+            ElMessage.error('图片上传失败: ' + (response?.message || '未知错误'))
+          }
+        } catch (error) {
+          ElMessage.error('图片上传失败: ' + (error.message || '网络错误'))
+        }
+      }
+    }
+  }
+})
+
 // 商户产品表单
 const merchantProductForm = reactive({
   id: null,
@@ -273,7 +343,8 @@ const merchantProductForm = reactive({
   skuId: null,
   price: 0,
   stock: 0,
-  status: 1
+  status: 1,
+  detail: '' // 添加产品详情字段
 })
 
 // 表单验证规则
@@ -427,7 +498,10 @@ const handleEdit = async (row) => {
   isEdit.value = true
   dialogVisible.value = true
   // 填充表单数据
-  Object.assign(merchantProductForm, row)
+  Object.assign(merchantProductForm, {
+    ...row,
+    detail: row.detail || '' // 确保detail字段存在
+  })
   // 设置选中产品信息
   if (row.skuId) {
     try {
@@ -548,6 +622,16 @@ const handleSave = async () => {
   }
 }
 
+// 编辑器创建回调
+const handleEditorCreated = (editor) => {
+  editorRef.value = editor // 记录 editor 实例，重要！
+}
+
+// 编辑器内容变化处理
+const handleEditorChange = (editor) => {
+  merchantProductForm.detail = editor.getHtml()
+}
+
 // 添加图片处理方法
 const getFirstImage = (subImages) => {
   if (!subImages) return ''
@@ -571,6 +655,13 @@ const getImageList = (subImages) => {
   }
 }
 
+// 在组件卸载前销毁编辑器
+onBeforeUnmount(() => {
+  const editor = editorRef.value
+  if (editor == null) return
+  editor.destroy()
+})
+
 // 初始化加载
 onMounted(() => {
   loadMerchantProductList()
@@ -591,5 +682,29 @@ onMounted(() => {
   height: 100%;
   background: #f5f7fa;
   color: #909399;
+}
+</style>
+
+<style scoped>
+.editor-container {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  border-bottom: 1px solid #ccc;
+}
+
+.editor-content {
+  height: 300px;
+}
+
+.product-detail-view {
+  padding: 10px;
+  min-height: 200px;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+  background-color: #f5f7fa;
 }
 </style>
