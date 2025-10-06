@@ -76,7 +76,7 @@
     </main>
 
     <!-- 底部 -->
-    <footer class="footer">
+    <footer class="public-footer">
       <div class="container">
         <div class="footer-content">
           <div class="footer-section">

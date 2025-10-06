@@ -132,7 +132,7 @@
 }
 
 /* 底部样式 */
-.footer {
+.admin-footer {
     background: white;
     border-top: 1px solid #e8e8e8;
     padding: 0 24px;
@@ -158,7 +158,7 @@
     background-color: #121212;
 }
 
-:global(.dark) .footer {
+:global(.dark) .admin-footer {
     background: #1f1f1f;
     border-top-color: #333;
 }

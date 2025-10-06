@@ -137,10 +137,6 @@
   margin-top: var(--spacing-small);
 }
 
-.products-grid {
-  margin-bottom: var(--spacing-extra-large);
-}
-
 /* 响应式规则 */
 @media (max-width: 480px) {
   .pagination-container {

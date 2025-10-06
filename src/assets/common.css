@@ -359,9 +359,6 @@
 
 /* 产品相关组件样式 */
 .products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--spacing-large);
   margin-bottom: var(--spacing-extra-large);
 }
 

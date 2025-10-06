@@ -130,7 +130,7 @@
 }
 
 /* 底部 */
-.footer {
+.public-footer {
   background: var(--text-color-primary);
   color: var(--bg-color);
   margin-top: auto;
