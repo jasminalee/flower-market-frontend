@@ -85,8 +85,8 @@
           </div>
           <div class="footer-section">
             <h4>联系方式</h4>
-            <p>电话：400-123-4567</p>
-            <p>邮箱：info@flowermarket.com</p>
+            <p>电话：xxx-123-4567</p>
+            <p>邮箱：info@vtc.com</p>
           </div>
           <div class="footer-section">
             <h4>快速链接</h4>

@@ -267,8 +267,8 @@ const goToProducts = () => {
  * 查看产品详情
  */
 const viewProduct = (product) => {
-  ElMessage.success(`查看产品：${product.productName}`)
-  // 这里可以跳转到产品详情页
+  // 跳转到产品详情页
+  router.push(`/products/${product.id}`)
 }
 
 /**

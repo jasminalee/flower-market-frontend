@@ -24,6 +24,13 @@ const routes = [
         meta: { title: '花卉产品' }
       },
       {
+        path: 'products/:id',
+        name: 'ProductDetail',
+        component: () => import('@/views/public/ProductDetail.vue'),
+        meta: { title: '产品详情' },
+        props: true
+      },
+      {
         path: 'shopping-cart',
         name: 'ShoppingCart',
         component: () => import('@/views/public/ShoppingCart.vue'),
