@@ -23,30 +23,32 @@ export const useAuthStore = defineStore('auth', () => {
    * @returns {Promise<Boolean>} 登录是否成功
    */
   const login = async (credentials) => {
+    console.log('登录开始:')
     try {
       const response = await authApi.login(credentials)
-      
-      // 调试：打印登录响应数据
-      console.log('登录响应数据:', response);
-      
+
       // 根据OpenAPI文档，响应格式应为ResponseResult对象
       if (response && response.code === 200) {
         // 从响应中提取token和用户信息
         // 根据文档，登录成功后返回的数据结构可能包含token和user信息
         if (response.data && typeof response.data === 'object') {
+          console.log('登录成功:', response.data)
           // 如果data中有token字段，直接使用
           if (response.data.token) {
             token.value = response.data.token
-            user.value = response.data.user || { username: credentials.username }
             // 设置权限信息
             permissions.value = response.data.permissions || []
             roles.value = response.data.roles || []
           } else {
             // 如果整个data就是token
             token.value = response.data
-            user.value = { username: credentials.username }
+            user.value = { 
+              username: credentials.username,
+              // 可以根据需要添加其他字段
+            }
           }
-          
+          user.value = response.data
+
           // 保存到本地存储
           localStorage.setItem('token', token.value)
           localStorage.setItem('user', JSON.stringify(user.value))
@@ -57,7 +59,10 @@ export const useAuthStore = defineStore('auth', () => {
         } else if (typeof response.data === 'string') {
           // 如果data是字符串形式的token
           token.value = response.data
-          user.value = { username: credentials.username }
+          user.value = { 
+            username: credentials.username,
+            // 可以根据需要添加其他字段
+          }
           
           // 保存到本地存储
           localStorage.setItem('token', token.value)
