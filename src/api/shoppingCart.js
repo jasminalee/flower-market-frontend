@@ -31,5 +31,14 @@ export default {
    */
   update(shoppingCart) {
     return apiClient.put('/shoppingCart', shoppingCart)
+  },
+
+  /**
+   * 删除购物车项
+   * @param {number} id - 购物车项ID
+   * @returns {Promise} 返回删除结果
+   */
+  delete(id) {
+    return apiClient.delete(`/shoppingCart/${id}`)
   }
 }

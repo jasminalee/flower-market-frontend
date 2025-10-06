@@ -284,12 +284,23 @@ const removeItem = (item) => {
       cancelButtonText: '取消',
       type: 'warning'
     }
-  ).then(() => {
-    // 这里可以调用接口删除购物车项
-    cartItems.value = cartItems.value.filter(cartItem => cartItem.id !== item.id)
-    // 从选中列表中移除
-    selectedItems.value = selectedItems.value.filter(selectedItem => selectedItem.id !== item.id)
-    ElMessage.success('删除成功')
+  ).then(async () => {
+    try {
+      // 调用接口删除购物车项
+      const response = await shoppingCartApi.delete(item.id)
+      
+      if (response && response.code === 200) {
+        cartItems.value = cartItems.value.filter(cartItem => cartItem.id !== item.id)
+        // 从选中列表中移除
+        selectedItems.value = selectedItems.value.filter(selectedItem => selectedItem.id !== item.id)
+        ElMessage.success('删除成功')
+      } else {
+        ElMessage.error('删除失败: ' + (response?.message || '未知错误'))
+      }
+    } catch (error) {
+      console.error('删除购物车项失败:', error)
+      ElMessage.error('删除失败: ' + (error.message || '网络错误'))
+    }
   }).catch(() => {
     // 用户取消删除
   })
