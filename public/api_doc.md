@@ -118,3 +118,115 @@
   "timestamp": 1759729169075
 }
 ```
+
+
+
+
+## 新增-更新数据
+
+
+**接口地址**:`/merchantProduct`
+
+
+**请求方式**:`POST`
+
+
+**请求数据类型**:`application/json`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求示例**:
+
+
+```javascript
+{
+  "avgRating": 0,
+  "brand": "",
+  "createTime": "",
+  "description": "",
+  "detail": "",
+  "id": 0,
+  "isDiscounted": 0,
+  "isHot": 0,
+  "merchantId": 0,
+  "merchantName": "",
+  "minPrice": 0,
+  "price": 0,
+  "productId": 0,
+  "skuId": 0,
+  "status": 0,
+  "stock": 0,
+  "subImages": "",
+  "totalSales": 0,
+  "updateTime": ""
+}
+```
+
+
+**请求参数**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|merchantProduct|merchantProduct|body|true|商户产品信息|商户产品信息|
+|    avgRating|平均评分||false|number||
+|    brand|品牌||false|string||
+|    createTime|创建时间||false|string(date-time)||
+|    description|产品描述||false|string||
+|    detail|产品详情||false|string||
+|    id|ID||false|integer(int64)||
+|    isDiscounted|是否打折(1:是,0:否)||false|integer(int32)||
+|    isHot|是否热销(1:是,0:否)||false|integer(int32)||
+|    merchantId|商户ID（逻辑关联sys_user表）||false|integer(int64)||
+|    merchantName|商品名称||false|string||
+|    minPrice|最低价格||false|number||
+|    price|商户定价||false|number||
+|    productId|产品ID（逻辑关联product表）||false|integer(int64)||
+|    skuId|SKU ID（逻辑关联product_sku表）||false|integer(int64)||
+|    status|状态（0-下架，1-上架）||false|integer(int32)||
+|    stock|商户库存||false|integer(int32)||
+|    subImages|子图URL集合，JSON格式存储||false|string||
+|    totalSales|总销量||false|integer(int32)||
+|    updateTime|更新时间||false|string(date-time)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|ResponseResult|
+|201|Created||
+|401|Unauthorized||
+|403|Forbidden||
+|404|Not Found||
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||object||
+|message||string||
+|timestamp||integer(int64)|integer(int64)|
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": {},
+	"message": "",
+	"timestamp": 0
+}
+```

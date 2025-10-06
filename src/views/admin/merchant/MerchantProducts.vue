@@ -22,19 +22,6 @@
             </el-input>
           </el-form-item>
 
-          <el-form-item label="产品编码">
-            <el-input
-              v-model="searchForm.productCode"
-              placeholder="搜索产品编码"
-              clearable
-              @keyup.enter="handleSearch"
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
-          </el-form-item>
-
           <el-form-item label="状态">
             <el-select v-model="searchForm.status" placeholder="选择状态" clearable>
               <el-option label="上架" :value="1" />
@@ -92,7 +79,6 @@
       <el-table-column prop="merchantName" label="产品名称" min-width="150" />
       <el-table-column prop="brand" label="品牌" min-width="100" />
       <el-table-column prop="description" label="产品描述" min-width="200" show-overflow-tooltip />
-      <el-table-column prop="skuCode" label="产品编码" min-width="120" />
       <el-table-column prop="skuId" label="SKU ID" min-width="100" />
       <el-table-column prop="price" label="商户定价" min-width="100">
         <template #default="{ row }">
@@ -199,10 +185,6 @@
         <el-input v-model="selectedSku.merchantName" disabled />
       </el-form-item>
       
-      <el-form-item label="产品编码">
-        <el-input v-model="selectedSku.skuCode" disabled />
-      </el-form-item>
-
       <el-form-item label="SKU ID">
         <el-input v-model="merchantProductForm.skuId" disabled />
       </el-form-item>
@@ -273,7 +255,6 @@ const selectedSku = ref({})
 // 搜索表单
 const searchForm = reactive({
   productName: '',
-  productCode: '',
   status: ''
 })
 
@@ -322,7 +303,6 @@ const loadMerchantProductList = async () => {
       size: pagination.size,
       merchantId: merchantProductForm.merchantId,
       productName: searchForm.productName || undefined,
-      productCode: searchForm.productCode || undefined,
       status: searchForm.status !== '' ? searchForm.status : undefined
     }
 
@@ -397,7 +377,6 @@ const handleSearch = () => {
  */
 const handleReset = () => {
   searchForm.productName = ''
-  searchForm.productCode = ''
   searchForm.status = ''
   pagination.page = 1
   loadMerchantProductList()
