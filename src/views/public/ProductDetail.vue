@@ -408,37 +408,17 @@ const buyNow = async () => {
       return
     }
 
-    // 获取当前用户ID
-    const userId = authStore.user?.id || authStore.user?.userId
-    
-    // 获取用户的收货地址
-    const addressResponse = await receiverAddressApi.listByUserId(userId)
-    
-    if (addressResponse.code === 200 && addressResponse.data && addressResponse.data.length > 0) {
-      receiverAddresses.value = addressResponse.data
-      selectedAddress.value = addressResponse.data.find(addr => addr.isDefault === 1) || addressResponse.data[0]
-      
-      // 显示地址选择对话框
-      addressDialogVisible.value = true
-    } else {
-      ElMessageBox.confirm(
-        '您还没有收货地址，是否前往添加？',
-        '提示',
-        {
-          confirmButtonText: '去添加',
-          cancelButtonText: '取消',
-          type: 'warning',
-        }
-      ).then(() => {
-        // 这里可以跳转到地址管理页面
-        router.push('/personal/shipping-address')
-      }).catch(() => {
-        // 用户取消
-      })
-    }
+    // 直接跳转到订单预览页面，传递产品ID和数量
+    router.push({
+      name: 'OrderPreview',
+      query: {
+        productId: product.value.id,
+        quantity: quantity.value
+      }
+    })
   } catch (error) {
-    console.error('获取收货地址失败:', error)
-    ElMessage.error('获取收货地址失败: ' + (error.message || '未知错误'))
+    console.error('跳转订单预览失败:', error)
+    ElMessage.error('跳转订单预览失败: ' + (error.message || '未知错误'))
   }
 }
 

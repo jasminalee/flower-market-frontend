@@ -22,13 +22,23 @@
       <el-card class="confirmation-card" shadow="hover">
         <template #header>
           <div class="card-header">
-            <el-icon size="20"><SuccessFilled /></el-icon>
-            <span>订单创建成功</span>
+            <el-icon size="20" color="#67C23A"><SuccessFilled /></el-icon>
+            <span>订单提交成功</span>
           </div>
         </template>
 
-        <div v-if="order.id" class="order-details">
-          <el-row :gutter="20">
+        <div v-if="loading" class="loading-container">
+          <el-skeleton :rows="8" animated />
+        </div>
+
+        <div v-else-if="order.id" class="order-details">
+          <div class="success-message">
+            <el-icon size="60" color="#67C23A"><SuccessFilled /></el-icon>
+            <h2>订单创建成功！</h2>
+            <p>您的订单编号是：{{ order.orderNo }}</p>
+          </div>
+
+          <el-row :gutter="20" class="mt-30">
             <el-col :span="24">
               <div class="order-summary">
                 <h3>订单信息</h3>
@@ -41,57 +51,7 @@
                   </el-descriptions-item>
                   <el-descriptions-item label="创建时间">{{ formatDate(order.createTime) }}</el-descriptions-item>
                   <el-descriptions-item label="订单总额">¥{{ order.totalAmount }}</el-descriptions-item>
-                  <el-descriptions-item label="优惠金额">¥{{ order.discountAmount }}</el-descriptions-item>
                   <el-descriptions-item label="实际支付">¥{{ order.payAmount }}</el-descriptions-item>
-                </el-descriptions>
-              </div>
-            </el-col>
-          </el-row>
-
-          <el-row :gutter="20" class="mt-20">
-            <el-col :span="24">
-              <div class="product-info">
-                <h3>商品信息</h3>
-                <el-card class="product-card" shadow="never">
-                  <el-row :gutter="20">
-                    <el-col :span="6">
-                      <el-image 
-                        :src="product.mainImage" 
-                        :alt="product.merchantName"
-                        fit="cover"
-                        class="product-image"
-                      >
-                        <template #error>
-                          <div class="image-error">
-                            <el-icon size="30"><Picture /></el-icon>
-                          </div>
-                        </template>
-                      </el-image>
-                    </el-col>
-                    <el-col :span="18">
-                      <div class="product-details">
-                        <h4>{{ product.merchantName }}</h4>
-                        <p class="product-description">{{ product.description }}</p>
-                        <div class="product-price">
-                          <span class="price">¥{{ product.minPrice }}</span>
-                          <span class="quantity">数量: {{ quantity }}</span>
-                        </div>
-                      </div>
-                    </el-col>
-                  </el-row>
-                </el-card>
-              </div>
-            </el-col>
-          </el-row>
-
-          <el-row :gutter="20" class="mt-20">
-            <el-col :span="24">
-              <div class="shipping-info">
-                <h3>收货信息</h3>
-                <el-descriptions :column="1" border>
-                  <el-descriptions-item label="收货人">{{ order.receiverName }}</el-descriptions-item>
-                  <el-descriptions-item label="联系电话">{{ order.receiverPhone }}</el-descriptions-item>
-                  <el-descriptions-item label="收货地址">{{ order.receiverAddress }}</el-descriptions-item>
                 </el-descriptions>
               </div>
             </el-col>
@@ -108,8 +68,10 @@
           </el-row>
         </div>
 
-        <div v-else class="loading-container">
-          <el-skeleton :rows="8" animated />
+        <div v-else class="no-data">
+          <el-empty description="订单信息不存在">
+            <el-button type="primary" @click="continueShopping">继续购物</el-button>
+          </el-empty>
         </div>
       </el-card>
     </div>
@@ -121,10 +83,9 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { 
-  HomeFilled, Goods, Document, SuccessFilled, Picture
+  HomeFilled, Goods, Document, SuccessFilled
 } from '@element-plus/icons-vue'
 import orderApi from '@/api/order'
-import merchantProduct from '@/api/merchantProduct'
 
 // 路由相关
 const route = useRoute()
@@ -132,8 +93,6 @@ const router = useRouter()
 
 // 响应式数据
 const order = ref({})
-const product = ref({})
-const quantity = ref(1)
 const loading = ref(true)
 
 // 方法
@@ -188,15 +147,6 @@ const fetchOrderDetail = async () => {
     
     if (response.code === 200 && response.data) {
       order.value = response.data
-      
-      // 从查询参数获取数量，如果没有则使用默认值1
-      quantity.value = parseInt(route.query.quantity) || response.data.quantity || 1
-      
-      // 获取产品详情
-      const productId = route.query.productId || response.data.merchantProductId
-      if (productId) {
-        await fetchProductDetail(productId)
-      }
     } else {
       ElMessage.error(response.message || '获取订单详情失败')
     }
@@ -205,21 +155,6 @@ const fetchOrderDetail = async () => {
     ElMessage.error('获取订单详情失败')
   } finally {
     loading.value = false
-  }
-}
-
-/**
- * 获取产品详情
- */
-const fetchProductDetail = async (productId) => {
-  try {
-    const response = await merchantProduct.getById(productId)
-    
-    if (response.code === 200 && response.data) {
-      product.value = response.data
-    }
-  } catch (error) {
-    console.error('获取产品详情失败:', error)
   }
 }
 
@@ -249,7 +184,7 @@ onMounted(() => {
 }
 
 .confirmation-card {
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
@@ -261,54 +196,29 @@ onMounted(() => {
   font-weight: 500;
 }
 
+.success-message {
+  text-align: center;
+  padding: 30px 0;
+}
+
+.success-message h2 {
+  margin: 20px 0 10px 0;
+  color: #67C23A;
+}
+
+.success-message p {
+  font-size: 16px;
+  color: #606266;
+}
+
 .order-details {
   padding: 20px 0;
 }
 
-.order-summary h3,
-.product-info h3,
-.shipping-info h3 {
+.order-summary h3 {
   margin-bottom: 15px;
   font-size: 16px;
   font-weight: 500;
-}
-
-.product-card {
-  border: 1px solid #ebeef5;
-}
-
-.product-image {
-  width: 100%;
-  height: 120px;
-  border-radius: 4px;
-}
-
-.product-details h4 {
-  margin: 0 0 10px 0;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.product-description {
-  color: #606266;
-  font-size: 14px;
-  margin: 10px 0;
-}
-
-.product-price {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.price {
-  color: #fa4f4f;
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.quantity {
-  color: #909399;
 }
 
 .action-buttons {
@@ -318,20 +228,7 @@ onMounted(() => {
   margin-top: 30px;
 }
 
-.mt-20 {
-  margin-top: 20px;
-}
-
 .mt-30 {
   margin-top: 30px;
-}
-
-.image-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #909399;
 }
 </style>
