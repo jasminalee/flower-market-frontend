@@ -1,5 +1,5 @@
 <template>
-      <div class="page-header">
+  <div class="page-header">
     <div class="page-header-content">
       <h1>购物车</h1>
       <p>查看和管理您的购物车商品</p>
