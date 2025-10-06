@@ -14,6 +14,21 @@
         label-width="120px"
         class="profile-form"
       >
+        <el-form-item label="头像" prop="avatar">
+          <el-upload
+            class="avatar-uploader"
+            :action="uploadUrl"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+            :on-change="handleAvatarChange"
+            :disabled="loading"
+          >
+            <img v-if="profileForm.avatar" :src="profileForm.avatar" class="avatar" />
+            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
+        
         <el-form-item label="用户ID" prop="id">
           <el-input v-model="profileForm.id" disabled />
         </el-form-item>
@@ -38,10 +53,6 @@
           <el-input v-model="profileForm.addr" type="textarea" />
         </el-form-item>
         
-        <el-form-item label="头像" prop="avatar">
-          <el-input v-model="profileForm.avatar" />
-        </el-form-item>
-        
         <el-form-item>
           <el-button type="primary" @click="submitForm" :loading="loading">保存</el-button>
           <el-button @click="resetForm">重置</el-button>
@@ -55,7 +66,9 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/config/store.js'
 import { ElMessage } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 import sysUserApi from '@/api/sysUser.js'
+import apiClient from '@/api/apiClient.js'
 
 // 获取认证存储实例
 const authStore = useAuthStore()
@@ -65,6 +78,10 @@ const profileFormRef = ref()
 
 // 加载状态
 const loading = ref(false)
+
+// API基础URL
+const API_BASE_URL = apiClient.raw.defaults.baseURL || 'http://localhost:18091'
+const uploadUrl = API_BASE_URL + "/api/upload/image"
 
 // 表单数据
 const profileForm = reactive({
@@ -92,6 +109,55 @@ const profileRules = {
   phone: [
     { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
   ]
+}
+
+/**
+ * 处理头像上传成功
+ */
+const handleAvatarSuccess = (response, uploadFile) => {
+  if (response && response.code === 200) {
+    console.log('头像上传成功:', response)
+    // 检查返回的是否是完整URL，如果不是则拼接基础URL
+    if (response.data && response.data.startsWith('http')) {
+      profileForm.avatar = response.data
+    } else {
+      profileForm.avatar = API_BASE_URL + response.data
+    }
+    ElMessage.success('头像上传成功')
+  } else {
+    // 如果上传失败，移除预览图片
+    profileForm.avatar = ''
+    ElMessage.error('头像上传失败')
+  }
+}
+
+/**
+ * 上传前检查
+ */
+const beforeAvatarUpload = (rawFile) => {
+  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
+    ElMessage.error('头像图片必须是 JPG 或 PNG 格式!')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error('头像图片大小不能超过 2MB!')
+    return false
+  }
+  return true
+}
+
+/**
+ * 处理头像预览
+ */
+const handleAvatarChange = (file) => {
+  // 创建预览URL
+  const previewUrl = URL.createObjectURL(file.raw)
+  console.log('file:', file)
+  console.log('previewUrl:', previewUrl)
+
+  // 为了预览效果，我们可以临时设置预览URL，但会在上传成功后替换
+  if (!profileForm.avatar || profileForm.avatar.startsWith('blob:')) {
+    profileForm.avatar = previewUrl
+  }
 }
 
 /**
@@ -166,4 +232,31 @@ onMounted(() => {
 
 <style scoped>
 @import '@/assets/profile.css';
+
+.avatar-uploader .avatar {
+  width: 120px;
+  height: 120px;
+  display: block;
+}
+
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 120px;
+  height: 120px;
+  text-align: center;
+}
 </style>
