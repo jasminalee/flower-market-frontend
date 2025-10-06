@@ -160,8 +160,8 @@ const fetchOrderDetail = async () => {
 
 // 按钮操作
 const goToPayment = () => {
-  ElMessage.info('支付功能开发中...')
-  // 这里可以跳转到支付页面
+  // 跳转到个人中心的订单页面进行支付
+  router.push('/admin/personal/orders')
 }
 
 const viewOrderList = () => {
