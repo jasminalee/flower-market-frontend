@@ -103,10 +103,7 @@ import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import sysUserApi from '@/api/sysUser.js'
 import apiClient from '@/api/apiClient.js'
-import girlAvatar from '@/assets/images/girl.png'
-import manAvatar from '@/assets/images/man.png'
-import girlAvatar1 from '@/assets/images/girl1.png'
-import manAvatar1 from '@/assets/images/man1.png'
+
 // 获取认证存储实例
 const authStore = useAuthStore()
 
@@ -121,14 +118,14 @@ const API_BASE_URL = apiClient.raw.defaults.baseURL || 'http://localhost:18091'
 const uploadUrl = API_BASE_URL + "/api/upload/image"
 
 // 默认头像
-const defaultAvatar = girlAvatar
+const defaultAvatar =  API_BASE_URL+"/images/avater/girl.png"
 
 // 预设头像选项
 const avatarOptions = [
-  girlAvatar,
-  manAvatar,
-  girlAvatar1,
-  manAvatar1,
+  API_BASE_URL+"/images/avater/girl.png",
+  API_BASE_URL+"/images/avater/man.png",
+  API_BASE_URL+"/images/avater/girl1.png",
+  API_BASE_URL+"/images/avater/man1.png",
 ]
 
 // 表单数据
