@@ -253,6 +253,15 @@ const routes = [
               title: '我的订单',
               requiresAuth: true
             }
+          },
+          {
+            path: 'payment-methods',
+            name: 'PaymentMethods',
+            component: () => import('@/views/admin/personal/PaymentMethods.vue'),
+            meta: { 
+              title: '支付方式',
+              requiresAuth: true
+            }
           }
         ]
       }

@@ -1,0 +1,108 @@
+.payment-methods-page {
+  padding: 20px;
+}
+
+.payment-methods-card {
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.toolbar {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-form {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.search-form .el-form-item {
+  margin-bottom: 0;
+}
+
+.action-buttons {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.form-card {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-card .el-form-item {
+  margin-bottom: 20px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.payment-method-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: #fafafa;
+}
+
+.payment-method-info {
+  flex: 1;
+}
+
+.payment-method-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.payment-method-info p {
+  margin: 5px 0;
+  color: #606266;
+  font-size: 14px;
+}
+
+.payment-method-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.status-tag {
+  margin-left: 10px;
+}
+
+.enabled {
+  color: #67c23a;
+}
+
+.disabled {
+  color: #909399;
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}

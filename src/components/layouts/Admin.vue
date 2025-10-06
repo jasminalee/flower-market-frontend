@@ -299,6 +299,16 @@ const userMenus = computed(() => {
         path: '/admin/personal/shipping-address',
         title: '收货地址',
         icon: 'Files' // Using Files icon for address management
+      },
+      {
+        path: '/admin/personal/orders',
+        title: '我的订单',
+        icon: 'Tickets' // Using Tickets icon for order management
+      },
+      {
+        path: '/admin/personal/payment-methods',
+        title: '支付方式',
+        icon: 'Coin' // Using Coin icon for payment methods
       }
     ]
   })
@@ -360,6 +370,10 @@ const breadcrumbs = computed(() => {
           crumbs.push({ title: '我的评论' })
         } else if (paths.includes('shipping-address')) {
           crumbs.push({ title: '收货地址' })
+        } else if (paths.includes('orders')) {
+          crumbs.push({ title: '我的订单' })
+        } else if (paths.includes('payment-methods')) {
+          crumbs.push({ title: '支付方式' })
         }
       }
   }
