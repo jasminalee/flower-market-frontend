@@ -162,7 +162,7 @@ const handleUserCommand = async (command) => {
 }
 </script>
 
-<style scoped>
+<style src="@/assets/publicLayout.css" scoped>
   /* 添加用户头像样式 */
   .user-info {
     display: flex;

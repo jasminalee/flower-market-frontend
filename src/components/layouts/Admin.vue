@@ -2,7 +2,7 @@
   <div class="admin-layout">
     <el-container class="layout-container">
       <!-- 侧边栏 -->
-      <el-aside :width="sidebarWidth" class="sidebar"w>
+      <el-aside :width="sidebarWidth" class="sidebar">
         <div class="sidebar-header">
           <div class="logo" v-if="!isCollapsed">
             <el-icon size="28" color="#409eff">
