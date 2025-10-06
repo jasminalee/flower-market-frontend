@@ -5,73 +5,108 @@
     </template>
   </el-page-header>
 
-  <div class="comments-container">
-    <el-card class="comments-card">
-      <!-- 评论列表 -->
-      <el-table 
-        :data="comments" 
-        style="width: 100%" 
-        v-loading="loading"
-        element-loading-text="加载中..."
-      >
-        <el-table-column prop="content" label="评论内容" min-width="200">
-          <template #default="scope">
-            <div class="comment-content">{{ scope.row.content }}</div>
-          </template>
-        </el-table-column>
-        
-        <el-table-column prop="rating" label="评分" width="100">
-          <template #default="scope">
-            <el-rate
-              v-model="scope.row.rating"
-              disabled
-              show-score
-              score-template="{value}分"
-            />
-          </template>
-        </el-table-column>
-        
-        <el-table-column prop="sourceType" label="来源类型" width="120">
-          <template #default="scope">
-            <el-tag :type="getSourceTypeTag(scope.row.sourceType)">
-              {{ getSourceTypeName(scope.row.sourceType) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        
-        <el-table-column prop="createTime" label="评论时间" width="180">
-          <template #default="scope">
-            {{ formatDate(scope.row.createTime) }}
-          </template>
-        </el-table-column>
-        
-        <el-table-column label="操作" width="120">
-          <template #default="scope">
-            <el-button 
-              size="small" 
-              type="danger" 
-              @click="handleDelete(scope.row)"
-            >
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+  <el-card class="filter-card">
+    <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
+      <el-col :span="20">
+        <el-form :model="searchForm" inline>
+          <el-form-item label="来源类型">
+            <el-select v-model="searchForm.sourceType" placeholder="选择来源类型" clearable>
+              <el-option label="产品" value="product" />
+              <el-option label="文章" value="article" />
+              <el-option label="论坛" value="forum" />
+            </el-select>
+          </el-form-item>
 
-      <!-- 分页 -->
-      <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="pagination.current"
-          v-model:page-size="pagination.size"
-          :page-sizes="[10, 20, 50]"
-          :total="pagination.total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
-  </div>
+          <el-form-item label="评分">
+            <el-select v-model="searchForm.rating" placeholder="选择评分" clearable>
+              <el-option label="1星" :value="1" />
+              <el-option label="2星" :value="2" />
+              <el-option label="3星" :value="3" />
+              <el-option label="4星" :value="4" />
+              <el-option label="5星" :value="5" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button type="primary" @click="handleSearch">
+              <el-icon><Search /></el-icon>
+              搜索
+            </el-button>
+            <el-button @click="handleReset">
+              <el-icon><Refresh /></el-icon>
+              重置
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </el-col>
+    </el-row>
+  </el-card>
+
+  <el-card class="table-card">
+    <!-- 评论列表 -->
+    <el-table 
+      :data="comments" 
+      :loading="loading"
+      stripe
+      style="width: 100%"
+    >
+      <el-table-column prop="content" label="评论内容" min-width="200">
+        <template #default="scope">
+          <div class="comment-content">{{ scope.row.content }}</div>
+        </template>
+      </el-table-column>
+      
+      <el-table-column prop="rating" label="评分" min-width="100">
+        <template #default="scope">
+          <el-rate
+            v-model="scope.row.rating"
+            disabled
+          />
+        </template>
+      </el-table-column>
+      
+      <el-table-column prop="sourceType" label="来源类型" min-width="120">
+        <template #default="scope">
+          <el-tag :type="getSourceTypeTag(scope.row.sourceType)">
+            {{ getSourceTypeName(scope.row.sourceType) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      
+      <el-table-column prop="createTime" label="评论时间" min-width="180">
+        <template #default="scope">
+          {{ formatDate(scope.row.createTime) }}
+        </template>
+      </el-table-column>
+      
+      <el-table-column label="操作" width="150" fixed="right">
+        <template #default="scope">
+          <el-button 
+            size="small" 
+            type="danger"
+            text
+            @click="handleDelete(scope.row)"
+          >
+            <el-icon><Delete /></el-icon>
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- 分页 -->
+    <div class="pagination-container">
+      <el-pagination
+        v-model:current-page="pagination.current"
+        v-model:page-size="pagination.size"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="pagination.total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </div>
+  </el-card>
 </template>
 
 <script setup>
@@ -79,6 +114,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/config/store.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import commentApi from '@/api/comment.js'
+import { Search, Refresh, Delete } from '@element-plus/icons-vue'
 
 // 获取认证存储实例
 const authStore = useAuthStore()
@@ -88,6 +124,12 @@ const loading = ref(false)
 
 // 评论数据
 const comments = ref([])
+
+// 搜索表单
+const searchForm = reactive({
+  sourceType: '',
+  rating: ''
+})
 
 // 分页参数
 const pagination = reactive({
@@ -110,7 +152,9 @@ const loadComments = async () => {
     const params = {
       current: pagination.current,
       size: pagination.size,
-      userId: authStore.user.id
+      userId: authStore.user.id,
+      sourceType: searchForm.sourceType || undefined,
+      rating: searchForm.rating || undefined
     }
     
     const result = await commentApi.page(params)
@@ -129,10 +173,31 @@ const loadComments = async () => {
 }
 
 /**
+ * 搜索
+ */
+const handleSearch = () => {
+  pagination.current = 1
+  loadComments()
+  ElMessage.success('搜索成功')
+}
+
+/**
+ * 重置搜索
+ */
+const handleReset = () => {
+  searchForm.sourceType = ''
+  searchForm.rating = ''
+  pagination.current = 1
+  loadComments()
+  ElMessage.info('搜索条件已重置')
+}
+
+/**
  * 处理分页大小变化
  */
 const handleSizeChange = (val) => {
   pagination.size = val
+  pagination.current = 1
   loadComments()
 }
 
@@ -221,5 +286,10 @@ onMounted(() => {
 })
 </script>
 
-<style src="@/assets/comment.css" scoped>
+<style scoped>
+.comment-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>
