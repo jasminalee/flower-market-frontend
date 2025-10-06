@@ -9,10 +9,10 @@
     <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
       <el-col :span="23">
         <el-form :model="searchForm" inline>
-          <el-form-item label="产品名称">
+          <el-form-item label="商品名称">
             <el-input
-              v-model="searchForm.productName"
-              placeholder="搜索产品名称"
+              v-model="searchForm.merchantName"
+              placeholder="搜索商品名称"
               clearable
               @keyup.enter="handleSearch"
             >
@@ -76,7 +76,7 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column prop="merchantName" label="产品名称" min-width="150" />
+      <el-table-column prop="merchantName" label="商品名称" min-width="150" />
       <el-table-column prop="brand" label="品牌" min-width="100" />
       <el-table-column prop="description" label="产品描述" min-width="200" show-overflow-tooltip />
       <el-table-column prop="skuId" label="SKU ID" min-width="100" />
@@ -161,7 +161,7 @@
       :rules="merchantProductRules"
       label-width="100px"
     >
-      <el-form-item v-if="!isEdit" label="选择SKU" prop="skuId">
+      <el-form-item label="选择SKU" prop="skuId">
         <el-select 
           v-model="merchantProductForm.skuId" 
           placeholder="请选择SKU" 
@@ -175,22 +175,18 @@
           <el-option
             v-for="sku in availableSkus"
             :key="sku.id"
-            :label="sku.merchantName"
+            :label="sku.skuName"
             :value="sku.id"
           />
         </el-select>
       </el-form-item>
       
-      <el-form-item label="产品名称">
-        <el-input v-model="selectedSku.merchantName" disabled />
-      </el-form-item>
-      
-      <el-form-item label="显示名称" prop="merchantName">
-        <el-input v-model="merchantProductForm.merchantName" placeholder="请输入商品显示名称" />
-      </el-form-item>
-      
-      <el-form-item label="SKU ID">
+      <el-form-item label="SKU ID" v-if="merchantProductForm.skuId">
         <el-input v-model="merchantProductForm.skuId" disabled />
+      </el-form-item>
+      
+      <el-form-item label="商品名称" prop="merchantName">
+        <el-input v-model="merchantProductForm.merchantName" placeholder="请输入商品商品名称" />
       </el-form-item>
 
       <el-row :gutter="16">
@@ -374,7 +370,7 @@ const selectedSku = ref({})
 
 // 搜索表单
 const searchForm = reactive({
-  productName: '',
+  merchantName: '',
   status: ''
 })
 
@@ -480,7 +476,7 @@ const loadMerchantProductList = async () => {
       current: pagination.page,
       size: pagination.size,
       merchantId: merchantProductForm.merchantId,
-      productName: searchForm.productName || undefined,
+      merchantName: searchForm.merchantName || undefined,
       status: searchForm.status !== '' ? searchForm.status : undefined
     }
 
@@ -533,7 +529,9 @@ const handleSkuChange = (skuId) => {
   const sku = availableSkus.value.find(s => s.id === skuId)
   if (sku) {
     selectedSku.value = sku
-    // 同时设置productId
+    // 同步商品名称
+    merchantProductForm.merchantName = sku.merchantName || ''
+    // 同步productId
     merchantProductForm.productId = sku.productId
     // 自动填充价格和库存（可选）
     merchantProductForm.price = sku.price || 0
@@ -554,7 +552,7 @@ const handleSearch = () => {
  * 重置搜索
  */
 const handleReset = () => {
-  searchForm.productName = ''
+  searchForm.merchantName = ''
   searchForm.status = ''
   pagination.page = 1
   loadMerchantProductList()
@@ -637,8 +635,8 @@ const handleEdit = async (row) => {
       const response = await productSkuApi.getById(row.skuId)
       if (response && response.code === 200) {
         selectedSku.value = response.data || {}
-        // 同步商品名称
-        if (selectedSku.value.merchantName) {
+        // 同步商品名称，但只在表单中merchantName为空时才设置
+        if (selectedSku.value.merchantName && !merchantProductForm.merchantName) {
           merchantProductForm.merchantName = selectedSku.value.merchantName;
         }
       } else {
