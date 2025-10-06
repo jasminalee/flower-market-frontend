@@ -1,28 +1,22 @@
 <template>
   <div class="product-detail-page">
     <!-- 面包屑导航 -->
-    <el-page-header 
-      class="breadcrumb-container" 
-      @back="goBack"
-      :content="product.productName || '产品详情'"
-    >
-      <template #breadcrumb>
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">
-            <el-icon><HomeFilled /></el-icon>
-            首页
-          </el-breadcrumb-item>
-          <el-breadcrumb-item :to="{ path: '/products' }">
-            <el-icon><Goods /></el-icon>
-            产品展示
-          </el-breadcrumb-item>
-          <el-breadcrumb-item>
-            <el-icon><Document /></el-icon>
-            {{ product.productName || '产品详情' }}
-          </el-breadcrumb-item>
-        </el-breadcrumb>
-      </template>
-    </el-page-header>
+    <div class="breadcrumb-banner">
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">
+          <el-icon><HomeFilled /></el-icon>
+          首页
+        </el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/products' }">
+          <el-icon><Goods /></el-icon>
+          产品展示
+        </el-breadcrumb-item>
+        <el-breadcrumb-item>
+          <el-icon><Document /></el-icon>
+          {{ product.productName || '产品详情' }}
+        </el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
 
     <!-- 加载状态 -->
     <div v-if="loading" class="loading-container">
@@ -112,7 +106,7 @@
                   <span v-if="product.isDiscounted" class="original-price">¥{{ product.originalPrice }}</span>
                 </div>
                 
-                <div class="product-tags">
+                <div class="detail-product-tags">
                   <el-tag v-if="product.isDiscounted" type="danger">特价</el-tag>
                   <el-tag v-if="product.isHot" type="danger">热销</el-tag>
                   <el-tag v-if="product.status === 1" type="success">上架</el-tag>
@@ -346,13 +340,6 @@ const addToFavorites = () => {
  */
 const shareProduct = () => {
   ElMessage.success('分享功能开发中...')
-}
-
-/**
- * 返回上一页
- */
-const goBack = () => {
-  router.go(-1)
 }
 
 // 生命周期
