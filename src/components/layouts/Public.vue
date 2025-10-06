@@ -134,7 +134,8 @@ const goToLogin = () => {
 const handleUserCommand = async (command) => {
   switch (command) {
     case 'profile':
-      ElMessage.info('个人中心功能开发中...')
+      // 跳转到管理后台的个人中心页面
+      router.push('/admin/personal/profile')
       break
     case 'settings':
       // 跳转到管理后台
