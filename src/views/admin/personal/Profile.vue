@@ -104,7 +104,9 @@ import { Plus } from '@element-plus/icons-vue'
 import sysUserApi from '@/api/sysUser.js'
 import apiClient from '@/api/apiClient.js'
 import girlAvatar from '@/assets/images/girl.png'
-
+import manAvatar from '@/assets/images/man.png'
+import girlAvatar1 from '@/assets/images/girl1.png'
+import manAvatar1 from '@/assets/images/man1.png'
 // 获取认证存储实例
 const authStore = useAuthStore()
 
@@ -124,6 +126,9 @@ const defaultAvatar = girlAvatar
 // 预设头像选项
 const avatarOptions = [
   girlAvatar,
+  manAvatar,
+  girlAvatar1,
+  manAvatar1
 ]
 
 // 表单数据
