@@ -62,10 +62,10 @@
       <el-table-column label="产品图片" min-width="100">
         <template #default="{ row }">
           <el-image
-            :src="getFirstImage(row.subImages)"
+            :src="row.mainImage"
             class="product-image"
             fit="cover"
-            :preview-src-list="getImageList(row.subImages)"
+            :preview-src-list="[row.mainImage]"
             preview-teleported
           >
             <template #error>
@@ -442,6 +442,7 @@ const merchantProductForm = reactive({
   detail: '', // 产品详情
   description: '', // 产品描述
   brand: '', // 品牌
+  mainImage: '', // 主图URL
   subImages: '', // 子图URL集合
   avgRating: 0, // 平均评分
   totalSales: 0, // 总销量
@@ -615,6 +616,7 @@ const handleAdd = () => {
     detail: '',
     description: '',
     brand: '',
+    mainImage: '',
     subImages: '',
     avgRating: 0,
     totalSales: 0,
@@ -640,6 +642,7 @@ const handleEdit = async (row) => {
     detail: row.detail || '', // 确保detail字段存在
     description: row.description || '',
     brand: row.brand || '',
+    mainImage: row.mainImage || '',
     subImages: row.subImages || '',
     avgRating: row.avgRating || 0,
     totalSales: row.totalSales || 0,

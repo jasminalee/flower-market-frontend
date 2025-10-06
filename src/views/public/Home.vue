@@ -167,7 +167,7 @@ import { ElMessage } from 'element-plus'
 import { 
   View, ArrowRight, Picture
 } from '@element-plus/icons-vue'
-import productApi from '@/api/product'
+import merchantProduct from '@/api/merchantProduct'
 
 // 引入样式文件
 import '@/assets/home.css'
@@ -225,7 +225,7 @@ const fetchFeaturedProducts = async () => {
   try {
     loading.value = true
     // 调用主页商品列表接口，获取前4个产品作为特色产品
-    const response = await productApi.homepage({
+    const response = await merchantProduct.page({
       current: 1,
       size: 4
     })
