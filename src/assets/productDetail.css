@@ -3,7 +3,6 @@
 .product-detail-page {
   min-height: calc(100vh - var(--header-height) - var(--footer-height));
   background-color: var(--bg-color-page);
-  padding: var(--spacing-large) 0;
 }
 
 /* 面包屑导航 - 简化版横幅样式 */
@@ -26,11 +25,6 @@
   max-width: 1200px;
 }
 
-.public-breadcrumb-banner .el-breadcrumb__item,
-.public-breadcrumb-banner .el-breadcrumb__inner,
-.public-breadcrumb-banner .el-breadcrumb__separator {
-  color: white;
-}
 
 .public-breadcrumb-banner .el-breadcrumb__inner:hover {
   color: rgba(255, 255, 255, 0.8);

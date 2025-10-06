@@ -11,7 +11,7 @@
         <el-form :model="searchForm" inline>
           <el-form-item label="产品名称">
             <el-input
-              v-model="searchForm.skuName"
+              v-model="searchForm.merchantName"
               placeholder="搜索产品名称"
               clearable
               @keyup.enter="handleSearch"
@@ -72,7 +72,7 @@
       style="width: 100%"
     >
       <el-table-column prop="id" label="ID" min-width="50" />
-      <el-table-column prop="skuName" label="产品名称" min-width="150" />
+      <el-table-column prop="merchantName" label="产品名称" min-width="150" />
       <el-table-column prop="skuCode" label="产品编码" min-width="120" />
       <el-table-column prop="skuId" label="SKU ID" min-width="100" />
       <el-table-column prop="price" label="商户定价" min-width="100">
@@ -153,14 +153,14 @@
           <el-option
             v-for="sku in availableSkus"
             :key="sku.id"
-            :label="sku.skuName"
+            :label="sku.merchantName"
             :value="sku.id"
           />
         </el-select>
       </el-form-item>
       
       <el-form-item label="产品名称">
-        <el-input v-model="selectedSku.skuName" disabled />
+        <el-input v-model="selectedSku.merchantName" disabled />
       </el-form-item>
       
       <el-form-item label="产品编码">
@@ -236,7 +236,7 @@ const selectedSku = ref({})
 
 // 搜索表单
 const searchForm = reactive({
-  skuName: '',
+  merchantName: '',
   skuId: '',
   status: ''
 })
@@ -284,7 +284,7 @@ const loadMerchantProductList = async () => {
     const params = {
       current: pagination.page,
       size: pagination.size,
-      skuName: searchForm.skuName || undefined,
+      merchantName: searchForm.merchantName || undefined,
       skuId: searchForm.skuId || undefined,
       status: searchForm.status !== '' ? searchForm.status : undefined,
       merchantId: merchantProductForm.merchantId
@@ -315,7 +315,7 @@ const loadMerchantProductList = async () => {
 const loadAvailableSkus = async (searchKeyword = '') => {
   try {
     const params = {
-      skuName: searchKeyword || undefined,
+      merchantName: searchKeyword || undefined,
       current: 1,
       size: 100
     }
@@ -360,7 +360,7 @@ const handleSearch = () => {
  * 重置搜索
  */
 const handleReset = () => {
-  searchForm.skuName = ''
+  searchForm.merchantName = ''
   searchForm.skuId = ''
   searchForm.status = ''
   pagination.page = 1
