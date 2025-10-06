@@ -303,7 +303,7 @@ const addToCart = async (product) => {
     
     // 构造购物车对象
     const shoppingCart = {
-      productId: product.id,
+      merchantProductId: product.id,
       merchantName: product.merchantName,
       skuId: product.skuId,
       price: product.price || product.minPrice || 0,

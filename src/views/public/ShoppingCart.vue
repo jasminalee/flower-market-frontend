@@ -193,24 +193,24 @@ const loadCartItems = async () => {
 const enhanceCartItemsWithProductDetails = async () => {
   try {
     // 获取所有唯一的产品ID
-    const productIds = [...new Set(cartItems.value.map(item => item.productId).filter(id => id))]
+    const merchantProductIds = [...new Set(cartItems.value.map(item => item.merchantProductId).filter(id => id))]
     
     // 批量获取产品详情
     const productDetails = {}
-    for (const productId of productIds) {
+    for (const merchantProductId of merchantProductIds) {
       try {
-        const productResponse = await productApi.getById(productId)
+        const productResponse = await productApi.getById(merchantProductId)
         if (productResponse && productResponse.code === 200) {
-          productDetails[productId] = productResponse.data
+          productDetails[merchantProductId] = productResponse.data
         }
       } catch (error) {
-        console.warn(`获取产品 ${productId} 详情失败:`, error)
+        console.warn(`获取产品 ${merchantProductId} 详情失败:`, error)
       }
     }
     
     // 将产品详情合并到购物车项中
     cartItems.value = cartItems.value.map(item => {
-      const productDetail = productDetails[item.productId]
+      const productDetail = productDetails[item.merchantProductId]
       if (productDetail) {
         return {
           ...item,

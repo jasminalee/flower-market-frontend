@@ -329,7 +329,7 @@ const addToCart = async () => {
     console.log('product:', product)
     // 构造购物车对象
     const shoppingCart = {
-      productId: product.value.id,
+      merchantProductId: product.value.id,
       skuId: product.value.skuId,
       merchantName: product.value.merchantName,
       price: product.value.minPrice,
