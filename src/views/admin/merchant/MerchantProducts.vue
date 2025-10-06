@@ -295,12 +295,18 @@
       </el-form-item>
       
       <el-form-item label="子图URL">
-        <el-input 
-          v-model="merchantProductForm.subImages" 
-          placeholder="请输入子图URL集合，JSON格式存储" 
-          type="textarea" 
-          :rows="2" 
-        />
+        <el-upload
+          class="upload-demo"
+          :action="uploadUrl"
+          :on-success="handleSubImageSuccess"
+          :on-remove="handleSubImageRemove"
+          :file-list="subImageList"
+          list-type="picture-card"
+          :auto-upload="true"
+          multiple
+        >
+          <el-icon><Plus /></el-icon>
+        </el-upload>
       </el-form-item>
       
       <el-form-item label="产品详情" prop="detail">
@@ -464,6 +470,21 @@ const merchantProductRules = {
 
 // 计算属性
 const dialogTitle = computed(() => isEdit.value ? '编辑商户产品' : '上架产品')
+
+const subImageList = computed(() => {
+  if (!merchantProductForm.subImages) return [];
+  
+  try {
+    const images = JSON.parse(merchantProductForm.subImages);
+    return images.map((url, index) => ({
+      name: `image_${index + 1}.jpg`,
+      url: url
+    }));
+  } catch (e) {
+    console.error('解析子图URL列表失败:', e);
+    return [];
+  }
+})
 
 /**
  * 加载商户产品列表
@@ -783,6 +804,55 @@ const getImageList = (subImages) => {
     console.error('解析图片列表失败:', e)
     return []
   }
+}
+
+/**
+ * 处理子图上传成功
+ */
+const handleSubImageSuccess = (response, file) => {
+  if (response && response.code === 200) {
+    // 添加新上传的图片到列表
+    const imageUrl = API_BASE_URL + response.data;
+    
+    // 解析现有的子图URL列表
+    let subImages = [];
+    if (merchantProductForm.subImages) {
+      try {
+        subImages = JSON.parse(merchantProductForm.subImages);
+      } catch (e) {
+        console.error('解析子图URL列表失败:', e);
+        subImages = [];
+      }
+    }
+    
+    // 添加新图片URL
+    subImages.push(imageUrl);
+    
+    // 更新表单中的子图URL列表
+    merchantProductForm.subImages = JSON.stringify(subImages);
+    
+    ElMessage.success('图片上传成功');
+  } else {
+    ElMessage.error('图片上传失败: ' + (response?.message || '未知错误'));
+  }
+}
+
+/**
+ * 处理子图移除
+ */
+const handleSubImageRemove = (file, fileList) => {
+  // 从文件列表中提取URL
+  const imageUrls = fileList.map(item => {
+    // 如果是已上传的文件，使用response中的URL
+    if (item.response && item.response.code === 200) {
+      return API_BASE_URL + item.response.data;
+    }
+    // 如果是已存在的文件，使用url属性
+    return item.url;
+  });
+  
+  // 更新表单中的子图URL列表
+  merchantProductForm.subImages = JSON.stringify(imageUrls);
 }
 
 // 在组件卸载前销毁编辑器
