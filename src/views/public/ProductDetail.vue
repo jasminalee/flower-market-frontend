@@ -209,6 +209,9 @@
                 </el-descriptions>
               </div>
             </el-tab-pane>
+            <el-tab-pane label="用户评论" name="comments">
+              <Comment :product-id="product.id" @comment-submitted="handleCommentSubmitted" />
+            </el-tab-pane>
           </el-tabs>
         </el-card>
       </div>
@@ -233,6 +236,7 @@ import {
 } from '@element-plus/icons-vue'
 import merchantProduct from '@/api/merchantProduct'
 import shoppingCartApi from '@/api/shoppingCart'
+import Comment from '@/components/Comment.vue'
 import { useAuthStore } from '@/config/store.js'
 
 // 路由相关
@@ -369,6 +373,19 @@ const addToFavorites = () => {
  */
 const shareProduct = () => {
   ElMessage.success('分享功能开发中...')
+}
+
+/**
+ * 处理评论提交事件
+ */
+const handleCommentSubmitted = () => {
+  // 可以在这里添加一些处理逻辑，比如更新产品评分等
+  console.log('有新的评论提交')
+}
+
+// 返回产品列表
+const goBack = () => {
+  router.push('/products')
 }
 
 // 生命周期
