@@ -87,6 +87,39 @@
   margin-right: 8px;
 }
 
+/* 用户信息下拉菜单 */
+.user-dropdown {
+  cursor: pointer;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-base);
+  transition: var(--transition-base);
+}
+
+.user-info:hover {
+  background-color: var(--primary-extra-light);
+}
+
+.username {
+  font-size: 14px;
+  color: var(--text-color-primary);
+  font-weight: 500;
+}
+
+.dropdown-arrow {
+  transition: transform 0.3s ease;
+}
+
+.user-dropdown:focus .dropdown-arrow,
+.user-dropdown:hover .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
 /* 主内容区 */
 .main-content {
   flex: 1;
@@ -192,5 +225,9 @@
   .header-actions .el-button {
     padding: 8px 12px;
     font-size: 12px;
+  }
+  
+  .username {
+    display: none;
   }
 }

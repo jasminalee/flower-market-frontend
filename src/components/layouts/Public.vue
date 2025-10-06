@@ -36,7 +36,32 @@
             <!-- 主题切换 -->
             <ThemeToggle mode="icon" :show-text="false" class="theme-toggle-btn" />
             
-            <el-button type="primary" @click="goToLogin">
+            <!-- 登录后显示用户信息 -->
+            <el-dropdown v-if="isAuthenticated" @command="handleUserCommand" class="user-dropdown">
+              <div class="user-info">
+                <el-avatar :size="32" :src="userAvatar">
+                  <el-icon><User /></el-icon>
+                </el-avatar>
+                <span class="username">{{ userInfo?.username || '用户' }}</span>
+                <el-icon class="dropdown-arrow"><ArrowDown /></el-icon>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="profile">
+                    <el-icon><User /></el-icon>个人中心
+                  </el-dropdown-item>
+                  <el-dropdown-item command="settings">
+                    <el-icon><Setting /></el-icon>系统设置
+                  </el-dropdown-item>
+                  <el-dropdown-item divided command="logout">
+                    <el-icon><SwitchButton /></el-icon>退出登录
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            
+            <!-- 未登录显示登录按钮 -->
+            <el-button v-else type="primary" @click="goToLogin">
               <el-icon><User /></el-icon>
               登录
             </el-button>
@@ -80,17 +105,59 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { User, House } from '@element-plus/icons-vue'
-import { ElRow, ElCol } from 'element-plus'
+import { computed } from 'vue'
+import { useAuthStore } from '@/config/store.js'
+import { 
+  User, House, ArrowDown, Setting, SwitchButton 
+} from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import ThemeToggle from '../ThemeToggle.vue'
 
 const router = useRouter()
+const authStore = useAuthStore()
+
+// 计算属性
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+const userInfo = computed(() => authStore.user)
+const userAvatar = computed(() => userInfo.value?.avatar || '')
 
 /**
  * 跳转到登录页面
  */
 const goToLogin = () => {
   router.push('/login')
+}
+
+/**
+ * 处理用户菜单命令
+ */
+const handleUserCommand = async (command) => {
+  switch (command) {
+    case 'profile':
+      ElMessage.info('个人中心功能开发中...')
+      break
+    case 'settings':
+      ElMessage.info('系统设置功能开发中...')
+      break
+    case 'logout':
+      try {
+        await ElMessageBox.confirm(
+          '确定要退出登录吗？',
+          '提示',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        )
+        authStore.logout()
+        router.push('/')
+        ElMessage.success('已退出登录')
+      } catch {
+        // 用户取消操作
+      }
+      break
+  }
 }
 </script>
 
