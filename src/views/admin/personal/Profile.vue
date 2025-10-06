@@ -128,7 +128,7 @@ const avatarOptions = [
   girlAvatar,
   manAvatar,
   girlAvatar1,
-  manAvatar1
+  manAvatar1,
 ]
 
 // 表单数据
