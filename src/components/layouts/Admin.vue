@@ -289,6 +289,11 @@ const userMenus = computed(() => {
         path: '/admin/personal/profile',
         title: '个人信息',
         icon: 'Avatar' // Changed from 'User' to 'Avatar' for better distinction and consistency
+      },
+      {
+        path: '/admin/personal/comments',
+        title: '我的评论',
+        icon: 'ChatLineRound' // Using the same icon as merchant comments
       }
     ]
   })
@@ -342,13 +347,14 @@ const breadcrumbs = computed(() => {
       }
     }
     else if (paths.includes('personal')) {
-      crumbs.push({ title: '个人中心' })
-      
-      if (paths.includes('profile')) {
-        crumbs.push({ title: '个人信息' })
+        crumbs.push({ title: '个人中心' })
+        
+        if (paths.includes('profile')) {
+          crumbs.push({ title: '个人信息' })
+        } else if (paths.includes('comments')) {
+          crumbs.push({ title: '我的评论' })
+        }
       }
-    }
-
   }
   
   return crumbs

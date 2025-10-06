@@ -213,6 +213,15 @@ const routes = [
               title: '个人信息',
               requiresAuth: true
             }
+          },
+          {
+            path: 'comments',
+            name: 'MyComments',
+            component: () => import('@/views/admin/personal/MyComments.vue'),
+            meta: { 
+              title: '我的评论',
+              requiresAuth: true
+            }
           }
         ]
       }
