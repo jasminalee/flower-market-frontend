@@ -63,7 +63,7 @@
 
       <el-container class="main-container">
         <!-- 顶部栏 -->
-        <el-header class="header">
+        <el-header class="admin-header">
           <div class="header-left">
             <!-- 折叠按钮 -->
             <el-button 

@@ -56,8 +56,8 @@
     overflow: hidden;
 }
 
-/* 头部样式 */
-.header {
+/* 管理后台头部样式 */
+.admin-header {
     background: white;
     border-bottom: 1px solid #e8e8e8;
     padding: 0 16px;
@@ -148,7 +148,7 @@
 }
 
 /* 暗色主题 */
-:global(.dark) .header {
+:global(.dark) .admin-header {
     background: #1f1f1f;
     border-bottom-color: #333;
     color: #fff;

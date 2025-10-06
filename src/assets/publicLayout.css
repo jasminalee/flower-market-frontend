@@ -4,8 +4,8 @@
   flex-direction: column;
 }
 
-/* 顶部导航栏 */
-.header {
+/* 公共页面头部样式 */
+.public-header {
   background: var(--bg-color);
   box-shadow: var(--box-shadow-base);
   position: sticky;
@@ -177,7 +177,7 @@
 /* 特定响应式样式（使用 common.css 中的通用媒体查询） */
 
 @media (max-width: 768px) {
-  .header {
+  .public-header {
     padding: 16px 20px;
   }
 

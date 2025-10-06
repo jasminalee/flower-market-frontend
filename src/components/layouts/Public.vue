@@ -1,7 +1,7 @@
 <template>
   <div class="public-layout">
     <!-- 顶部导航栏 -->
-    <header class="header">
+    <header class="public-header">
       <el-row type="flex" justify="space-between" align="middle" :gutter="20" class="header-row">
         <!-- Logo 区域 -->
         <el-col :span="4">
