@@ -1,12 +1,12 @@
 <template>
+  <el-page-header class="page-header" title="个人中心">
+    <template #content>
+      支付方式
+    </template>
+  </el-page-header>
+
   <div class="payment-methods-page">
     <el-card class="payment-methods-card">
-      <template #header>
-        <div class="card-header">
-          <h3>支付方式管理</h3>
-          <el-button type="primary" @click="showAddForm">新增支付方式</el-button>
-        </div>
-      </template>
 
       <!-- 搜索表单 -->
       <div class="toolbar">
