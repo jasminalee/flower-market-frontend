@@ -279,6 +279,20 @@ const userMenus = computed(() => {
     })
   }
 
+  // 个人中心模块 - 所有用户都有权限
+  menus.push({
+    path: '/admin/personal',
+    title: '个人中心',
+    icon: 'User',
+    children: [
+      {
+        path: '/admin/personal/profile',
+        title: '个人信息',
+        icon: 'User'
+      }
+    ]
+  })
+
   return menus
 })
 
@@ -327,6 +341,13 @@ const breadcrumbs = computed(() => {
         crumbs.push({ title: '评论管理' })
       }
     }
+    else if (paths.includes('personal')) {
+      crumbs.push({ title: '个人中心' })
+      
+      if (paths.includes('profile')) {
+        crumbs.push({ title: '个人信息' })
+      }
+    }
 
   }
   
@@ -371,7 +392,8 @@ const handleMenuSelect = (index) => {
 const handleUserCommand = async (command) => {
   switch (command) {
     case 'profile':
-      ElMessage.info('个人中心功能开发中...')
+      // 跳转到个人中心
+      router.push('/admin/personal/profile')
       break
     case 'settings':
       // 跳转到首页

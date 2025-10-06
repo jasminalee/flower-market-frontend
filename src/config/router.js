@@ -193,6 +193,28 @@ const routes = [
             }
           }
         ]
+      },
+      // 个人中心模块
+      {
+        path: 'personal',
+        name: 'Personal',
+        redirect: '/admin/personal/profile',
+        meta: { 
+          title: '个人中心',
+          requiresAuth: true,
+          icon: 'el-icon-user'
+        },
+        children: [
+          {
+            path: 'profile',
+            name: 'Profile',
+            component: () => import('@/views/admin/personal/Profile.vue'),
+            meta: { 
+              title: '个人信息',
+              requiresAuth: true
+            }
+          }
+        ]
       }
     ]
   },

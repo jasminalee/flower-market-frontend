@@ -1,0 +1,65 @@
+/* 个人中心页面样式 */
+.profile-container {
+  padding: 20px;
+  background-color: var(--el-bg-color-page);
+  min-height: calc(100vh - 120px);
+}
+
+.profile-card {
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.profile-card .el-card__header {
+  background-color: var(--el-bg-color);
+  border-bottom: 1px solid var(--el-border-color-light);
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--el-text-color-primary);
+}
+
+.profile-form {
+  margin-top: 20px;
+}
+
+.profile-form .el-form-item {
+  margin-bottom: 20px;
+}
+
+.profile-form .el-form-item__label {
+  font-weight: 500;
+  color: var(--el-text-color-regular);
+}
+
+.profile-form .el-input,
+.profile-form .el-textarea {
+  width: 100%;
+}
+
+.profile-form .el-input.is-disabled .el-input__inner {
+  background-color: var(--el-disabled-bg-color);
+  color: var(--el-disabled-text-color);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 10px;
+  }
+  
+  .profile-card {
+    margin: 0 10px;
+  }
+  
+  .profile-form .el-form-item__label {
+    width: 100% !important;
+    text-align: left !important;
+    padding-bottom: 5px;
+  }
+  
+  .profile-form .el-form-item__content {
+    margin-left: 0 !important;
+  }
+}

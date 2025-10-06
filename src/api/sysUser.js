@@ -1,4 +1,3 @@
-// filepath: e:\IdeaProjects\flower-market-frontend\src\api\sysUser.js
 import api from './apiClient'
 
 export default {
@@ -25,5 +24,13 @@ export default {
    */
   async remove(id) {
     return api.delete(`/sysUser/${id}`)
+  },
+
+  /**
+   * 通过ID查询用户
+   * id: number
+   */
+  async getById(id) {
+    return api.get(`/sysUser/${id}`)
   }
 }
