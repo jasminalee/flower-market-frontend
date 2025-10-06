@@ -190,11 +190,15 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '@/config/store.js'
 import orderApi from '@/api/order'
 import paymentMethodApi from '@/api/paymentMethod'
 import { Search, Refresh, View, Wallet, Close } from '@element-plus/icons-vue'
+
+// 路由
+const router = useRouter()
 
 // Store
 const authStore = useAuthStore()
@@ -295,8 +299,8 @@ const fetchOrders = async () => {
  * 查看订单详情
  */
 const viewOrder = (order) => {
-  // 跳转到订单确认页面查看详情
-  window.open(`/#/order-confirmation/${order.id}`, '_blank')
+  // 使用 router.push 跳转而不是 window.open
+  router.push(`/order-confirmation/${order.id}`)
 }
 
 /**
