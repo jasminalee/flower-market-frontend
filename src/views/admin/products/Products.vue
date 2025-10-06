@@ -92,7 +92,6 @@
       </el-table-column>
       <el-table-column prop="productName" label="产品名称" min-width="150"/>
       <el-table-column prop="productCode" label="产品编码" min-width="120"/>
-      <el-table-column prop="brand" label="品牌" min-width="100"/>
       <el-table-column label="分类" min-width="120">
         <template #default="{ row }">
           <span v-if="getCategoryById(row.categoryId)">
@@ -177,11 +176,6 @@
 
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="品牌" prop="brand">
-            <el-input v-model="productForm.brand" placeholder="请输入品牌" :disabled="!isEdit"/>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
           <el-form-item label="分类" prop="categoryId">
             <el-cascader
                 v-model="productForm.categoryId"
@@ -234,39 +228,7 @@
             </el-form-item>
           </el-col>
         </el-col>
-
-        <el-col :span="24">
-          <el-form-item label="产品描述" prop="description">
-            <el-input
-                v-model="productForm.description"
-                type="textarea"
-                placeholder="请输入产品描述"
-                :rows="3"
-                :disabled="!isEdit"
-            />
-          </el-form-item>
-        </el-col>
       </el-row>
-
-      <el-form-item label="产品详情" prop="detail">
-        <div class="editor-container" v-if="isEdit">
-          <Toolbar
-              class="editor-toolbar"
-              :editor="editorRef"
-              :defaultConfig="toolbarConfig"
-              :mode="mode"
-          />
-          <Editor
-              class="editor-content"
-              v-model="productForm.detail"
-              :defaultConfig="editorConfig"
-              :mode="mode"
-              @onCreated="handleEditorCreated"
-              @onChange="handleEditorChange"
-          />
-        </div>
-        <div class="product-detail-view" v-else v-html="productForm.detail"></div>
-      </el-form-item>
     </el-form>
 
     <template #footer>
@@ -281,15 +243,13 @@
 </template>
 
 <script setup>
-import {ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef, nextTick} from 'vue'
+import {ref, reactive, computed, onMounted, onBeforeUnmount, nextTick} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import productApi from '@/api/product.js'
 import productCategoryApi from '@/api/productCategory.js'
 import fileApi from '@/api/file.js'
 import apiClient from '@/api/apiClient.js'
 import {Plus, Search, Refresh, View, Edit, Delete} from '@element-plus/icons-vue'
-import '@wangeditor/editor/dist/css/style.css'
-import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
 import '@/assets/products.css'
 const API_BASE_URL = apiClient.raw.defaults.baseURL || 'http://localhost:18091'
 
@@ -324,62 +284,12 @@ const productForm = reactive({
   id: null,
   productName: '',
   productCode: '',
-  brand: '',
   categoryId: null,
   mainImage: '',
-  description: '',
-  detail: '',
   status: 1,
   productType: 1
 })
 const uploadUrl = API_BASE_URL + "/api/upload/image";
-// 编辑器模式
-const mode = 'default'
-
-// 编辑器实例，必须用 shallowRef
-const editorRef = shallowRef()
-
-// 预览URL数组，用于清理
-let previewUrls = []
-
-// 工具栏配置
-const toolbarConfig = {}
-
-// 富文本编辑器配置
-const editorConfig = reactive({
-  placeholder: '请输入产品详情...',
-  MENU_CONF: {
-    'uploadImage': {
-      server: uploadUrl,
-      fieldName: 'file',
-      maxFileSize: 5 * 1024 * 1024, // 5M
-      base64LimitSize: 0, // 禁用base64，强制使用上传
-      // 自定义上传图片
-      async customUpload(file, insertFn) {
-        try {
-          const formData = new FormData()
-          formData.append('file', file)
-
-          const response = await fileApi.uploadImage(formData)
-
-          if (response && response.code === 200) {
-            // 直接插入服务器URL
-            // 修复：确保使用正确的数据字段
-            const imageUrl = API_BASE_URL + response.data;
-            console.log('图片上传成功:', imageUrl)
-            // 修复图片回显问题，正确调用insertFn
-            insertFn(imageUrl, 'image.png', '图片加载中...')
-            ElMessage.success('图片上传成功')
-          } else {
-            ElMessage.error('图片上传失败: ' + (response?.message || '未知错误'))
-          }
-        } catch (error) {
-          ElMessage.error('图片上传失败: ' + (error.message || '网络错误'))
-        }
-      }
-    }
-  }
-})
 
 // 表单验证规则
 const productRules = {
@@ -390,9 +300,6 @@ const productRules = {
   productCode: [
     {required: true, message: '请输入产品编码', trigger: 'blur'},
     {min: 2, max: 50, message: '产品编码长度在 2 到 50 个字符', trigger: 'blur'}
-  ],
-  brand: [
-    {max: 50, message: '品牌长度不能超过 50 个字符', trigger: 'blur'}
   ],
   categoryId: [
     {required: true, message: '请选择分类', trigger: 'change'}
@@ -407,16 +314,6 @@ const dialogTitle = computed(() => {
   if (!isEdit.value) return '查看产品'
   return productForm.id ? '编辑产品' : '新增产品'
 })
-
-// 编辑器创建回调
-const handleEditorCreated = (editor) => {
-  editorRef.value = editor // 记录 editor 实例，重要！
-}
-
-// 编辑器内容变化处理
-const handleEditorChange = (editor) => {
-  productForm.detail = editor.getHtml()
-}
 
 /**
  * 加载产品列表
@@ -562,11 +459,8 @@ const handleView = async (product) => {
         id: detailData.id,
         productName: detailData.productName,
         productCode: detailData.productCode,
-        brand: detailData.brand,
         categoryId: detailData.categoryId,
         mainImage: detailData.mainImage,
-        description: detailData.description,
-        detail: detailContent,
         status: detailData.status,
         productType: detailData.productType
       })
@@ -589,13 +483,6 @@ const handleView = async (product) => {
 const handleEdit = (product) => {
   isEdit.value = true // 编辑模式
 
-  // 处理详情中的blob URL，替换为正确的图片路径
-  let detailContent = product.detail || '';
-  if (detailContent) {
-    // 移除blob URL，避免无效链接
-    detailContent = detailContent.replace(/src="blob:http[^"]*"/g, 'src=""');
-  }
-
   Object.assign(productForm, {
     id: product.id,
     productName: product.productName,
@@ -603,8 +490,6 @@ const handleEdit = (product) => {
     brand: product.brand,
     categoryId: product.categoryId,
     mainImage: product.mainImage,
-    description: product.description,
-    detail: detailContent,
     status: product.status,
     productType: product.productType
   })
@@ -665,8 +550,6 @@ const handleSave = async () => {
       brand: productForm.brand,
       categoryId: productForm.categoryId,
       mainImage: productForm.mainImage,
-      description: productForm.description,
-      detail: productForm.detail,
       status: productForm.status,
       productType: productForm.productType
     }
@@ -696,11 +579,8 @@ const resetProductForm = () => {
     id: null,
     productName: '',
     productCode: '',
-    brand: '',
     categoryId: null,
     mainImage: '',
-    description: '',
-    detail: '',
     status: 1,
     productType: 1
   })
@@ -711,27 +591,12 @@ const resetProductForm = () => {
     productFormRef.value.resetFields()
   }
 
-  // 重置编辑器内容
-  if (editorRef.value) {
-    editorRef.value.clear()
-  }
-
-  // 清理预览URL对象
-  if (previewUrls.length > 0) {
-    previewUrls.forEach(url => URL.revokeObjectURL(url))
-    previewUrls = []
-  }
-  
   // 确保主图也重置
   productForm.mainImage = ''
 }
 
 // 组件销毁前清理编辑器
 onBeforeUnmount(() => {
-  if (editorRef.value) {
-    editorRef.value.destroy()
-    editorRef.value = null
-  }
   // 清理预览URL对象
   if (previewUrls.length > 0) {
     previewUrls.forEach(url => URL.revokeObjectURL(url))
