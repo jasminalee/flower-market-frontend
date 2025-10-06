@@ -105,7 +105,7 @@
                     <el-icon><User /></el-icon>个人中心
                   </el-dropdown-item>
                   <el-dropdown-item command="settings">
-                    <el-icon><Setting /></el-icon>系统设置
+                    <el-icon><House /></el-icon>回到首页
                   </el-dropdown-item>
                   <el-dropdown-item divided command="logout">
                     <el-icon><SwitchButton /></el-icon>退出登录
@@ -136,7 +136,7 @@ import {
   Management, Fold, Expand, User, ArrowDown, Setting, 
   SwitchButton, Monitor, UserFilled, Lock, Sunny, Moon,
   ShoppingCartFull, Avatar, Tickets, Coin, Files, Folder, Promotion,
-  ChatLineRound
+  ChatLineRound, House
 } from '@element-plus/icons-vue'
 import '@/assets/admin.css'
 
@@ -374,7 +374,8 @@ const handleUserCommand = async (command) => {
       ElMessage.info('个人中心功能开发中...')
       break
     case 'settings':
-      ElMessage.info('系统设置功能开发中...')
+      // 跳转到首页
+      router.push('/')
       break
     case 'logout':
       try {

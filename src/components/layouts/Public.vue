@@ -137,7 +137,8 @@ const handleUserCommand = async (command) => {
       ElMessage.info('个人中心功能开发中...')
       break
     case 'settings':
-      ElMessage.info('系统设置功能开发中...')
+      // 跳转到管理后台
+      router.push('/admin/dashboard')
       break
     case 'logout':
       try {
