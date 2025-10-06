@@ -136,7 +136,7 @@ import {
   Management, Fold, Expand, User, ArrowDown, Setting, 
   SwitchButton, Monitor, UserFilled, Lock, Sunny, Moon,
   ShoppingCartFull, Avatar, Tickets, Coin, Files, Folder, Promotion,
-  ChatLineRound, House
+  ChatLineRound, House, Shop
 } from '@element-plus/icons-vue'
 import '@/assets/admin.css'
 
@@ -274,7 +274,7 @@ const userMenus = computed(() => {
     menus.push({
       path: '/admin/merchant',
       title: '商户管理',
-      icon: 'User',
+      icon: 'Shop', // Changed from 'User' to 'Shop' for better representation of merchant management
       children: merchantMenus
     })
   }
@@ -283,12 +283,12 @@ const userMenus = computed(() => {
   menus.push({
     path: '/admin/personal',
     title: '个人中心',
-    icon: 'User',
+    icon: 'User', // Keeping the 'User' icon as it's appropriate for personal center
     children: [
       {
         path: '/admin/personal/profile',
         title: '个人信息',
-        icon: 'User'
+        icon: 'Avatar' // Changed from 'User' to 'Avatar' for better distinction and consistency
       }
     ]
   })
