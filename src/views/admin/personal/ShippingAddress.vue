@@ -390,39 +390,6 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-.set-default {
-  color: var(--el-color-primary);
-  cursor: pointer;
-  font-size: 14px;
-}
+<style src="@/assets/css/shipping-address.css" scoped>
 
-.set-default:hover {
-  color: var(--el-color-primary-light-3);
-}
-
-.add-address-card {
-  border: 2px dashed var(--el-border-color-light);
-  border-radius: 8px;
-  padding: 15px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.add-address-card:hover {
-  border-color: var(--el-color-primary);
-  background-color: var(--el-color-primary-light-9);
-}
-
-.add-address-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: var(--el-color-primary);
-}
 </style>
