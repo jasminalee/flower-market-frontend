@@ -1,7 +1,7 @@
 <template>
   <div class="product-detail-page">
     <!-- 面包屑导航 -->
-    <div class="breadcrumb-banner">
+    <div class="public-breadcrumb-banner">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">
           <el-icon><HomeFilled /></el-icon>

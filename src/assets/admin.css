@@ -82,42 +82,44 @@
     color: #409eff;
 }
 
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.theme-switch {
-    --el-switch-on-color: #409eff;
-    --el-switch-off-color: #dcdfe6;
-}
-
-.user-dropdown {
-    cursor: pointer;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px;
-    border-radius: 6px;
-    transition: background-color 0.3s;
-}
-
-.user-info:hover {
-    background-color: #f5f5f5;
-}
-
-.username {
+/* 面包屑导航样式 */
+.admin-header .el-breadcrumb {
+    margin-left: 20px;
     font-size: 14px;
-    color: #333;
 }
 
-.dropdown-arrow {
-    font-size: 12px;
+.admin-header .el-breadcrumb__item {
+    color: #666;
+}
+
+.admin-header .el-breadcrumb__inner {
+    color: #333;
+    font-weight: 500;
+}
+
+.admin-header .el-breadcrumb__inner:hover {
+    color: #409eff;
+}
+
+.admin-header .el-breadcrumb__separator {
     color: #999;
+}
+
+/* 暗色主题下的面包屑样式 */
+:global(.dark) .admin-header .el-breadcrumb__item {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+:global(.dark) .admin-header .el-breadcrumb__inner {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+:global(.dark) .admin-header .el-breadcrumb__inner:hover {
+    color: #409eff;
+}
+
+:global(.dark) .admin-header .el-breadcrumb__separator {
+    color: rgba(255, 255, 255, 0.5);
 }
 
 /* 主内容样式 */

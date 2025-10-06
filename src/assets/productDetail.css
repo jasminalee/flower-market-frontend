@@ -3,57 +3,52 @@
 .product-detail-page {
   min-height: calc(100vh - var(--header-height) - var(--footer-height));
   background-color: var(--bg-color-page);
+  padding: var(--spacing-large) 0;
 }
 
-/* 面包屑导航 */
-.breadcrumb-container {
+/* 面包屑导航 - 简化版横幅样式 */
+.public-breadcrumb-banner {
   background: linear-gradient(135deg, var(--primary-color-light), var(--primary-color));
   padding: var(--spacing-medium) var(--spacing-large);
   border-radius: var(--border-radius-base);
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   margin-bottom: var(--spacing-large);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.breadcrumb-container .el-page-header__content {
-  font-size: var(--font-size-large);
-  font-weight: 600;
-  color: white;
-}
-
-.el-page-header {
-  padding: 0;
-  background: transparent;
-}
-
-.el-breadcrumb {
+.public-breadcrumb-banner .el-breadcrumb {
   background: rgba(255, 255, 255, 0.2);
   padding: var(--spacing-small) var(--spacing-base);
   border-radius: var(--border-radius-small);
+  width: 100%;
+  max-width: 1200px;
 }
 
-.el-breadcrumb__item,
-.el-breadcrumb__inner,
-.el-breadcrumb__separator {
+.public-breadcrumb-banner .el-breadcrumb__item,
+.public-breadcrumb-banner .el-breadcrumb__inner,
+.public-breadcrumb-banner .el-breadcrumb__separator {
   color: white;
 }
 
-.el-breadcrumb__inner:hover {
+.public-breadcrumb-banner .el-breadcrumb__inner:hover {
   color: rgba(255, 255, 255, 0.8);
   text-decoration: underline;
 }
 
 /* Dark theme adjustments */
-[data-theme="dark"] .breadcrumb-container {
+[data-theme="dark"] .public-breadcrumb-banner {
   background: linear-gradient(135deg, var(--primary-color-dark), var(--primary-color));
 }
 
-[data-theme="dark"] .el-breadcrumb {
+[data-theme="dark"] .public-breadcrumb-banner .el-breadcrumb {
   background: rgba(0, 0, 0, 0.2);
 }
 
-[data-theme="dark"] .el-breadcrumb__item,
-[data-theme="dark"] .el-breadcrumb__inner,
-[data-theme="dark"] .el-breadcrumb__separator {
+[data-theme="dark"] .public-breadcrumb-banner .el-breadcrumb__item,
+[data-theme="dark"] .public-breadcrumb-banner .el-breadcrumb__inner,
+[data-theme="dark"] .public-breadcrumb-banner .el-breadcrumb__separator {
   color: rgba(255, 255, 255, 0.9);
 }
 
