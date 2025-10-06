@@ -5,7 +5,6 @@
       <template #header>
         <div class="card-header">
           <span>收货地址管理</span>
-          <el-button type="primary" @click="showAddForm">新增地址</el-button>
         </div>
       </template>
       
@@ -32,10 +31,20 @@
             <el-button size="small" type="danger" @click="deleteAddress(address)">删除</el-button>
           </div>
         </div>
+        
+        <!-- 新增地址按钮放在列表末尾 -->
+        <div class="address-card add-address-card" @click="showAddForm">
+          <div class="add-address-content">
+            <el-icon size="24"><Plus /></el-icon>
+            <span>新增收货地址</span>
+          </div>
+        </div>
       </div>
       
       <!-- 空状态 -->
-      <el-empty v-if="addressList.length === 0" description="暂无收货地址" />
+      <el-empty v-if="addressList.length === 0 && !showAddCardOnly" description="暂无收货地址">
+        <el-button type="primary" @click="showAddForm">新增地址</el-button>
+      </el-empty>
     </el-card>
     
     <!-- 地址表单对话框 -->
@@ -100,9 +109,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/config/store.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 import receiverAddressApi from '@/api/receiverAddress.js'
 import '@/assets/shippingAddress.css'
 
@@ -135,6 +145,9 @@ const isDefaultAddress = ref(false)
 
 // 级联选择器选中的地区
 const selectedRegion = ref([])
+
+// 控制是否只显示新增卡片
+const showAddCardOnly = computed(() => addressList.value.length === 0)
 
 // 地区选项（示例数据）
 const regionOptions = [
@@ -386,5 +399,30 @@ onMounted(() => {
 
 .set-default:hover {
   color: var(--el-color-primary-light-3);
+}
+
+.add-address-card {
+  border: 2px dashed var(--el-border-color-light);
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-address-card:hover {
+  border-color: var(--el-color-primary);
+  background-color: var(--el-color-primary-light-9);
+}
+
+.add-address-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--el-color-primary);
 }
 </style>
