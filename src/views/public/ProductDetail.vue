@@ -13,7 +13,7 @@
         </el-breadcrumb-item>
         <el-breadcrumb-item>
           <el-icon><Document /></el-icon>
-          {{ product.productName || '产品详情' }}
+          {{ product.merchantName || '产品详情' }}
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
@@ -39,7 +39,7 @@
               <div class="main-image-container">
                 <el-image 
                   :src="currentImage" 
-                  :alt="product.productName"
+                  :alt="product.merchantName"
                   fit="cover"
                   class="main-image"
                 >
@@ -87,7 +87,7 @@
                 </div>
               </template>
               
-              <h1 class="product-title">{{ product.productName }}</h1>
+              <h1 class="product-title">{{ product.merchantName }}</h1>
               
               <div class="product-meta">
                 <div class="product-rating">
@@ -185,7 +185,7 @@
             <el-tab-pane label="规格参数" name="specs">
               <div class="specs-content">
                 <el-descriptions :column="1" border>
-                  <el-descriptions-item label="产品名称">{{ product.productName }}</el-descriptions-item>
+                  <el-descriptions-item label="产品名称">{{ product.merchantName }}</el-descriptions-item>
                   <el-descriptions-item label="产品编码">{{ product.productCode }}</el-descriptions-item>
                   <el-descriptions-item label="品牌">{{ product.brand }}</el-descriptions-item>
                   <el-descriptions-item label="分类">{{ getCategoryName(product.categoryId) }}</el-descriptions-item>
@@ -322,11 +322,12 @@ const addToCart = async () => {
   try {
     // 获取当前登录用户ID
     const userId = authStore.user?.id || authStore.user?.userId || 2; // 如果没有获取到用户ID，使用默认值2
-    
+    console.log('product:', product)
     // 构造购物车对象
     const shoppingCart = {
       productId: product.value.id,
-      productName: product.value.productName,
+      skuId: product.value.skuId,
+      merchantName: product.value.merchantName,
       price: product.value.minPrice,
       quantity: quantity.value,
       merchantId: product.value.merchantId || 1, // 默认商户ID，实际应从产品信息中获取
@@ -338,7 +339,7 @@ const addToCart = async () => {
     const response = await shoppingCartApi.add(shoppingCart)
     
     if (response.code === 200) {
-      ElMessage.success(`已将 ${product.value.productName} 加入购物车`)
+      ElMessage.success(`已将 ${product.value.merchantName} 加入购物车`)
     } else {
       ElMessage.error(response.message || '添加到购物车失败')
     }
@@ -360,7 +361,7 @@ const buyNow = () => {
  * 收藏商品
  */
 const addToFavorites = () => {
-  ElMessage.success(`已收藏 ${product.value.productName}`)
+  ElMessage.success(`已收藏 ${product.value.merchantName}`)
 }
 
 /**

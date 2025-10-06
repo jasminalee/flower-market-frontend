@@ -98,7 +98,7 @@
               <div class="product-image-container">
                 <el-image 
                   :src="product.mainImage" 
-                  :alt="product.productName"
+                  :alt="product.merchantName"
                   fit="cover"
                   class="product-image"
                   lazy
@@ -131,7 +131,7 @@
               </div>
               <div class="product-info">
                 <div class="product-header">
-                  <h3 class="product-title">{{ product.productName }}</h3>
+                  <h3 class="product-title">{{ product.merchantName }}</h3>
                   <div class="product-category">
                     <el-tag size="small">{{ getCategoryName(getCategoryKey(product.categoryId)) }}</el-tag>
                   </div>
@@ -304,7 +304,8 @@ const addToCart = async (product) => {
     // 构造购物车对象
     const shoppingCart = {
       productId: product.id,
-      productName: product.productName,
+      merchantName: product.merchantName,
+      skuId: product.skuId,
       price: product.price || product.minPrice || 0,
       quantity: 1, // 默认数量为1
       merchantId: product.merchantId || 1, // 默认商户ID
@@ -316,7 +317,7 @@ const addToCart = async (product) => {
     const response = await shoppingCartApi.add(shoppingCart)
     
     if (response.code === 200) {
-      ElMessage.success(`已将 ${product.productName} 加入购物车`)
+      ElMessage.success(`已将 ${product.merchantName} 加入购物车`)
     } else {
       ElMessage.error(response.message || '添加到购物车失败')
     }
@@ -327,7 +328,7 @@ const addToCart = async (product) => {
 }
 
 const addToFavorites = (product) => {
-  ElMessage.success(`已收藏 ${product.productName}`)
+  ElMessage.success(`已收藏 ${product.merchantName}`)
 }
 
 const goToCart = () => {
