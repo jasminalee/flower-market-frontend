@@ -126,7 +126,7 @@
                 <div class="product-tags">
                   <el-tag v-if="product.isNew" type="success" size="small">新品</el-tag>
                   <el-tag v-if="product.isHot" type="danger" size="small">热销</el-tag>
-                  <el-tag v-if="product.discount" type="warning" size="small">{{ product.discount }}折</el-tag>
+                  <el-tag v-if="product.isDiscounted" type="warning" size="small">特价</el-tag>
                 </div>
               </div>
               <div class="product-info">
@@ -306,7 +306,7 @@ const addToCart = async (product) => {
       merchantProductId: product.id,
       merchantName: product.merchantName,
       skuId: product.skuId,
-      price: product.price || product.minPrice || 0,
+      price: product.price,
       quantity: 1, // 默认数量为1
       merchantId: product.merchantId || 1, // 默认商户ID
       userId: userId,
@@ -368,17 +368,33 @@ const fetchProducts = async () => {
       products.value = response.data.records
       total.value = response.data.total
       
-      // 为每个产品添加模拟的销售数量和评分（实际应用中应从API获取）
+      // 使用实际的API数据而不是生成随机值
       products.value.forEach(product => {
-        product.salesCount = Math.floor(Math.random() * 2000) + 500
-        product.rating = (Math.random() * 4 + 1).toFixed(1) // 1-5之间的评分
-        product.isNew = Math.random() > 0.7
-        product.isHot = Math.random() > 0.5
-        if (Math.random() > 0.8) {
-          product.discount = Math.floor(Math.random() * 5) + 5 // 5-9折
+        // 使用API返回的实际销售数量或总销量
+        product.salesCount = product.totalSales || 0
+        
+        // 使用API返回的实际评分
+        product.rating = product.avgRating || 0
+        
+        // 使用API返回的热销标识
+        product.isHot = product.isHot === 1
+        
+        // 使用API返回的折扣标识
+        product.isDiscounted = product.isDiscounted === 1
+        
+        // 使用API返回的实际价格
+        product.price = product.minPrice || product.price || 0
+        
+        // 设置新品标识（可以根据创建时间判断，例如7天内为新品）
+        if (product.createTime) {
+          const createTime = new Date(product.createTime)
+          const now = new Date()
+          const diffTime = Math.abs(now - createTime)
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+          product.isNew = diffDays <= 7
+        } else {
+          product.isNew = false
         }
-        // 添加价格字段（实际应从SKU中获取最低价格）
-        product.price = Math.floor(Math.random() * 300) + 100
       })
     } else {
       ElMessage.error(response.message || '获取产品数据失败')
