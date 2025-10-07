@@ -31,11 +31,11 @@
           <el-skeleton :rows="8" animated />
         </div>
 
-        <div v-else-if="order.id" class="order-details">
+        <div v-else-if="orderDetail.order && orderDetail.order.id" class="order-details">
           <div class="success-message">
             <el-icon size="60" color="#67C23A"><SuccessFilled /></el-icon>
             <h2>订单创建成功！</h2>
-            <p>您的订单编号是：{{ order.orderNo }}</p>
+            <p>您的订单编号是：{{ orderDetail.order.orderNo }}</p>
           </div>
 
           <el-row :gutter="20" class="mt-30">
@@ -43,16 +43,71 @@
               <div class="order-summary">
                 <h3>订单信息</h3>
                 <el-descriptions :column="1" border>
-                  <el-descriptions-item label="订单编号">{{ order.orderNo }}</el-descriptions-item>
+                  <el-descriptions-item label="订单编号">{{ orderDetail.order.orderNo }}</el-descriptions-item>
                   <el-descriptions-item label="订单状态">
-                    <el-tag :type="getOrderStatusType(order.status)">
-                      {{ getOrderStatusText(order.status) }}
+                    <el-tag :type="getOrderStatusType(orderDetail.order.status)">
+                      {{ getOrderStatusText(orderDetail.order.status) }}
                     </el-tag>
                   </el-descriptions-item>
-                  <el-descriptions-item label="创建时间">{{ formatDate(order.createTime) }}</el-descriptions-item>
-                  <el-descriptions-item label="订单总额">¥{{ order.totalAmount }}</el-descriptions-item>
-                  <el-descriptions-item label="实际支付">¥{{ order.payAmount }}</el-descriptions-item>
+                  <el-descriptions-item label="创建时间">{{ formatDate(orderDetail.order.createTime) }}</el-descriptions-item>
+                  <el-descriptions-item label="订单总额">¥{{ orderDetail.order.totalAmount }}</el-descriptions-item>
+                  <el-descriptions-item label="实际支付">¥{{ orderDetail.order.payAmount }}</el-descriptions-item>
                 </el-descriptions>
+              </div>
+            </el-col>
+          </el-row>
+
+          <!-- Shipping Information -->
+          <el-row :gutter="20" class="mt-30">
+            <el-col :span="24">
+              <div class="shipping-information">
+                <h3>收货信息</h3>
+                <el-card>
+                  <el-row :gutter="20">
+                    <el-col :span="12">
+                      <div class="info-item">
+                        <span class="label">收货人：</span>
+                        <span>{{ orderDetail.order.receiverName }}</span>
+                      </div>
+                    </el-col>
+                    <el-col :span="12">
+                      <div class="info-item">
+                        <span class="label">联系电话：</span>
+                        <span>{{ orderDetail.order.receiverPhone }}</span>
+                      </div>
+                    </el-col>
+                    <el-col :span="24">
+                      <div class="info-item">
+                        <span class="label">收货地址：</span>
+                        <span>{{ orderDetail.order.receiverAddress }}</span>
+                      </div>
+                    </el-col>
+                  </el-row>
+                </el-card>
+              </div>
+            </el-col>
+          </el-row>
+
+          <!-- Order Items -->
+          <el-row :gutter="20" class="mt-30">
+            <el-col :span="24">
+              <div class="order-items">
+                <h3>商品明细</h3>
+                <el-table :data="orderDetail.orderItems" stripe style="width: 100%">
+                  <el-table-column prop="productName" label="商品名称" min-width="150" />
+                  <el-table-column prop="skuName" label="规格" min-width="120" />
+                  <el-table-column prop="price" label="单价" min-width="100">
+                    <template #default="scope">
+                      ¥{{ scope.row.price }}
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="quantity" label="数量" min-width="80" />
+                  <el-table-column prop="totalPrice" label="小计" min-width="100">
+                    <template #default="scope">
+                      ¥{{ scope.row.totalPrice }}
+                    </template>
+                  </el-table-column>
+                </el-table>
               </div>
             </el-col>
           </el-row>
@@ -60,7 +115,14 @@
           <el-row :gutter="20" class="mt-30">
             <el-col :span="24">
               <div class="action-buttons">
-                <el-button type="primary" @click="goToPayment">去支付</el-button>
+                <!-- 只有在订单状态为待付款时才显示去支付按钮 -->
+                <el-button 
+                  type="primary" 
+                  @click="goToPayment" 
+                  v-if="orderDetail.order.status === 1"
+                >
+                  去支付
+                </el-button>
                 <el-button @click="viewOrderList">查看订单列表</el-button>
                 <el-button @click="continueShopping">继续购物</el-button>
               </div>
@@ -75,25 +137,189 @@
         </div>
       </el-card>
     </div>
+
+    <!-- Payment Method Dialog -->
+    <el-dialog
+      title="选择支付方式"
+      v-model="paymentDialogVisible"
+      width="800px"
+      :close-on-click-modal="false"
+    >
+      <div v-if="paymentMethodsLoading" class="loading-container">
+        <el-skeleton :rows="5" animated />
+      </div>
+      
+      <div v-else>
+        <!-- Order Info -->
+        <el-card class="mb-20" v-if="orderDetail.order">
+          <template #header>
+            <div class="card-header">
+              <span>订单信息</span>
+            </div>
+          </template>
+          
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <div class="info-item">
+                <span class="label">订单编号：</span>
+                <span>{{ orderDetail.order.orderNo }}</span>
+              </div>
+            </el-col>
+            <el-col :span="12">
+              <div class="info-item">
+                <span class="label">下单时间：</span>
+                <span>{{ formatDate(orderDetail.order.createTime) }}</span>
+              </div>
+            </el-col>
+            <el-col :span="12">
+              <div class="info-item">
+                <span class="label">订单总额：</span>
+                <span>¥{{ orderDetail.order.totalAmount }}</span>
+              </div>
+            </el-col>
+            <el-col :span="12">
+              <div class="info-item">
+                <span class="label">实际支付：</span>
+                <span>¥{{ orderDetail.order.payAmount }}</span>
+              </div>
+            </el-col>
+          </el-row>
+        </el-card>
+        
+        <!-- Shipping Information -->
+        <el-card class="mb-20" v-if="orderDetail.order">
+          <template #header>
+            <div class="card-header">
+              <span>收货信息</span>
+            </div>
+          </template>
+          
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <div class="info-item">
+                <span class="label">收货人：</span>
+                <span>{{ orderDetail.order.receiverName }}</span>
+              </div>
+            </el-col>
+            <el-col :span="12">
+              <div class="info-item">
+                <span class="label">联系电话：</span>
+                <span>{{ orderDetail.order.receiverPhone }}</span>
+              </div>
+            </el-col>
+            <el-col :span="24">
+              <div class="info-item">
+                <span class="label">收货地址：</span>
+                <span>{{ orderDetail.order.receiverAddress }}</span>
+              </div>
+            </el-col>
+          </el-row>
+        </el-card>
+        
+        <!-- Order Items -->
+        <el-card class="mb-20" v-if="orderDetail.orderItems && orderDetail.orderItems.length > 0">
+          <template #header>
+            <div class="card-header">
+              <span>商品明细</span>
+            </div>
+          </template>
+          
+          <el-table :data="orderDetail.orderItems" stripe style="width: 100%">
+            <el-table-column prop="productName" label="商品名称" min-width="150" />
+            <el-table-column prop="skuName" label="规格" min-width="120" />
+            <el-table-column prop="price" label="单价" min-width="100">
+              <template #default="scope">
+                ¥{{ scope.row.price }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="quantity" label="数量" min-width="80" />
+            <el-table-column prop="totalPrice" label="小计" min-width="100">
+              <template #default="scope">
+                ¥{{ scope.row.totalPrice }}
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+        
+        <el-alert
+          :title="`支付金额: ¥${orderDetail.order ? orderDetail.order.payAmount : 0}`"
+          type="success"
+          show-icon
+          :closable="false"
+          class="mb-20"
+        />
+        
+        <el-table 
+          :data="availablePaymentMethods" 
+          stripe
+          style="width: 100%"
+          @row-click="selectPaymentMethod"
+          :row-class-name="rowClassName"
+        >
+          <el-table-column prop="methodName" label="支付方式" min-width="150" />
+          <el-table-column prop="accountName" label="账户名称" min-width="150" />
+          <el-table-column prop="accountNumber" label="账户号码/卡号" min-width="200" />
+          <el-table-column label="操作" width="80">
+            <template #default="scope">
+              <el-button 
+                type="primary" 
+                size="small" 
+                text
+                v-if="selectedPaymentMethod && selectedPaymentMethod.id === scope.row.id"
+              >
+                已选择
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="paymentDialogVisible = false">取消</el-button>
+          <el-button 
+            type="primary" 
+            @click="confirmPayment"
+            :loading="paymentLoading"
+            :disabled="!selectedPaymentMethod"
+          >
+            确认支付
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
   HomeFilled, Goods, Document, SuccessFilled
 } from '@element-plus/icons-vue'
 import orderApi from '@/api/order'
+import paymentMethodApi from '@/api/paymentMethod'
+import { useAuthStore } from '@/config/store.js'
 
 // 路由相关
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 // 响应式数据
-const order = ref({})
+const orderDetail = ref({
+  order: {},
+  orderItems: []
+})
 const loading = ref(true)
+
+// Payment related data
+const paymentDialogVisible = ref(false)
+const paymentMethodsLoading = ref(false)
+const paymentLoading = ref(false)
+const selectedPaymentMethod = ref(null)
+const availablePaymentMethods = ref([])
 
 // 方法
 const getOrderStatusType = (status) => {
@@ -142,11 +368,11 @@ const fetchOrderDetail = async () => {
       return
     }
     
-    // 调用API获取订单详情
-    const response = await orderApi.getById(orderId)
+    // 调用API获取订单详情（包含订单项）
+    const response = await orderApi.getDetailById(orderId)
     
     if (response.code === 200 && response.data) {
-      order.value = response.data
+      orderDetail.value = response.data
     } else {
       ElMessage.error(response.message || '获取订单详情失败')
     }
@@ -158,10 +384,120 @@ const fetchOrderDetail = async () => {
   }
 }
 
+/**
+ * 获取支付方式列表
+ */
+const fetchPaymentMethods = async () => {
+  try {
+    paymentMethodsLoading.value = true
+    
+    // 获取当前用户ID
+    const userId = authStore.user?.id || authStore.user?.userId
+    
+    // 调用API获取用户的支付方式列表
+    const response = await paymentMethodApi.listByUserId(userId)
+    
+    if (response.code === 200 && response.data) {
+      availablePaymentMethods.value = response.data.filter(method => method.status === 1) || []
+      if (availablePaymentMethods.value.length === 0) {
+        ElMessage.warning('您还没有可用的支付方式，请先添加支付方式')
+      }
+    } else {
+      ElMessage.error(response.message || '获取支付方式列表失败')
+    }
+  } catch (error) {
+    console.error('获取支付方式列表失败:', error)
+    ElMessage.error('获取支付方式列表失败')
+  } finally {
+    paymentMethodsLoading.value = false
+  }
+}
+
+/**
+ * 选择支付方式
+ */
+const selectPaymentMethod = (row) => {
+  selectedPaymentMethod.value = row
+}
+
+/**
+ * 表格行样式
+ */
+const rowClassName = ({ row }) => {
+  if (selectedPaymentMethod.value && selectedPaymentMethod.value.id === row.id) {
+    return 'selected-row'
+  }
+  return ''
+}
+
+/**
+ * 确认支付
+ */
+const confirmPayment = async () => {
+  if (!selectedPaymentMethod.value) {
+    ElMessage.warning('请选择支付方式')
+    return
+  }
+  
+  ElMessageBox.confirm(
+    `确定要使用 ${selectedPaymentMethod.value.methodName} 支付订单 ${orderDetail.value.order.orderNo} 吗？`,
+    '确认支付',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(async () => {
+    try {
+      paymentLoading.value = true
+      
+      // 更新订单状态为已付款 (状态码2)
+      // 只发送必要的字段，不包含时间相关的字段
+      const orderData = {
+        id: orderDetail.value.order.id,
+        orderNo: orderDetail.value.order.orderNo,
+        totalAmount: orderDetail.value.order.totalAmount,
+        payAmount: orderDetail.value.order.payAmount,
+        status: 2, // 已付款
+        paymentMethod: selectedPaymentMethod.value.id, // 设置支付方式
+        // paymentTime: new Date().toISOString(), // 设置支付时间
+        receiverName: orderDetail.value.order.receiverName,
+        receiverPhone: orderDetail.value.order.receiverPhone,
+        receiverAddress: orderDetail.value.order.receiverAddress,
+        userId: orderDetail.value.order.userId,
+        merchantId: orderDetail.value.order.merchantId
+        // 不包含 createTime, updateTime 等只读字段
+      }
+      
+      const response = await orderApi.save(orderData)
+      
+      if (response.code === 200) {
+        ElMessage.success('支付成功')
+        paymentDialogVisible.value = false
+        // 重新加载订单详情以显示更新后的状态
+        await fetchOrderDetail()
+        // 不再跳转到订单列表页面，保持在当前页面
+        // router.push('/admin/personal/orders')
+      } else {
+        ElMessage.error(response.message || '支付失败')
+      }
+    } catch (error) {
+      console.error('支付失败:', error)
+      ElMessage.error('支付失败: ' + (error.message || '未知错误'))
+    } finally {
+      paymentLoading.value = false
+    }
+  }).catch(() => {
+    // 用户取消操作
+  })
+}
+
 // 按钮操作
-const goToPayment = () => {
-  // 跳转到个人中心的订单页面进行支付
-  router.push('/admin/personal/orders')
+const goToPayment = async () => {
+  // 显示支付对话框
+  paymentDialogVisible.value = true
+  selectedPaymentMethod.value = null
+  await fetchPaymentMethods()
 }
 
 const viewOrderList = () => {
@@ -178,57 +514,5 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-.order-confirmation-page {
-  padding: 20px 0;
-}
-
-.confirmation-card {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.success-message {
-  text-align: center;
-  padding: 30px 0;
-}
-
-.success-message h2 {
-  margin: 20px 0 10px 0;
-  color: #67C23A;
-}
-
-.success-message p {
-  font-size: 16px;
-  color: #606266;
-}
-
-.order-details {
-  padding: 20px 0;
-}
-
-.order-summary h3 {
-  margin-bottom: 15px;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 30px;
-}
-
-.mt-30 {
-  margin-top: 30px;
-}
+<style src="@/assets/order-confirmation.css" scoped>
 </style>

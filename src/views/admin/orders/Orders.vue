@@ -65,11 +65,9 @@
       >
         <el-table-column prop="id" label="订单ID" min-width="50" />
         <el-table-column prop="orderNo" label="订单编号" min-width="200" />
-        <el-table-column prop="createTime" label="下单时间" min-width="180">
-          <template #default="scope">
-            {{ formatDate(scope.row.createTime) }}
-          </template>
-        </el-table-column>
+        <el-table-column prop="createTime" label="下单时间" min-width="180" />
+        <el-table-column prop="updateTime" label="更新时间" min-width="180" />
+        <el-table-column prop="payTime" label="支付时间" min-width="180" />
         <el-table-column prop="totalAmount" label="订单总额" min-width="120">
           <template #default="scope">
             ¥{{ scope.row.totalAmount }}
