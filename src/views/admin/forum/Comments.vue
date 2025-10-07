@@ -399,38 +399,6 @@ onMounted(() => {
   flex-direction: column;
   gap: 8px;
 }
-
-.comment-user {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.user-name {
-  font-weight: 500;
-}
-
-.comment-text {
-  padding: 8px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  line-height: 1.5;
-}
-
-.comment-source {
-  font-size: 12px;
-  color: #909399;
-}
-
-.pagination-container {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.comment-content {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 </style>
+
+<style src="@/assets/admin-forum-comments.css"></style>

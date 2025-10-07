@@ -847,19 +847,6 @@ onMounted(() => {
   flex: 1;
 }
 
-/* 富文本编辑器容器 */
-.editor-container {
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-}
-
-.editor-toolbar {
-  border-bottom: 1px solid #dcdfe6;
-  background-color: #f5f7fa;
-}
-
-.editor-content {
-  min-height: 300px;
-  background-color: #fff;
-}
 </style>
+
+<style src="@/assets/admin-forum-posts.css"></style>

@@ -1,6 +1,6 @@
-/* Forum Styles */
+/* Forum Styles - General Components */
 
-/* Forum Home/Category List */
+/* Forum Header (for category list page) */
 .forum-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -24,7 +24,7 @@
   opacity: 0.9;
 }
 
-/* Category Cards */
+/* Category Cards (for category list page) */
 .categories-section {
   padding: 2rem 0;
 }
@@ -85,7 +85,7 @@
   color: #666;
 }
 
-/* Posts List */
+/* Posts List (general styles) */
 .posts-section {
   padding: 2rem 0;
 }

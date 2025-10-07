@@ -1,0 +1,72 @@
+/* Admin Forum Categories Styles */
+
+/* Page Header */
+.page-header {
+  margin-bottom: 20px;
+}
+
+/* Filter Card */
+.filter-card {
+  margin-bottom: 20px;
+}
+
+.filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Table */
+.table-card {
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-section {
+  margin-bottom: 20px;
+}
+
+.category-info {
+  display: flex;
+  align-items: center;
+}
+
+/* Pagination */
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Tree Table Styles */
+:deep(.el-table__body) .el-table__row {
+  transition: background-color 0.2s;
+}
+
+:deep(.el-table__body) .el-table__row .cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dialog */
+.el-dialog {
+  border-radius: 8px;
+}
+
+/* Form Items */
+.el-form-item {
+  margin-bottom: 20px;
+}
+
+/* Dialog Footer */
+.dialog-footer {
+  text-align: right;
+  padding: 15px 20px 0;
+  border-top: 1px solid #ebeef5;
+  margin-top: 10px;
+}

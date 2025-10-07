@@ -1,0 +1,104 @@
+/* Admin Forum Posts Styles */
+
+/* Page Header */
+.page-header {
+  margin-bottom: 20px;
+}
+
+/* Filter Card */
+.filter-card {
+  margin-bottom: 20px;
+}
+
+.filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Table */
+.table-card {
+  margin-bottom: 20px;
+}
+
+.post-title-cell {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.post-title {
+  flex: 1;
+}
+
+/* Pagination */
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Dialog */
+.post-dialog {
+  border-radius: 8px;
+}
+
+/* Form Items */
+.el-form-item {
+  margin-bottom: 20px;
+}
+
+/* Cover Uploader */
+.cover-uploader {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+  margin-top: 10px;
+}
+
+.cover-uploader:hover {
+  border-color: #409eff;
+}
+
+.cover-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 120px;
+  height: 120px;
+  text-align: center;
+  line-height: 120px;
+}
+
+.cover {
+  width: 120px;
+  height: 120px;
+  display: block;
+  object-fit: cover;
+}
+
+/* Dialog Footer */
+.dialog-footer {
+  text-align: right;
+  padding: 15px 20px 0;
+  border-top: 1px solid #ebeef5;
+  margin-top: 10px;
+}
+
+/* Editor Container */
+.editor-container {
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+}
+
+.editor-toolbar {
+  border-bottom: 1px solid #dcdfe6;
+  background-color: #f5f7fa;
+}
+
+.editor-content {
+  min-height: 300px;
+  background-color: #fff;
+}

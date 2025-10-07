@@ -489,14 +489,6 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
 }
-
-/* 确保树形表格的缩进样式 */
-:deep(.el-table__body) .el-table__row {
-  transition: background-color 0.2s;
-}
-
-:deep(.el-table__body) .el-table__row .cell {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 </style>
+
+<style src="@/assets/admin-forum-categories.css"></style>
