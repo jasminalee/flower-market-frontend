@@ -457,12 +457,30 @@ const showPostForm = () => {
 /**
  * 编辑帖子
  */
-const editPost = (row) => {
-  isEdit.value = true
-  dialogTitle.value = '编辑帖子'
-  dialogVisible.value = true
-  // 填充表单数据
-  Object.assign(postForm, row)
+const editPost = async (row) => {
+  try {
+    // 显示加载状态
+    loading.value = true
+    
+    // 调用API获取帖子详情
+    const response = await forumPostApi.getById(row.id)
+    
+    if (response.code === 200) {
+      isEdit.value = true
+      dialogTitle.value = '编辑帖子'
+      dialogVisible.value = true
+      
+      // 填充表单数据
+      Object.assign(postForm, response.data)
+    } else {
+      ElMessage.error(response.message || '获取帖子详情失败')
+    }
+  } catch (error) {
+    console.error('获取帖子详情失败:', error)
+    ElMessage.error('获取帖子详情失败: ' + (error.message || '网络错误'))
+  } finally {
+    loading.value = false
+  }
 }
 
 /**
