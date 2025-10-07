@@ -269,6 +269,25 @@ const userMenus = computed(() => {
       icon: 'ChatLineRound'
     })
   }
+  
+  const orderMenus = []
+  
+  if (isAdmin || authStore.hasPermission('merchant:order:list')) {
+    orderMenus.push({
+      path: '/admin/merchant/orders',
+      title: '卖出订单',
+      icon: 'Tickets'
+    })
+  }
+  
+  if (orderMenus.length > 0) {
+    merchantMenus.push({
+      path: '/admin/merchant/orders',
+      title: '订单管理',
+      icon: 'Tickets',
+      children: orderMenus
+    })
+  }
 
   if (merchantMenus.length > 0) {
     menus.push({
@@ -359,6 +378,12 @@ const breadcrumbs = computed(() => {
         crumbs.push({ title: '商户产品' })
       } else if (paths.includes('comments')) {
         crumbs.push({ title: '评论管理' })
+      } else if (paths.includes('orders')) {
+        crumbs.push({ title: '订单管理' })
+        
+        if (paths.includes('orders')) {
+          crumbs.push({ title: '卖出订单' })
+        }
       }
     }
     else if (paths.includes('personal')) {

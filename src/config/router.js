@@ -204,6 +204,16 @@ const routes = [
               requiresAuth: true,
               permission: 'merchant:comment:list'
             }
+          },
+          {
+            path: 'orders',
+            name: 'MerchantOrders',
+            component: () => import('@/views/admin/orders/Orders.vue'),
+            meta: { 
+              title: '订单管理',
+              requiresAuth: true,
+              permission: 'merchant:order:list'
+            }
           }
         ]
       },

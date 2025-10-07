@@ -1,0 +1,88 @@
+/* 订单管理页面样式 */
+
+/* 表格操作列样式 */
+.table-card .el-table .el-button--small {
+  padding: 6px 10px;
+  margin: 0 2px;
+}
+
+/* 对话框样式 */
+.order-dialog .el-dialog__body {
+  padding: 20px;
+}
+
+.order-dialog .el-form {
+  margin-top: 10px;
+}
+
+.order-dialog {
+  width: 800px;
+  margin-top: 4vh;
+}
+
+/* 表单行间距 */
+.order-dialog .el-row {
+  margin-bottom: 15px;
+}
+
+/* 表单项标签 */
+.order-dialog .el-form-item__label {
+  font-weight: 500;
+}
+
+/* 订单详情查看模式 */
+.order-detail-view {
+  min-height: 300px;
+  padding: 10px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  background-color: #f5f7fa;
+  overflow-y: auto;
+  /* 移除可能限制内容显示的属性 */
+  max-height: none;
+}
+
+/* 对话框底部按钮 */
+.dialog-footer {
+  text-align: right;
+  padding: 15px 20px 0;
+  border-top: 1px solid #ebeef5;
+  margin-top: 10px;
+}
+
+/* 分页容器 */
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 过滤器栏 */
+.filters-bar {
+  flex-wrap: wrap;
+}
+
+/* 信息项 */
+.info-item {
+  margin-bottom: 10px;
+}
+
+.info-item .label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.card-header {
+  font-weight: bold;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .order-dialog .el-dialog {
+    width: 95% !important;
+  }
+  
+  .order-detail-view {
+    min-height: 200px;
+  }
+}
