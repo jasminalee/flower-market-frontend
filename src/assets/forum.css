@@ -2,26 +2,45 @@
 
 /* Forum Header (for category list page) */
 .forum-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   color: white;
   padding: 2rem 0;
   margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.forum-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="forum-grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23forum-grain)"/></svg>');
+  pointer-events: none;
 }
 
 .forum-header-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
+  position: relative;
+  z-index: 1;
 }
 
 .forum-header h1 {
   font-size: 2.5rem;
+  font-weight: 700;
   margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .forum-header p {
   font-size: 1.2rem;
   opacity: 0.9;
+  margin: 0;
 }
 
 /* Category Cards (for category list page) */
@@ -30,32 +49,41 @@
 }
 
 .categories-grid {
-  margin: 0 -10px;
+  margin: 0 -15px;
 }
 
 .category-card {
-  margin-bottom: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 30px;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  background: var(--bg-color);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
 }
 
 .category-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .category-header {
   display: flex;
   align-items: center;
-  padding: 1rem;
-  background-color: #f8f9fa;
+  padding: var(--spacing-medium);
+  background-color: var(--bg-color-page);
+  border-bottom: 1px solid var(--border-color-lighter);
 }
 
 .category-icon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #409eff;
+  background-color: var(--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,24 +93,27 @@
 }
 
 .category-title {
-  font-size: 1.2rem;
+  font-size: var(--font-size-large);
   font-weight: 600;
   margin: 0;
+  color: var(--text-color-primary);
 }
 
 .category-description {
-  padding: 1rem;
-  color: #666;
-  font-size: 0.9rem;
+  padding: var(--spacing-medium);
+  color: var(--text-color-regular);
+  font-size: var(--font-size-base);
+  flex-grow: 1;
 }
 
 .category-stats {
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background-color: #f1f3f4;
-  font-size: 0.85rem;
-  color: #666;
+  padding: var(--spacing-small) var(--spacing-medium);
+  background-color: var(--bg-color-page);
+  font-size: var(--font-size-small);
+  color: var(--text-color-secondary);
+  border-top: 1px solid var(--border-color-lighter);
 }
 
 /* Posts List (general styles) */
@@ -90,65 +121,91 @@
   padding: 2rem 0;
 }
 
+.posts-grid {
+  margin: 0 -15px;
+}
+
 .post-card {
-  margin-bottom: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 30px;
   cursor: pointer;
-  transition: box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  background: var(--bg-color);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
 }
 
 .post-card:hover {
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .post-header {
   display: flex;
   align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #eee;
+  padding: var(--spacing-medium);
+  border-bottom: 1px solid var(--border-color-lighter);
 }
 
 .post-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #409eff;
+  background-color: var(--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: bold;
   margin-right: 12px;
+  font-size: var(--font-size-small);
 }
 
 .post-info {
   flex: 1;
+  min-width: 0;
 }
 
 .post-title {
-  font-size: 1.1rem;
+  font-size: var(--font-size-large);
   font-weight: 600;
-  margin: 0 0 5px 0;
-  color: #333;
+  margin: 0 0 var(--spacing-mini) 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-color-primary);
 }
 
 .post-meta {
   display: flex;
-  font-size: 0.85rem;
-  color: #888;
+  font-size: var(--font-size-small);
+  color: var(--text-color-secondary);
+  gap: var(--spacing-small);
 }
 
 .post-meta-item {
-  margin-right: 15px;
   display: flex;
   align-items: center;
+  gap: var(--spacing-mini);
 }
 
-.post-meta-item i {
-  margin-right: 4px;
+.post-tags {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-mini);
+  margin-left: var(--spacing-small);
 }
 
 .post-content {
-  padding: 1rem;
+  padding: var(--spacing-medium);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 120px;
 }
 
 .post-preview {
@@ -156,44 +213,57 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: #666;
+  color: var(--text-color-regular);
   line-height: 1.6;
+  flex-grow: 1;
 }
 
 .post-footer {
   display: flex;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
-  background-color: #f8f9fa;
-  border-top: 1px solid #eee;
-  font-size: 0.85rem;
-  color: #888;
+  padding: var(--spacing-small) var(--spacing-medium);
+  background-color: var(--bg-color-page);
+  border-top: 1px solid var(--border-color-lighter);
+  font-size: var(--font-size-small);
+  color: var(--text-color-secondary);
+}
+
+.post-stats {
+  display: flex;
+  gap: var(--spacing-base);
+}
+
+.post-stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-mini);
 }
 
 /* Post Detail */
 .post-detail-header {
   padding: 1.5rem 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color-lighter);
   margin-bottom: 1.5rem;
 }
 
 .post-detail-title {
   font-size: 1.8rem;
   margin: 0 0 1rem 0;
-  color: #333;
+  color: var(--text-color-primary);
 }
 
 .post-detail-meta {
   display: flex;
   align-items: center;
-  color: #888;
-  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-base);
+  gap: var(--spacing-base);
 }
 
 .post-detail-content {
   padding: 1rem 0;
   line-height: 1.8;
-  color: #444;
+  color: var(--text-color-regular);
 }
 
 .post-detail-content img {
@@ -207,14 +277,14 @@
 .comments-section {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-color-lighter);
 }
 
 .comment-form {
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
+  background-color: var(--bg-color-page);
+  border-radius: var(--card-border-radius);
 }
 
 .comment-list {
@@ -223,7 +293,7 @@
 
 .comment-item {
   padding: 1rem 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color-lighter);
 }
 
 .comment-header {
@@ -236,7 +306,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #409eff;
+  background-color: var(--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -249,17 +319,18 @@
 .comment-author {
   font-weight: 600;
   margin-right: 10px;
+  color: var(--text-color-primary);
 }
 
 .comment-time {
-  color: #888;
-  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-small);
 }
 
 .comment-content {
   margin-left: 42px;
   line-height: 1.6;
-  color: #444;
+  color: var(--text-color-regular);
 }
 
 /* Responsive */
@@ -274,10 +345,39 @@
   
   .category-card,
   .post-card {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
   }
   
   .post-detail-title {
     font-size: 1.5rem;
+  }
+  
+  .post-header {
+    padding: var(--spacing-base);
+  }
+  
+  .post-content {
+    padding: var(--spacing-base);
+  }
+  
+  .post-footer {
+    padding: var(--spacing-small) var(--spacing-base);
+  }
+  
+  .category-header {
+    padding: var(--spacing-base);
+  }
+  
+  .category-description {
+    padding: var(--spacing-base);
+  }
+  
+  .category-stats {
+    padding: var(--spacing-small) var(--spacing-base);
+  }
+  
+  .categories-grid,
+  .posts-grid {
+    margin: 0 -10px;
   }
 }

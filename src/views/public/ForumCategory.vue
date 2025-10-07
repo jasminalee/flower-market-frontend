@@ -37,7 +37,9 @@
               >
                 <div class="post-header">
                   <div class="post-avatar">
-                    {{ post.userAvatar || '用' }}
+                    <el-avatar :size="32" :src="post.userAvatar">
+                      <el-icon><User /></el-icon>
+                    </el-avatar>
                   </div>
                   <div class="post-info">
                     <h3 class="post-title">{{ post.title }}</h3>

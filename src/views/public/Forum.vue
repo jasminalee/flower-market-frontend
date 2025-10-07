@@ -110,6 +110,10 @@
                             <span class="post-time">{{ formatDate(post.createTime) }}</span>
                           </div>
                         </div>
+                        <div class="post-tags">
+                          <el-tag v-if="post.isTop" type="danger" size="small">置顶</el-tag>
+                          <el-tag v-if="post.isEssence" type="warning" size="small">精华</el-tag>
+                        </div>
                       </div>
                       <div class="post-content">
                         <div class="post-preview" v-html="getPostPreview(post.content)"></div>
