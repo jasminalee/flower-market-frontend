@@ -123,7 +123,7 @@
   <el-dialog
     title="选择支付方式"
     v-model="paymentDialogVisible"
-    width="600px"
+    width="800px"
     :close-on-click-modal="false"
   >
     <div v-if="paymentMethodsLoading" class="loading-container">
@@ -131,16 +131,87 @@
     </div>
     
     <div v-else>
-      <el-alert
-        :title="`订单编号: ${selectedOrder.orderNo}`"
-        type="info"
-        show-icon
-        :closable="false"
-        class="mb-20"
-      />
+      <!-- Order Info -->
+      <el-card class="mb-20" v-if="selectedOrder.order">
+        <template #header>
+          <div class="card-header">
+            <span>订单信息</span>
+          </div>
+        </template>
+        
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">订单编号：</span>
+              <span>{{ selectedOrder.order.orderNo }}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">下单时间：</span>
+              <span>{{ formatDate(selectedOrder.order.createTime) }}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">订单总额：</span>
+              <span>¥{{ selectedOrder.order.totalAmount }}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">实际支付：</span>
+              <span>¥{{ selectedOrder.order.payAmount }}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">收货人：</span>
+              <span>{{ selectedOrder.order.receiverName }}</span>
+            </div>
+          </el-col>
+          <el-col :span="24">
+            <div class="info-item">
+              <span class="label">收货地址：</span>
+              <span>{{ selectedOrder.order.receiverAddress }}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">联系电话：</span>
+              <span>{{ selectedOrder.order.receiverPhone }}</span>
+            </div>
+          </el-col>
+        </el-row>
+      </el-card>
+      
+      <!-- Order Items -->
+      <el-card class="mb-20" v-if="selectedOrder.orderItems && selectedOrder.orderItems.length > 0">
+        <template #header>
+          <div class="card-header">
+            <span>商品明细</span>
+          </div>
+        </template>
+        
+        <el-table :data="selectedOrder.orderItems" stripe style="width: 100%">
+          <el-table-column prop="productName" label="商品名称" min-width="150" />
+          <el-table-column prop="skuName" label="规格" min-width="120" />
+          <el-table-column prop="price" label="单价" min-width="100">
+            <template #default="scope">
+              ¥{{ scope.row.price }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="quantity" label="数量" min-width="80" />
+          <el-table-column prop="totalPrice" label="小计" min-width="100">
+            <template #default="scope">
+              ¥{{ scope.row.totalPrice }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
       
       <el-alert
-        :title="`支付金额: ¥${selectedOrder.payAmount}`"
+        :title="`支付金额: ¥${selectedOrder.order ? selectedOrder.order.payAmount : selectedOrder.payAmount}`"
         type="success"
         show-icon
         :closable="false"
@@ -453,10 +524,23 @@ const viewOrderDetail = async (order) => {
  * 去支付
  */
 const goToPayment = async (order) => {
-  selectedOrder.value = order
-  selectedPaymentMethod.value = null
-  paymentDialogVisible.value = true
-  await fetchPaymentMethods()
+  try {
+    // 先查询订单详情
+    const response = await orderApi.getDetailById(order.id)
+    
+    if (response.code === 200 && response.data) {
+      // 将订单详情保存到selectedOrder中，以便在支付对话框中显示
+      selectedOrder.value = response.data
+      selectedPaymentMethod.value = null
+      paymentDialogVisible.value = true
+      await fetchPaymentMethods()
+    } else {
+      ElMessage.error(response.message || '获取订单详情失败')
+    }
+  } catch (error) {
+    console.error('获取订单详情失败:', error)
+    ElMessage.error('获取订单详情失败')
+  }
 }
 
 /**
