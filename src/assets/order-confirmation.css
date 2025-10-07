@@ -62,12 +62,20 @@
 }
 
 .info-item {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.info-item:last-child {
+  border-bottom: none;
 }
 
 .info-item .label {
   font-weight: bold;
   margin-right: 10px;
+  display: inline-block;
+  width: 80px;
 }
 
 .selected-row {
@@ -76,4 +84,15 @@
 
 .dialog-footer {
   text-align: right;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-header h3 {
+  margin: 0;
 }

@@ -72,26 +72,19 @@
                     <el-col :span="12">
                       <div class="info-item">
                         <span class="label">收货人：</span>
-                        <span>{{ orderDetail.order.receiverName }}</span>
+                        <span>{{ orderDetail.order.receiverName || '暂无' }}</span>
                       </div>
                     </el-col>
                     <el-col :span="12">
                       <div class="info-item">
                         <span class="label">联系电话：</span>
-                        <span>{{ orderDetail.order.receiverPhone }}</span>
+                        <span>{{ orderDetail.order.receiverPhone || '暂无' }}</span>
                       </div>
                     </el-col>
                     <el-col :span="24">
                       <div class="info-item">
                         <span class="label">收货地址：</span>
-                        <span>{{ orderDetail.order.receiverAddress }}</span>
-                      </div>
-                    </el-col>
-                    <!-- 显示更多收货地址详情 -->
-                    <el-col :span="24" v-if="selectedAddress">
-                      <div class="info-item">
-                        <span class="label">地址详情：</span>
-                        <span>{{ selectedAddress.province }}{{ selectedAddress.city }}{{ selectedAddress.district }}{{ selectedAddress.detailAddress }}</span>
+                        <span>{{ orderDetail.order.receiverAddress || '暂无' }}</span>
                       </div>
                     </el-col>
                   </el-row>
@@ -369,6 +362,12 @@ const fetchReceiverAddresses = async () => {
       } else {
         // 如果订单中没有地址ID，则选择默认地址
         selectedAddress.value = addressResponse.data.find(addr => addr.isDefault === 1) || null
+        // 如果找到了默认地址，更新订单信息
+        if (selectedAddress.value) {
+          orderDetail.value.order.receiverName = selectedAddress.value.receiverName
+          orderDetail.value.order.receiverPhone = selectedAddress.value.receiverPhone
+          orderDetail.value.order.receiverAddress = `${selectedAddress.value.province}${selectedAddress.value.city}${selectedAddress.value.district}${selectedAddress.value.detailAddress}`
+        }
       }
     }
   } catch (error) {
