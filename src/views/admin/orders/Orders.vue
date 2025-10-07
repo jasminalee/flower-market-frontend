@@ -1,7 +1,7 @@
 <template>
-  <el-page-header class="page-header" title="商户管理">
+  <el-page-header class="page-header" title="订单管理">
     <template #content>
-      订单管理
+      商户订单
     </template>
   </el-page-header>
 

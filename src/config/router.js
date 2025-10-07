@@ -204,13 +204,26 @@ const routes = [
               requiresAuth: true,
               permission: 'merchant:comment:list'
             }
-          },
+          }
+        ]
+      },
+      // 订单管理模块
+      {
+        path: 'orders',
+        name: 'Orders',
+        redirect: '/admin/orders/merchant-orders',
+        meta: { 
+          title: '订单管理',
+          requiresAuth: true,
+          icon: 'el-icon-tickets'
+        },
+        children: [
           {
-            path: 'orders',
+            path: 'merchant-orders',
             name: 'MerchantOrders',
             component: () => import('@/views/admin/orders/Orders.vue'),
             meta: { 
-              title: '订单管理',
+              title: '商户订单',
               requiresAuth: true,
               permission: 'merchant:order:list'
             }

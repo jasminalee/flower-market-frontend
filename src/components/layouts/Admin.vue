@@ -269,25 +269,6 @@ const userMenus = computed(() => {
       icon: 'ChatLineRound'
     })
   }
-  
-  const orderMenus = []
-  
-  if (isAdmin || authStore.hasPermission('merchant:order:list')) {
-    orderMenus.push({
-      path: '/admin/merchant/orders',
-      title: '卖出订单',
-      icon: 'Tickets'
-    })
-  }
-  
-  if (orderMenus.length > 0) {
-    merchantMenus.push({
-      path: '/admin/merchant/orders',
-      title: '订单管理',
-      icon: 'Tickets',
-      children: orderMenus
-    })
-  }
 
   if (merchantMenus.length > 0) {
     menus.push({
@@ -295,6 +276,27 @@ const userMenus = computed(() => {
       title: '商户管理',
       icon: 'Shop', // Changed from 'User' to 'Shop' for better representation of merchant management
       children: merchantMenus
+    })
+  }
+
+  // 订单管理模块 - 独立的一级菜单项，与商户管理同级
+  const orderMenus = []
+  
+  if (isAdmin || authStore.hasPermission('merchant:order:list')) {
+    orderMenus.push({
+      path: '/admin/orders/merchant-orders',
+      title: '商户订单',
+      icon: 'Tickets'
+    })
+  }
+  
+  // 只有当有子菜单时才添加订单管理一级菜单
+  if (orderMenus.length > 0) {
+    menus.push({
+      path: '/admin/orders',
+      title: '订单管理',
+      icon: 'Tickets',
+      children: orderMenus
     })
   }
 
@@ -378,12 +380,12 @@ const breadcrumbs = computed(() => {
         crumbs.push({ title: '商户产品' })
       } else if (paths.includes('comments')) {
         crumbs.push({ title: '评论管理' })
-      } else if (paths.includes('orders')) {
-        crumbs.push({ title: '订单管理' })
-        
-        if (paths.includes('orders')) {
-          crumbs.push({ title: '卖出订单' })
-        }
+      }
+    } else if (paths.includes('orders')) {
+      crumbs.push({ title: '订单管理' })
+      
+      if (paths.includes('orders') && paths.includes('merchant')) {
+        crumbs.push({ title: '商户订单' })
       }
     }
     else if (paths.includes('personal')) {
