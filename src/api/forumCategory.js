@@ -26,6 +26,13 @@ export default {
   },
 
   /**
+   * 获取论坛板块树结构
+   */
+  async getTree(params = {}) {
+    return api.get('/forumCategory/tree', { params })
+  },
+
+  /**
    * 获取启用的板块列表（用于前端展示）
    */
   async getAvailable() {

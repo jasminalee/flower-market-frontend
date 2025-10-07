@@ -1,33 +1,38 @@
 <template>
-  <div class="forum-categories">
-    <el-card class="category-card">
-      <template #header>
-        <div class="card-header">
-          <span>论坛板块管理</span>
-          <el-button type="primary" @click="showCategoryForm">
-            <el-icon><Plus /></el-icon>
-            新增板块
-          </el-button>
-        </div>
-      </template>
+  <el-page-header class="page-header" title="论坛管理">
+    <template #content>
+      管理论坛板块
+    </template>
+  </el-page-header>
 
-      <!-- 搜索和筛选区域 -->
-      <div class="filter-section">
-        <el-form :inline="true" :model="filterForm" class="filter-form">
+  <el-card class="filter-card">
+    <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
+      <el-col :span="22">
+        <el-form :model="filterForm" inline>
           <el-form-item label="板块名称">
-            <el-input v-model="filterForm.name" placeholder="请输入板块名称" clearable />
+            <el-input
+              v-model="filterForm.name"
+              placeholder="搜索板块名称"
+              clearable
+              @keyup.enter="fetchCategories"
+            >
+              <template #prefix>
+                <el-icon><Search /></el-icon>
+              </template>
+            </el-input>
           </el-form-item>
+
           <el-form-item label="状态">
-            <el-select v-model="filterForm.status" placeholder="请选择状态" clearable>
-              <el-option label="全部" value="" />
+            <el-select v-model="filterForm.status" placeholder="选择状态" clearable>
               <el-option label="启用" :value="1" />
               <el-option label="禁用" :value="0" />
             </el-select>
           </el-form-item>
+
           <el-form-item>
             <el-button type="primary" @click="fetchCategories">
               <el-icon><Search /></el-icon>
-              查询
+              搜索
             </el-button>
             <el-button @click="resetFilter">
               <el-icon><Refresh /></el-icon>
@@ -35,152 +40,155 @@
             </el-button>
           </el-form-item>
         </el-form>
-      </div>
+      </el-col>
 
-      <!-- 表格区域 -->
-      <el-table
-        :data="categories"
-        v-loading="loading"
-        stripe
-        style="width: 100%"
-        row-key="id"
-      >
-        <el-table-column prop="name" label="板块名称" min-width="150">
-          <template #default="{ row }">
-            <div class="category-info">
-              <div class="category-icon">
-                <el-icon v-if="row.icon"><component :is="row.icon" /></el-icon>
-                <el-icon v-else><Folder /></el-icon>
-              </div>
-              <span>{{ row.name }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="level" label="级别" width="80">
-          <template #default="{ row }">
-            <el-tag :type="row.level === 1 ? 'primary' : 'success'">
-              {{ row.level === 1 ? '一级' : '二级' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="parentId" label="父板块" width="120">
-          <template #default="{ row }">
-            <span v-if="row.parentId === 0">顶级板块</span>
-            <span v-else>{{ getParentCategoryName(row.parentId) }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="sort" label="排序" width="80" />
-        <el-table-column prop="status" label="状态" width="80">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
-              {{ row.status === 1 ? '启用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180">
-          <template #default="{ row }">
-            {{ formatDate(row.createTime) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
-          <template #default="{ row }">
-            <el-button size="small" @click="editCategory(row)">
-              编辑
-            </el-button>
-            <el-button size="small" type="danger" @click="deleteCategory(row)">
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <el-col :span="2" style="text-align: right;">
+        <el-button type="primary" @click="showCategoryForm">
+          <el-icon><Plus /></el-icon>
+          新增板块
+        </el-button>
+      </el-col>
+    </el-row>
+  </el-card>
 
-      <!-- 分页 -->
-      <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
-
-    <!-- 板块表单对话框 -->
-    <el-dialog
-      :title="dialogTitle"
-      v-model="dialogVisible"
-      width="500px"
-      @close="handleDialogClose"
+  <el-card class="table-card">
+    <el-table
+      :data="categoryTree"
+      :loading="loading"
+      stripe
+      style="width: 100%"
+      row-key="id"
+      :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+      default-expand-all
     >
-      <el-form
-        :model="categoryForm"
-        :rules="categoryRules"
-        ref="categoryFormRef"
-        label-width="100px"
-      >
-        <el-form-item label="板块名称" prop="name">
-          <el-input v-model="categoryForm.name" placeholder="请输入板块名称" />
-        </el-form-item>
-        <el-form-item label="板块描述" prop="description">
-          <el-input
-            v-model="categoryForm.description"
-            type="textarea"
-            :rows="3"
-            placeholder="请输入板块描述"
+      <el-table-column prop="name" label="板块名称" min-width="150">
+        <template #default="{ row }">
+          <div class="category-info">
+            <div class="category-icon">
+              <el-icon v-if="row.icon"><component :is="row.icon" /></el-icon>
+              <el-icon v-else><Folder /></el-icon>
+            </div>
+            <span>{{ row.name }}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="level" label="板块级别" min-width="100">
+        <template #default="{ row }">
+          <el-tag v-if="row.level === 1" type="primary">一级板块</el-tag>
+          <el-tag v-else-if="row.level === 2" type="success">二级板块</el-tag>
+          <span v-else>{{ getCategoryLevelText(row.level) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="sort" label="排序" min-width="80" />
+      <el-table-column label="状态" min-width="100">
+        <template #default="{ row }">
+          <el-tag :type="row.status === 1 ? 'success' : 'danger'">
+            {{ row.status === 1 ? '启用' : '禁用' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间" min-width="160">
+        <template #default="{ row }">
+          {{ formatDate(row.createTime) }}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="操作" width="250" fixed="right">
+        <template #default="{ row }">
+          <el-button type="warning" size="small" text @click="editCategory(row)">
+            <el-icon><Edit /></el-icon>
+            编辑
+          </el-button>
+          <el-button type="primary" size="small" text @click="addChildCategory(row)" v-if="row.level === 1">
+            <el-icon><Plus /></el-icon>
+            添加下级
+          </el-button>
+          <el-button type="danger" size="small" text @click="deleteCategory(row)">
+            <el-icon><Delete /></el-icon>
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    
+    <el-empty description="暂无数据" v-if="categoryTree.length === 0 && !loading" />
+  </el-card>
+
+  <!-- 板块表单对话框 -->
+  <el-dialog
+    :title="dialogTitle"
+    v-model="dialogVisible"
+    width="600px"
+    @close="handleDialogClose"
+  >
+    <el-form
+      :model="categoryForm"
+      :rules="categoryRules"
+      ref="categoryFormRef"
+      label-width="100px"
+    >
+      <el-form-item label="板块名称" prop="name">
+        <el-input v-model="categoryForm.name" placeholder="请输入板块名称" />
+      </el-form-item>
+
+      <el-form-item label="板块级别" prop="level">
+        <el-select v-model="categoryForm.level" placeholder="请选择板块级别" style="width: 100%" :disabled="isEdit || isAddChild">
+          <el-option label="一级板块" :value="1" />
+          <el-option label="二级板块" :value="2" />
+        </el-select>
+      </el-form-item>
+
+      <el-form-item label="上级板块" prop="parentId" v-if="categoryForm.level === 2">
+        <el-select 
+          v-model="categoryForm.parentId" 
+          placeholder="请选择上级板块" 
+          style="width: 100%" 
+          :disabled="isEdit || isAddChild"
+        >
+          <el-option
+            v-for="category in parentCategoryOptions"
+            :key="category.id"
+            :label="category.name"
+            :value="category.id"
           />
-        </el-form-item>
-        <el-form-item label="板块级别" prop="level">
-          <el-select v-model="categoryForm.level" placeholder="请选择板块级别">
-            <el-option label="一级板块" :value="1" />
-            <el-option label="二级板块" :value="2" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="父板块" prop="parentId" v-if="categoryForm.level === 2">
-          <el-select v-model="categoryForm.parentId" placeholder="请选择父板块" filterable>
-            <el-option
-              v-for="parent in parentCategories"
-              :key="parent.id"
-              :label="parent.name"
-              :value="parent.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="排序号" prop="sort">
-          <el-input-number
-            v-model="categoryForm.sort"
-            :min="0"
-            :max="999"
-            controls-position="right"
-          />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-switch
-            v-model="categoryForm.status"
-            :active-value="1"
-            :inactive-value="0"
-            active-text="启用"
-            inactive-text="禁用"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveCategory">保存</el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
+        </el-select>
+      </el-form-item>
+
+      <el-form-item label="板块描述" prop="description">
+        <el-input
+          v-model="categoryForm.description"
+          type="textarea"
+          :rows="3"
+          placeholder="请输入板块描述"
+        />
+      </el-form-item>
+
+      <el-form-item label="排序号" prop="sort">
+        <el-input-number v-model="categoryForm.sort" :min="0" controls-position="right" style="width: 100%" />
+      </el-form-item>
+
+      <el-form-item label="状态" prop="status">
+        <el-radio-group v-model="categoryForm.status">
+          <el-radio :label="1">启用</el-radio>
+          <el-radio :label="0">禁用</el-radio>
+        </el-radio-group>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveCategory" :loading="saving">
+          {{ saving ? '保存中...' : '保存' }}
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed, watch } from 'vue'
+import { ref, reactive, onMounted, computed, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search, Refresh, Folder } from '@element-plus/icons-vue'
+import { Plus, Search, Refresh, Folder, Edit, Delete } from '@element-plus/icons-vue'
 import forumCategoryApi from '@/api/forumCategory'
 import { useAuthStore } from '@/config/store.js'
 
@@ -188,17 +196,15 @@ const authStore = useAuthStore()
 
 // 响应式数据
 const loading = ref(false)
-const categories = ref([])
-const parentCategories = ref([])
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
-
-// 表单相关
+const saving = ref(false)
 const dialogVisible = ref(false)
-const dialogTitle = ref('')
 const isEdit = ref(false)
+const isAddChild = ref(false)
 const categoryFormRef = ref()
+
+// 分类列表数据
+const categoryTree = ref([])
+const parentCategoryOptions = ref([])
 
 // 筛选表单
 const filterForm = reactive({
@@ -221,17 +227,20 @@ const categoryForm = reactive({
 const categoryRules = {
   name: [
     { required: true, message: '请输入板块名称', trigger: 'blur' }
-  ],
-  level: [
-    { required: true, message: '请选择板块级别', trigger: 'change' }
   ]
 }
+
+// 计算属性
+const dialogTitle = computed(() => {
+  if (isAddChild.value) return '添加下级板块'
+  return isEdit.value ? '编辑板块' : '新增板块'
+})
 
 /**
  * 计算属性
  */
 const allCategories = computed(() => {
-  return [...categories.value, ...parentCategories.value]
+  return [...categoryTree.value, ...parentCategoryOptions.value]
 })
 
 /**
@@ -252,22 +261,46 @@ const formatDate = (dateString) => {
 }
 
 /**
+ * 获取板块级别文本描述
+ */
+const getCategoryLevelText = (level) => {
+  const levelMap = {
+    1: '一级板块',
+    2: '二级板块'
+  }
+  return levelMap[level] || '未知'
+}
+
+/**
  * 显示板块表单
  */
 const showCategoryForm = () => {
   isEdit.value = false
-  dialogTitle.value = '新增板块'
-  dialogVisible.value = true
-  // 重置表单
-  Object.assign(categoryForm, {
-    id: undefined,
-    name: '',
-    description: '',
-    level: 1,
-    parentId: 0,
-    sort: 0,
-    status: 1
+  isAddChild.value = false
+  resetCategoryForm()
+  nextTick(() => {
+    if (categoryFormRef.value) {
+      categoryFormRef.value.clearValidate()
+    }
   })
+  dialogVisible.value = true
+}
+
+/**
+ * 添加下级板块
+ */
+const addChildCategory = (category) => {
+  isEdit.value = false
+  isAddChild.value = true
+  resetCategoryForm()
+  categoryForm.parentId = category.id
+  categoryForm.level = category.level + 1
+  nextTick(() => {
+    if (categoryFormRef.value) {
+      categoryFormRef.value.clearValidate()
+    }
+  })
+  dialogVisible.value = true
 }
 
 /**
@@ -275,10 +308,15 @@ const showCategoryForm = () => {
  */
 const editCategory = (row) => {
   isEdit.value = true
-  dialogTitle.value = '编辑板块'
-  dialogVisible.value = true
+  isAddChild.value = false
   // 填充表单数据
   Object.assign(categoryForm, row)
+  nextTick(() => {
+    if (categoryFormRef.value) {
+      categoryFormRef.value.clearValidate()
+    }
+  })
+  dialogVisible.value = true
 }
 
 /**
@@ -300,6 +338,7 @@ const deleteCategory = async (row) => {
     if (response.code === 200) {
       ElMessage.success('删除成功')
       fetchCategories()
+      fetchParentCategories()
     } else {
       ElMessage.error(response.message || '删除失败')
     }
@@ -315,6 +354,8 @@ const saveCategory = async () => {
   try {
     await categoryFormRef.value.validate()
     
+    saving.value = true
+    
     const data = { ...categoryForm }
     const response = await forumCategoryApi.save(data)
     
@@ -322,11 +363,33 @@ const saveCategory = async () => {
       ElMessage.success(isEdit.value ? '更新成功' : '新增成功')
       dialogVisible.value = false
       fetchCategories()
+      fetchParentCategories()
     } else {
       ElMessage.error(response.message || (isEdit.value ? '更新失败' : '新增失败'))
     }
   } catch (error) {
     console.error('保存板块失败:', error)
+  } finally {
+    saving.value = false
+  }
+}
+
+/**
+ * 重置分类表单
+ */
+const resetCategoryForm = () => {
+  Object.assign(categoryForm, {
+    id: undefined,
+    name: '',
+    description: '',
+    level: 1,
+    parentId: 0,
+    sort: 0,
+    status: 1
+  })
+
+  if (categoryFormRef.value) {
+    categoryFormRef.value.resetFields()
   }
 }
 
@@ -338,29 +401,11 @@ const handleDialogClose = () => {
 }
 
 /**
- * 处理分页大小变化
- */
-const handleSizeChange = (newSize) => {
-  pageSize.value = newSize
-  currentPage.value = 1
-  fetchCategories()
-}
-
-/**
- * 处理当前页变化
- */
-const handleCurrentChange = (newPage) => {
-  currentPage.value = newPage
-  fetchCategories()
-}
-
-/**
  * 重置筛选条件
  */
 const resetFilter = () => {
   filterForm.name = ''
   filterForm.status = ''
-  currentPage.value = 1
   fetchCategories()
 }
 
@@ -372,10 +417,7 @@ const fetchCategories = async () => {
     loading.value = true
     
     // 构建请求参数，只包含有值的参数
-    const params = {
-      current: currentPage.value,
-      size: pageSize.value
-    }
+    const params = {}
     
     // 只有当筛选条件有值时才添加到参数中
     if (filterForm.name) {
@@ -385,12 +427,25 @@ const fetchCategories = async () => {
       params.status = filterForm.status
     }
     
-    // 调用API获取板块数据
-    const response = await forumCategoryApi.page(params)
+    // 使用树形结构API获取数据
+    const response = await forumCategoryApi.getTree(params)
     
     if (response.code === 200) {
-      categories.value = response.data.records
-      total.value = response.data.total
+      console.log('使用树形结构API获取数据:', response.data)
+      // Ensure the tree data has the hasChildren property set correctly
+      const treeData = response.data || []
+      const setHasChildren = (nodes) => {
+        nodes.forEach(node => {
+          if (node.children && node.children.length > 0) {
+            node.hasChildren = true
+            setHasChildren(node.children)
+          } else {
+            node.hasChildren = false
+          }
+        })
+      }
+      setHasChildren(treeData)
+      categoryTree.value = treeData
     } else {
       ElMessage.error(response.message || '获取板块数据失败')
     }
@@ -407,9 +462,9 @@ const fetchCategories = async () => {
  */
 const fetchParentCategories = async () => {
   try {
-    const response = await forumCategoryApi.list({ level: 1 })
+    const response = await forumCategoryApi.list({ level: 1, status: 1 })
     if (response.code === 200) {
-      parentCategories.value = response.data
+      parentCategoryOptions.value = response.data
     }
   } catch (error) {
     console.error('获取父板块列表失败:', error)
@@ -459,5 +514,15 @@ onMounted(() => {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+}
+
+/* 确保树形表格的缩进样式 */
+:deep(.el-table__body) .el-table__row {
+  transition: background-color 0.2s;
+}
+
+:deep(.el-table__body) .el-table__row .cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
