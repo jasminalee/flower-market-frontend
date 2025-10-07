@@ -42,6 +42,8 @@
                   :alt="product.merchantName"
                   fit="cover"
                   class="main-image"
+                  :preview-src-list="productImages"
+                  preview-teleported
                 >
                   <template #error>
                     <div class="image-error">
@@ -65,6 +67,8 @@
                       class="thumbnail-image"
                       :class="{ active: currentImage === image }"
                       @click="currentImage = image"
+                      :preview-src-list="productImages"
+                      preview-teleported
                     >
                       <template #error>
                         <div class="thumbnail-error">
@@ -199,313 +203,241 @@
                       {{ product.isDiscounted ? '是' : '否' }}
                     </el-tag>
                   </el-descriptions-item>
-                  <el-descriptions-item label="是否热销">
-                    <el-tag :type="product.isHot ? 'success' : 'info'">
-                      {{ product.isHot ? '是' : '否' }}
-                    </el-tag>
-                  </el-descriptions-item>
-                  <el-descriptions-item label="总销量">{{ product.totalSales }} 件</el-descriptions-item>
-                  <el-descriptions-item label="平均评分">{{ product.avgRating }} 分</el-descriptions-item>
                 </el-descriptions>
               </div>
             </el-tab-pane>
-            <el-tab-pane label="用户评论" name="comments">
-              <Comment :product-id="product.id" @comment-submitted="handleCommentSubmitted" />
+            <el-tab-pane label="用户评价" name="reviews">
+              <div class="reviews-content">
+                <div class="review-summary">
+                  <div class="rating-score">
+                    <span class="score">{{ product.avgRating || 0 }}</span>
+                    <el-rate v-model="product.avgRating" disabled />
+                  </div>
+                  <div class="rating-distribution">
+                    <!-- 这里可以展示评分分布 -->
+                  </div>
+                </div>
+                
+                <div class="review-list">
+                  <div v-if="reviews.length === 0" class="no-reviews">
+                    <el-empty description="暂无评价" />
+                  </div>
+                  <div v-else>
+                    <div v-for="review in reviews" :key="review.id" class="review-item">
+                      <div class="review-header">
+                        <el-avatar :src="review.userAvatar" size="small">{{ review.userName?.charAt(0) }}</el-avatar>
+                        <span class="review-user">{{ review.userName }}</span>
+                        <el-rate v-model="review.rating" disabled />
+                        <span class="review-time">{{ formatDate(review.createTime) }}</span>
+                      </div>
+                      <div class="review-content">
+                        {{ review.content }}
+                      </div>
+                      <div v-if="review.images && review.images.length > 0" class="review-images">
+                        <el-image 
+                          v-for="(image, index) in review.images" 
+                          :key="index"
+                          :src="image" 
+                          fit="cover"
+                          class="review-image"
+                          :preview-src-list="review.images"
+                          preview-teleported
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </el-tab-pane>
           </el-tabs>
         </el-card>
       </div>
     </div>
     
-    <!-- 无数据状态 -->
-    <div v-else class="no-data-container">
-      <el-empty description="产品不存在或已被删除">
-        <el-button type="primary" @click="goBack">返回产品列表</el-button>
+    <!-- 产品不存在或加载失败 -->
+    <div v-else class="product-not-found">
+      <el-empty description="产品不存在或加载失败">
+        <el-button type="primary" @click="goToProducts">返回产品列表</el-button>
       </el-empty>
     </div>
-    
-    <!-- 收货地址选择对话框 -->
-    <el-dialog v-model="addressDialogVisible" title="选择收货地址" width="500">
-      <el-table :data="receiverAddresses" style="width: 100%" max-height="300">
-        <el-table-column prop="receiverName" label="收货人" />
-        <el-table-column prop="province" label="地址" >
-          <template #default="scope">
-            {{ scope.row.province }}{{ scope.row.city }}{{ scope.row.district }}{{ scope.row.detailAddress }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作">
-          <template #default="scope">
-            <el-button 
-              type="primary" 
-              size="small" 
-              @click="selectAddress(scope.row)"
-              :disabled="selectedAddress && selectedAddress.id === scope.row.id"
-            >
-              {{ selectedAddress && selectedAddress.id === scope.row.id ? '已选择' : '选择' }}
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="addressDialogVisible = false">取消</el-button>
-          <el-button 
-            type="primary" 
-            @click="confirmPurchase" 
-            :disabled="!selectedAddress"
-            :loading="purchaseLoading"
-          >
-            确认购买
-          </el-button>
-        </span>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { 
-  ShoppingCart, Goods, Star, Share, Picture,
-  HomeFilled, Document
+  HomeFilled, Goods, Document, Picture, ShoppingCart, Star, Share
 } from '@element-plus/icons-vue'
-import merchantProduct from '@/api/merchantProduct'
-import shoppingCartApi from '@/api/shoppingCart'
-import orderApi from '@/api/order'
-import receiverAddressApi from '@/api/receiverAddress'
-import Comment from '@/components/Comment.vue'
-import { useAuthStore } from '@/config/store.js'
+import productApi from '@/api/product.js'
+import productCategoryApi from '@/api/productCategory.js'
+import commentApi from '@/api/comment.js'
 
-// 路由相关
+// 路由
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()
 
 // 响应式数据
-const loading = ref(true)
+const loading = ref(false)
 const product = ref({})
-const quantity = ref(1)
+const categories = ref([])
 const currentImage = ref('')
+const quantity = ref(1)
 const activeTab = ref('detail')
-const receiverAddresses = ref([])  // 收货地址列表
-const selectedAddress = ref(null) // 选中的收货地址
-const addressDialogVisible = ref(false) // 地址选择对话框可见性
-const purchaseLoading = ref(false) // 购买按钮加载状态
+const reviews = ref([])
 
-// 计算属性 - 产品图片数组
-const productImages = ref([])
-
-// 方法
-const getCategoryName = (categoryId) => {
-  const categoryMap = {
-    1: '玫瑰',
-    2: '百合',
-    3: '向日葵',
-    4: '康乃馨'
+/**
+ * 计算属性：产品图片数组
+ */
+const productImages = computed(() => {
+  if (!product.value.subImages) return []
+  
+  // 如果subImages是字符串，则按逗号分割
+  if (typeof product.value.subImages === 'string') {
+    return product.value.subImages.split(',').filter(url => url.trim() !== '')
   }
-  return categoryMap[categoryId] || '其他'
+  
+  // 如果subImages是数组，直接返回
+  if (Array.isArray(product.value.subImages)) {
+    return product.value.subImages.filter(url => url.trim() !== '')
+  }
+  
+  return []
+})
+
+/**
+ * 获取分类名称
+ */
+const getCategoryName = (categoryId) => {
+  if (!categoryId) return '未知分类'
+  const category = categories.value.find(cat => cat.id === categoryId)
+  return category ? category.name : '未知分类'
+}
+
+/**
+ * 格式化日期
+ */
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString()
 }
 
 /**
  * 获取产品详情
  */
-const fetchProductDetail = async () => {
+const fetchProduct = async (id) => {
+  loading.value = true
   try {
-    loading.value = true
-    const productId = route.params.id
-    
-    if (!productId) {
-      ElMessage.error('产品ID不能为空')
-      router.push('/products')
-      return
-    }
-    
-    // 调用API获取产品详情
-    const response = await merchantProduct.getById(productId)
-    
-    if (response.code === 200 && response.data) {
+    const response = await productApi.getById(id)
+    if (response && response.code === 200) {
       product.value = response.data
       
-      // 处理图片
-      productImages.value = []
-      
-      // 添加主图
-      if (product.value.mainImage) {
-        productImages.value.push(product.value.mainImage)
-        currentImage.value = product.value.mainImage
+      // 设置默认图片
+      if (productImages.value.length > 0) {
+        currentImage.value = productImages.value[0]
+      } else {
+        currentImage.value = product.value.mainImage || ''
       }
       
-      // 添加子图
-      if (product.value.subImages) {
-        try {
-          const subImages = JSON.parse(product.value.subImages)
-          productImages.value.push(...subImages)
-        } catch (e) {
-          console.warn('解析子图数据失败:', e)
-        }
-      }
-      
-      // 如果没有图片，设置默认图片
-      if (productImages.value.length === 0) {
-        currentImage.value = ''
-      }
+      // 获取评论
+      fetchReviews(id)
     } else {
-      ElMessage.error(response.message || '获取产品详情失败')
+      ElMessage.error('获取产品信息失败')
     }
   } catch (error) {
-    console.error('获取产品详情失败:', error)
-    ElMessage.error('获取产品详情失败')
+    console.error('获取产品信息失败:', error)
+    ElMessage.error('获取产品信息失败: ' + (error.message || '未知错误'))
   } finally {
     loading.value = false
   }
 }
 
 /**
- * 加入购物车
+ * 获取产品分类
  */
-const addToCart = async () => {
+const fetchCategories = async () => {
   try {
-    // 获取当前登录用户ID
-    const userId = authStore.user?.id || authStore.user?.userId || 2; // 如果没有获取到用户ID，使用默认值2
-    console.log('product:', product)
-    // 构造购物车对象
-    const shoppingCart = {
-      merchantProductId: product.value.id,
-      skuId: product.value.skuId,
-      merchantName: product.value.merchantName,
-      price: product.value.minPrice,
-      quantity: quantity.value,
-      merchantId: product.value.merchantId || 1, // 默认商户ID，实际应从产品信息中获取
-      userId: userId,
-      status: 1 // 有效状态
-    }
-    
-    // 调用API添加到购物车
-    const response = await shoppingCartApi.add(shoppingCart)
-    
-    if (response.code === 200) {
-      ElMessage.success(`已将 ${product.value.merchantName} 加入购物车`)
-    } else {
-      ElMessage.error(response.message || '添加到购物车失败')
+    const response = await productCategoryApi.list()
+    if (response && response.code === 200) {
+      categories.value = response.data || []
     }
   } catch (error) {
-    console.error('添加到购物车失败:', error)
-    ElMessage.error('添加到购物车失败: ' + (error.message || '未知错误'))
+    console.error('获取产品分类失败:', error)
   }
+}
+
+/**
+ * 获取产品评论
+ */
+const fetchReviews = async (productId) => {
+  try {
+    const response = await commentApi.list({
+      sourceId: productId,
+      sourceType: 'product'
+    })
+    if (response && response.code === 200) {
+      reviews.value = response.data || []
+    }
+  } catch (error) {
+    console.error('获取产品评论失败:', error)
+  }
+}
+
+/**
+ * 加入购物车
+ */
+const addToCart = () => {
+  ElMessage.success('已加入购物车')
 }
 
 /**
  * 立即购买
  */
-const buyNow = async () => {
-  try {
-    // 检查用户是否登录
-    if (!authStore.isAuthenticated) {
-      ElMessage.warning('请先登录')
-      router.push('/login')
-      return
-    }
-
-    // 直接跳转到订单预览页面，传递产品ID和数量
-    router.push({
-      name: 'OrderPreview',
-      query: {
-        productId: product.value.id,
-        quantity: quantity.value
-      }
-    })
-  } catch (error) {
-    console.error('跳转订单预览失败:', error)
-    ElMessage.error('跳转订单预览失败: ' + (error.message || '未知错误'))
-  }
+const buyNow = () => {
+  ElMessage.info('跳转到购买页面')
 }
 
 /**
- * 选择收货地址
- */
-const selectAddress = (address) => {
-  selectedAddress.value = address
-}
-
-/**
- * 确认购买
- */
-const confirmPurchase = async () => {
-  if (!selectedAddress.value) {
-    ElMessage.warning('请选择收货地址')
-    return
-  }
-  
-  try {
-    purchaseLoading.value = true
-    
-    // 获取当前用户ID
-    const userId = authStore.user?.id || authStore.user?.userId
-    
-    // 创建订单
-    const orderResponse = await orderApi.createOrderFromDirectPurchase(
-      product.value.id,
-      quantity.value,
-      selectedAddress.value.id,
-      userId
-    )
-    
-    if (orderResponse.code === 200 && orderResponse.data) {
-      ElMessage.success('订单创建成功')
-      addressDialogVisible.value = false
-      // 跳转到订单确认页面，并传递产品和数量信息
-      router.push({
-        name: 'OrderConfirmation',
-        params: { id: orderResponse.data.id },
-        query: { 
-          productId: product.value.id,
-          quantity: quantity.value
-        }
-      })
-    } else {
-      ElMessage.error(orderResponse.message || '创建订单失败')
-    }
-  } catch (error) {
-    console.error('创建订单失败:', error)
-    ElMessage.error('创建订单失败: ' + (error.message || '未知错误'))
-  } finally {
-    purchaseLoading.value = false
-  }
-}
-
-/**
- * 收藏商品
+ * 添加到收藏
  */
 const addToFavorites = () => {
-  ElMessage.success(`已收藏 ${product.value.merchantName}`)
+  ElMessage.success('已添加到收藏')
 }
 
 /**
- * 分享商品
+ * 分享产品
  */
 const shareProduct = () => {
-  ElMessage.success('分享功能开发中...')
+  ElMessage.info('分享功能开发中')
 }
 
 /**
- * 处理评论提交事件
+ * 返回产品列表
  */
-const handleCommentSubmitted = () => {
-  // 可以在这里添加一些处理逻辑，比如更新产品评分等
-  console.log('有新的评论提交')
-}
-
-// 返回产品列表
-const goBack = () => {
+const goToProducts = () => {
   router.push('/products')
 }
 
+// 监听路由变化
+watch(
+  () => route.params.id,
+  (newId) => {
+    if (newId) {
+      fetchProduct(newId)
+    }
+  }
+)
+
 // 生命周期
 onMounted(() => {
-  fetchProductDetail()
+  const productId = route.params.id
+  if (productId) {
+    fetchProduct(productId)
+  }
+  fetchCategories()
 })
 </script>
 
-<style src="@/assets/productDetail.css"></style>
+<style src="@/assets/productDetail.css" scoped></style>

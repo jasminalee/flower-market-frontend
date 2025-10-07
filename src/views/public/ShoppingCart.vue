@@ -36,6 +36,8 @@
                   fit="cover"
                   class="product-image"
                   lazy
+                  :preview-src-list="[row.mainImage]"
+                  preview-teleported
                 >
                   <template #placeholder>
                     <div class="image-slot">
