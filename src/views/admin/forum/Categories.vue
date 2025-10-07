@@ -61,17 +61,7 @@
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       default-expand-all
     >
-      <el-table-column prop="name" label="板块名称" min-width="150">
-        <template #default="{ row }">
-          <div class="category-info">
-            <div class="category-icon">
-              <el-icon v-if="row.icon"><component :is="row.icon" /></el-icon>
-              <el-icon v-else><Folder /></el-icon>
-            </div>
-            <span>{{ row.name }}</span>
-          </div>
-        </template>
-      </el-table-column>
+      <el-table-column prop="name" label="板块名称" min-width="150" />
       <el-table-column prop="level" label="板块级别" min-width="100">
         <template #default="{ row }">
           <el-tag v-if="row.level === 1" type="primary">一级板块</el-tag>
@@ -430,22 +420,11 @@ const fetchCategories = async () => {
     // 使用树形结构API获取数据
     const response = await forumCategoryApi.getTree(params)
     
+    // 添加调试信息
+    console.log('论坛板块树形数据API响应:', response)
     if (response.code === 200) {
-      console.log('使用树形结构API获取数据:', response.data)
-      // Ensure the tree data has the hasChildren property set correctly
-      const treeData = response.data || []
-      const setHasChildren = (nodes) => {
-        nodes.forEach(node => {
-          if (node.children && node.children.length > 0) {
-            node.hasChildren = true
-            setHasChildren(node.children)
-          } else {
-            node.hasChildren = false
-          }
-        })
-      }
-      setHasChildren(treeData)
-      categoryTree.value = treeData
+      console.log('论坛板块树形数据内容:', response.data)
+      categoryTree.value = response.data || []
     } else {
       ElMessage.error(response.message || '获取板块数据失败')
     }
@@ -503,11 +482,6 @@ onMounted(() => {
 .category-info {
   display: flex;
   align-items: center;
-}
-
-.category-icon {
-  margin-right: 8px;
-  color: #409eff;
 }
 
 .pagination-container {
