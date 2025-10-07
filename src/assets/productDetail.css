@@ -75,7 +75,7 @@
   margin-bottom: var(--spacing-medium);
   border-radius: var(--border-radius-base);
   overflow: hidden;
-  height: 400px;
+  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -360,7 +360,7 @@
   }
   
   .main-image-container {
-    height: 300px;
+    height: 250px;
   }
   
   .thumbnail-wrapper {
@@ -412,5 +412,16 @@
   
   .detail-content {
     overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-image-container {
+    height: 200px;
+  }
+  
+  .thumbnail-image {
+    width: 50px;
+    height: 50px;
   }
 }

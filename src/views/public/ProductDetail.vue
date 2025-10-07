@@ -40,7 +40,7 @@
                 <el-image 
                   :src="currentImage" 
                   :alt="product.merchantName"
-                  fit="cover"
+                  fit="contain"
                   class="main-image"
                   :preview-src-list="productImages"
                   preview-teleported
