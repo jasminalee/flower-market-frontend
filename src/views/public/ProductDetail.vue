@@ -293,9 +293,18 @@ const reviews = ref([])
 const productImages = computed(() => {
   if (!product.value.subImages) return []
   
-  // 如果subImages是字符串，则按逗号分割
+  // 如果subImages是JSON字符串，则解析它
   if (typeof product.value.subImages === 'string') {
-    return product.value.subImages.split(',').filter(url => url.trim() !== '')
+    try {
+      // 尝试解析JSON字符串
+      const parsed = JSON.parse(product.value.subImages)
+      if (Array.isArray(parsed)) {
+        return parsed.filter(url => url.trim() !== '')
+      }
+    } catch (e) {
+      // 如果不是有效的JSON，按逗号分割处理
+      return product.value.subImages.split(',').filter(url => url.trim() !== '')
+    }
   }
   
   // 如果subImages是数组，直接返回
@@ -372,8 +381,9 @@ const fetchCategories = async () => {
  * 获取产品评论
  */
 const fetchReviews = async (productId) => {
+  console.log('获取产品评论...', productId)
   try {
-    const response = await commentApi.list({
+    const response = await commentApi.listBySource({
       sourceId: productId,
       sourceType: 'product'
     })
