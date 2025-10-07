@@ -48,6 +48,26 @@ const routes = [
         component: () => import('@/views/public/OrderConfirmation.vue'),
         meta: { title: '订单确认' },
         props: true
+      },
+      {
+        path: 'forum',
+        name: 'Forum',
+        component: () => import('@/views/public/Forum.vue'),
+        meta: { title: '后花园' }
+      },
+      {
+        path: 'forum/category/:id',
+        name: 'ForumCategory',
+        component: () => import('@/views/public/ForumCategory.vue'),
+        meta: { title: '板块帖子' },
+        props: true
+      },
+      {
+        path: 'forum/post/:id',
+        name: 'ForumPost',
+        component: () => import('@/views/public/ForumPost.vue'),
+        meta: { title: '帖子详情' },
+        props: true
       }
     ]
   },
@@ -283,6 +303,46 @@ const routes = [
             component: () => import('@/views/admin/personal/PaymentMethods.vue'),
             meta: { 
               title: '支付方式',
+              requiresAuth: true
+            }
+          }
+        ]
+      },
+      // 后花园模块 - 论坛管理
+      {
+        path: 'forum',
+        name: 'ForumManagement',
+        redirect: '/admin/forum/categories',
+        meta: { 
+          title: '后花园',
+          requiresAuth: true,
+          icon: 'el-icon-chat-line-round'
+        },
+        children: [
+          {
+            path: 'categories',
+            name: 'ForumCategories',
+            component: () => import('@/views/admin/forum/Categories.vue'),
+            meta: { 
+              title: '板块管理',
+              requiresAuth: true
+            }
+          },
+          {
+            path: 'posts',
+            name: 'ForumPosts',
+            component: () => import('@/views/admin/forum/Posts.vue'),
+            meta: { 
+              title: '帖子管理',
+              requiresAuth: true
+            }
+          },
+          {
+            path: 'comments',
+            name: 'ForumComments',
+            component: () => import('@/views/admin/forum/Comments.vue'),
+            meta: { 
+              title: '评论管理',
               requiresAuth: true
             }
           }

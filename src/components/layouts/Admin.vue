@@ -136,7 +136,7 @@ import {
   Management, Fold, Expand, User, ArrowDown, Setting, 
   SwitchButton, Monitor, UserFilled, Lock, Sunny, Moon,
   ShoppingCartFull, Avatar, Tickets, Coin, Files, Folder, Promotion,
-  ChatLineRound, House, Shop
+  ChatLineRound, House, Shop, Document
 } from '@element-plus/icons-vue'
 import '@/assets/admin.css'
 
@@ -330,6 +330,30 @@ const userMenus = computed(() => {
         path: '/admin/personal/payment-methods',
         title: '支付方式',
         icon: 'Coin' // Using Coin icon for payment methods
+      }
+    ]
+  })
+
+  // 后花园模块 - 论坛管理
+  menus.push({
+    path: '/admin/forum',
+    title: '后花园',
+    icon: 'ChatLineRound',
+    children: [
+      {
+        path: '/admin/forum/categories',
+        title: '板块管理',
+        icon: 'Folder'
+      },
+      {
+        path: '/admin/forum/posts',
+        title: '帖子管理',
+        icon: 'Document'
+      },
+      {
+        path: '/admin/forum/comments',
+        title: '评论管理',
+        icon: 'ChatLineRound'
       }
     ]
   })
