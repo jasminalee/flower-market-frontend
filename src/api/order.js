@@ -2,14 +2,14 @@ import api from './apiClient'
 
 export default {
   /**
-   * 直接购买生成订单
+   * 购物车-或者单个结账
    * merchantProductId: 商户产品ID
    * quantity: 购买数量
    * receiverAddressId: 收货信息ID
    * userId: 用户ID
    */
-  async createOrderFromDirectPurchase(merchantProductId, quantity, receiverAddressId, userId) {
-    return api.post('/order/createOrderFromDirectPurchase', null, {
+  async cartPurchase(merchantProductId, quantity, receiverAddressId, userId) {
+    return api.post('/order/cartPurchase', null, {
       params: { merchantProductId, quantity, receiverAddressId, userId }
     })
   },
