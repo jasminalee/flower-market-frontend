@@ -333,8 +333,24 @@ const removeItem = (item) => {
  * 去结算
  */
 const checkout = () => {
-  ElMessage.info('跳转到结算页面')
-  // 这里可以跳转到结算页面
+  if (selectedItems.value.length === 0) {
+    ElMessage.warning('请至少选择一个商品')
+    return
+  }
+  
+  // For now, we'll just pass the first selected item to the order preview
+  // In a full implementation, we would need to handle multiple items
+  const firstItem = selectedItems.value[0]
+  
+  // Navigate to order preview page with the first selected item
+  router.push({
+    name: 'OrderPreview',
+    query: {
+      from: 'cart',
+      productId: firstItem.merchantProductId,
+      quantity: firstItem.quantity
+    }
+  })
 }
 
 /**

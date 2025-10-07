@@ -11,6 +11,10 @@
           <el-icon><Goods /></el-icon>
           产品展示
         </el-breadcrumb-item>
+        <el-breadcrumb-item v-if="fromCart">
+          <el-icon><ShoppingCart /></el-icon>
+          购物车
+        </el-breadcrumb-item>
         <el-breadcrumb-item>
           <el-icon><Document /></el-icon>
           订单预览
@@ -185,7 +189,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
-  HomeFilled, Goods, Document, Picture
+  HomeFilled, Goods, Document, Picture, ShoppingCart
 } from '@element-plus/icons-vue'
 import merchantProduct from '@/api/merchantProduct'
 import receiverAddressApi from '@/api/receiverAddress'
@@ -205,6 +209,7 @@ const quantity = ref(1)
 const receiverAddresses = ref([])  // 收货地址列表
 const selectedAddress = ref(null) // 选中的收货地址
 const addressDialogVisible = ref(false) // 地址选择对话框可见性
+const fromCart = ref(false) // 是否来自购物车
 
 // 方法
 /**
@@ -223,6 +228,9 @@ const fetchProductDetail = async () => {
     
     // 获取数量参数
     quantity.value = parseInt(route.query.quantity) || 1
+    
+    // 检查是否来自购物车
+    fromCart.value = route.query.from === 'cart'
     
     // 调用API获取产品详情
     const response = await merchantProduct.getById(productId)
@@ -327,7 +335,11 @@ const confirmOrder = async () => {
  * 返回上一页
  */
 const goBack = () => {
-  router.go(-1)
+  if (fromCart.value) {
+    router.push('/shopping-cart')
+  } else {
+    router.go(-1)
+  }
 }
 
 // 生命周期
