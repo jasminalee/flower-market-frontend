@@ -486,14 +486,40 @@ const buyNow = async () => {
       return
     }
 
-    // 跳转到订单预览页面
-    router.push({
-      path: '/order-preview',
-      query: {
-        productId: product.value.id,
-        quantity: quantity.value
+    // 先封装一个购物车对象
+    const shoppingCart = {
+      merchantProductId: product.value.id,
+      merchantId: product.value.merchantId || 1,
+      skuId: product.value.skuId,
+      price: product.value.minPrice || product.value.price || 0,
+      quantity: quantity.value,
+      userId: userId,
+      status: 1 // 有效状态
+    }
+
+    // 调用API添加到购物车
+    const cartResponse = await shoppingCartApi.add(shoppingCart)
+
+    if (cartResponse.code === 200) {
+      // 购物车添加成功后，调用cartPurchase接口生成订单数据
+      // 根据API文档，需要传递购物车数组作为请求体
+      const shoppingCarts = [shoppingCart];
+      const orderResponse = await orderApi.cartPurchase(
+        shoppingCarts, // 传递购物车数组作为请求体
+        userId, // 用户ID作为查询参数
+        null, // receiverAddressId will be selected on the order confirmation page
+        '' // remark
+      )
+
+      if (orderResponse.code === 200 && orderResponse.data) {
+        // 生产订单数据后跳转到订单确认页面
+        router.push(`/order-confirmation/${orderResponse.data.id}`)
+      } else {
+        ElMessage.error(orderResponse.message || '创建订单失败')
       }
-    })
+    } else {
+      ElMessage.error(cartResponse.message || '添加到购物车失败')
+    }
   } catch (error) {
     console.error('立即购买失败:', error)
     ElMessage.error('立即购买失败: ' + (error.message || '未知错误'))

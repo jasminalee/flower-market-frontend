@@ -3,14 +3,14 @@ import api from './apiClient'
 export default {
   /**
    * 购物车-或者单个结账
-   * merchantProductId: 商户产品ID
-   * quantity: 购买数量
-   * receiverAddressId: 收货信息ID
+   * shoppingCarts: 购物车信息数组
    * userId: 用户ID
+   * receiverAddressId: 收货信息ID
+   * remark: 备注
    */
-  async cartPurchase(merchantProductId, quantity, receiverAddressId, userId) {
-    return api.post('/order/cartPurchase', null, {
-      params: { merchantProductId, quantity, receiverAddressId, userId }
+  async cartPurchase(shoppingCarts, userId, receiverAddressId = null, remark = '') {
+    return api.post('/order/cartPurchase', shoppingCarts, {
+      params: { userId, receiverAddressId, remark }
     })
   },
 

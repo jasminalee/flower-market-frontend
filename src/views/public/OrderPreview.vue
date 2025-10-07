@@ -309,7 +309,7 @@ const confirmOrder = async () => {
     const userId = authStore.user?.id || authStore.user?.userId
     
     // 创建订单
-    const orderResponse = await orderApi.createOrderFromDirectPurchase(
+    const orderResponse = await orderApi.cartPurchase(
       product.value.id,
       quantity.value,
       selectedAddress.value.id,
