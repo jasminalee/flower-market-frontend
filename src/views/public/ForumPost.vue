@@ -204,7 +204,7 @@ const submitComment = async () => {
     }
   } catch (error) {
     console.error('评论发表失败:', error)
-    ElMessage.error('评论发表失败')
+    ElMessage.error('评论发表失败: ' + (error.message || ''))
   }
 }
 
@@ -213,9 +213,13 @@ const submitComment = async () => {
  */
 const fetchPost = async (id) => {
   try {
+    loading.value = true
+    console.log('正在获取帖子信息，ID:', id)
     const response = await forumPostApi.getById(id)
+    console.log('获取帖子信息响应:', response)
     if (response.code === 200) {
       post.value = response.data
+      console.log('帖子数据:', post.value)
       
       // 添加模拟数据
       post.value.userName = post.value.userName || '用户' + Math.floor(Math.random() * 1000)
@@ -228,7 +232,9 @@ const fetchPost = async (id) => {
     }
   } catch (error) {
     console.error('获取帖子信息失败:', error)
-    ElMessage.error('获取帖子信息失败')
+    ElMessage.error('获取帖子信息失败: ' + (error.message || ''))
+  } finally {
+    loading.value = false
   }
 }
 
@@ -237,26 +243,42 @@ const fetchPost = async (id) => {
  */
 const fetchComments = async () => {
   try {
-    const response = await forumCommentApi.getByPost(route.params.id)
+    const postId = route.params.id
+    if (!postId) {
+      ElMessage.error('帖子ID不存在')
+      return
+    }
+    
+    console.log('正在获取评论信息，帖子ID:', postId)
+    const response = await forumCommentApi.getByPost(postId)
+    console.log('获取评论信息响应:', response)
     if (response.code === 200) {
       comments.value = response.data.map(comment => ({
         ...comment,
         userName: comment.userName || '用户' + Math.floor(Math.random() * 1000),
         userAvatar: comment.userAvatar || '用'
       }))
+      console.log('评论数据:', comments.value)
     } else {
       ElMessage.error(response.message || '获取评论失败')
     }
   } catch (error) {
     console.error('获取评论失败:', error)
-    ElMessage.error('获取评论失败')
+    ElMessage.error('获取评论失败: ' + (error.message || ''))
   }
 }
 
 // 生命周期
 onMounted(() => {
-  fetchPost(route.params.id)
-  fetchComments()
+  const postId = route.params.id
+  console.log('组件挂载，帖子ID:', postId)
+  if (postId) {
+    fetchPost(postId)
+    fetchComments()
+  } else {
+    ElMessage.error('帖子ID不存在')
+    loading.value = false
+  }
 })
 </script>
 
