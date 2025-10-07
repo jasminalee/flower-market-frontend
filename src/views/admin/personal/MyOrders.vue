@@ -421,10 +421,21 @@ const cancelOrder = (order) => {
     }
   ).then(async () => {
     try {
-      // 这里可以调用取消订单的API
-      ElMessage.success('订单取消成功')
-      // 重新加载订单列表
-      await fetchOrders()
+      // 更新订单状态为已取消 (状态码5)
+      const orderData = {
+        ...order,
+        status: 5 // 已取消
+      }
+      
+      const response = await orderApi.save(orderData)
+      
+      if (response.code === 200) {
+        ElMessage.success('订单取消成功')
+        // 重新加载订单列表
+        await fetchOrders()
+      } else {
+        ElMessage.error(response.message || '订单取消失败')
+      }
     } catch (error) {
       console.error('取消订单失败:', error)
       ElMessage.error('取消订单失败: ' + (error.message || '未知错误'))
