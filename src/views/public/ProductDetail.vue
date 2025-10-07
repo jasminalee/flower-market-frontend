@@ -266,17 +266,22 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
   HomeFilled, Goods, Document, Picture, ShoppingCart, Star, Share
 } from '@element-plus/icons-vue'
 import merchantProductApi from '@/api/merchantProduct.js'
 import productCategoryApi from '@/api/productCategory.js'
 import commentApi from '@/api/comment.js'
+import shoppingCartApi from '@/api/shoppingCart.js'
+import orderApi from '@/api/order.js'
+import receiverAddressApi from '@/api/receiverAddress.js'
+import { useAuthStore } from '@/config/store.js'
 
 // 路由
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 // 响应式数据
 const loading = ref(false)
@@ -398,15 +403,101 @@ const fetchReviews = async (productId) => {
 /**
  * 加入购物车
  */
-const addToCart = () => {
-  ElMessage.success('已加入购物车')
+const addToCart = async () => {
+  try {
+    // 检查用户是否已登录
+    if (!authStore.isAuthenticated) {
+      ElMessageBox.confirm(
+        '您需要先登录才能添加商品到购物车，是否前往登录？',
+        '提示',
+        {
+          confirmButtonText: '去登录',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        router.push('/login')
+      }).catch(() => {
+        // 用户取消登录
+      })
+      return
+    }
+
+    // 获取当前登录用户ID
+    const userId = authStore.user?.id || authStore.user?.userId
+    if (!userId) {
+      ElMessage.error('无法获取用户信息，请重新登录')
+      return
+    }
+
+    // 构造购物车对象
+    const shoppingCart = {
+      merchantProductId: product.value.id,
+      merchantName: product.value.merchantName,
+      skuId: product.value.skuId,
+      price: product.value.minPrice || product.value.price || 0,
+      quantity: quantity.value,
+      merchantId: product.value.merchantId || 1,
+      userId: userId,
+      status: 1 // 有效状态
+    }
+
+    // 调用API添加到购物车
+    const response = await shoppingCartApi.add(shoppingCart)
+
+    if (response.code === 200) {
+      ElMessage.success(`已将 ${product.value.merchantName} 加入购物车`)
+    } else {
+      ElMessage.error(response.message || '添加到购物车失败')
+    }
+  } catch (error) {
+    console.error('添加到购物车失败:', error)
+    ElMessage.error('添加到购物车失败: ' + (error.message || '未知错误'))
+  }
 }
 
 /**
  * 立即购买
  */
-const buyNow = () => {
-  ElMessage.info('跳转到购买页面')
+const buyNow = async () => {
+  try {
+    // 检查用户是否已登录
+    if (!authStore.isAuthenticated) {
+      ElMessageBox.confirm(
+        '您需要先登录才能购买商品，是否前往登录？',
+        '提示',
+        {
+          confirmButtonText: '去登录',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        router.push('/login')
+      }).catch(() => {
+        // 用户取消登录
+      })
+      return
+    }
+
+    // 获取当前登录用户ID
+    const userId = authStore.user?.id || authStore.user?.userId
+    if (!userId) {
+      ElMessage.error('无法获取用户信息，请重新登录')
+      return
+    }
+
+    // 跳转到订单预览页面
+    router.push({
+      path: '/order-preview',
+      query: {
+        productId: product.value.id,
+        quantity: quantity.value
+      }
+    })
+  } catch (error) {
+    console.error('立即购买失败:', error)
+    ElMessage.error('立即购买失败: ' + (error.message || '未知错误'))
+  }
 }
 
 /**
