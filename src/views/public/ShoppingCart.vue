@@ -130,6 +130,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Picture } from '@element-plus/icons-vue'
 import shoppingCartApi from '@/api/shoppingCart.js'
 import productApi from '@/api/product.js'
+import orderApi from '@/api/order.js'
 import { useAuthStore } from '@/config/store.js'
 
 // 响应式数据
@@ -332,25 +333,48 @@ const removeItem = (item) => {
 /**
  * 去结算
  */
-const checkout = () => {
+const checkout = async () => {
   if (selectedItems.value.length === 0) {
     ElMessage.warning('请至少选择一个商品')
     return
   }
   
-  // For now, we'll just pass the first selected item to the order preview
-  // In a full implementation, we would need to handle multiple items
-  const firstItem = selectedItems.value[0]
-  
-  // Navigate to order preview page with the first selected item
-  router.push({
-    name: 'OrderPreview',
-    query: {
-      from: 'cart',
-      productId: firstItem.merchantProductId,
-      quantity: firstItem.quantity
+  try {
+    // 获取当前登录用户ID
+    const userId = authStore.user?.id || authStore.user?.userId
+    if (!userId) {
+      ElMessage.error('用户未登录，请先登录')
+      return
     }
-  })
+    
+    // Prepare shopping cart data for API call
+    const shoppingCarts = selectedItems.value.map(item => ({
+      id: item.id,
+      merchantProductId: item.merchantProductId,
+      quantity: item.quantity,
+      price: item.price
+    }))
+    
+    // Call the cartPurchase API with the shopping carts and user ID
+    const response = await orderApi.cartPurchase(shoppingCarts, userId)
+    
+    if (response && response.code === 200) {
+      // Navigate directly to order confirmation page with the order ID
+      if (response.data && response.data.id) {
+        router.push({
+          name: 'OrderConfirmation',
+          params: { id: response.data.id }
+        })
+      } else {
+        ElMessage.error('订单创建成功，但无法获取订单信息')
+      }
+    } else {
+      ElMessage.error('结算失败: ' + (response?.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('结算失败:', error)
+    ElMessage.error('结算失败: ' + (error.message || '网络错误'))
+  }
 }
 
 /**

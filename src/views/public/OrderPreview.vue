@@ -309,11 +309,16 @@ const confirmOrder = async () => {
     const userId = authStore.user?.id || authStore.user?.userId
     
     // 创建订单
+    const shoppingCarts = [{
+      merchantProductId: product.value.id,
+      quantity: quantity.value,
+      price: product.value.minPrice
+    }];
+    
     const orderResponse = await orderApi.cartPurchase(
-      product.value.id,
-      quantity.value,
-      selectedAddress.value.id,
-      userId
+      shoppingCarts,
+      userId,
+      selectedAddress.value.id
     )
     
     if (orderResponse.code === 200 && orderResponse.data) {
