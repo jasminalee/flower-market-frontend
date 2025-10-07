@@ -2281,3 +2281,117 @@
 	"timestamp": 0
 }
 ```
+
+
+
+
+## 树状结构列表查询
+
+
+**接口地址**:`/forumCategory/tree`
+
+
+**请求方式**:`GET`
+
+
+**请求数据类型**:`application/x-www-form-urlencoded`
+
+
+**响应数据类型**:`*/*`
+
+
+**接口描述**:
+
+
+**请求参数**:
+
+
+**请求参数**:
+
+
+| 参数名称 | 参数说明 | 请求类型    | 是否必须 | 数据类型 | schema |
+| -------- | -------- | ----- | -------- | -------- | ------ |
+|level|板块级别（1-一级板块，2-二级板块）|query|true|integer(int32)||
+|name|板块名称|query|true|string||
+|status|状态（0-禁用，1-启用）|query|true|integer(int32)||
+|createTime|创建时间|query|false|string(date-time)||
+|description|板块描述|query|false|string||
+|icon|板块图标URL|query|false|string||
+|id|板块ID|query|false|integer(int64)||
+|parentId|父板块ID（用于构建板块树，0表示顶级板块）|query|false|integer(int64)||
+|sort|排序号|query|false|integer(int32)||
+|updateTime|更新时间|query|false|string(date-time)||
+
+
+**响应状态**:
+
+
+| 状态码 | 说明 | schema |
+| -------- | -------- | ----- | 
+|200|OK|ResponseResult«List«论坛分类树VO»»|
+|401|Unauthorized||
+|403|Forbidden||
+|404|Not Found||
+
+
+**响应参数**:
+
+
+| 参数名称 | 参数说明 | 类型 | schema |
+| -------- | -------- | ----- |----- | 
+|code||integer(int32)|integer(int32)|
+|data||array|论坛分类树VO|
+|&emsp;&emsp;children|子板块列表|array|论坛分类树VO|
+|&emsp;&emsp;createTime|创建时间|string(date-time)||
+|&emsp;&emsp;description|板块描述|string||
+|&emsp;&emsp;icon|板块图标URL|string||
+|&emsp;&emsp;id|板块ID|integer(int64)||
+|&emsp;&emsp;level|板块级别|integer(int32)||
+|&emsp;&emsp;name|板块名称|string||
+|&emsp;&emsp;parentId|父板块ID|integer(int64)||
+|&emsp;&emsp;sort|排序号|integer(int32)||
+|&emsp;&emsp;status|状态|integer(int32)||
+|&emsp;&emsp;updateTime|更新时间|string(date-time)||
+|message||string||
+|timestamp||integer(int64)|integer(int64)|
+
+
+**响应示例**:
+```javascript
+{
+	"code": 0,
+	"data": [
+		{
+			"children": [
+				{
+					"children": [
+						{}
+					],
+					"createTime": "",
+					"description": "",
+					"icon": "",
+					"id": 0,
+					"level": 0,
+					"name": "",
+					"parentId": 0,
+					"sort": 0,
+					"status": 0,
+					"updateTime": ""
+				}
+			],
+			"createTime": "",
+			"description": "",
+			"icon": "",
+			"id": 0,
+			"level": 0,
+			"name": "",
+			"parentId": 0,
+			"sort": 0,
+			"status": 0,
+			"updateTime": ""
+		}
+	],
+	"message": "",
+	"timestamp": 0
+}
+```

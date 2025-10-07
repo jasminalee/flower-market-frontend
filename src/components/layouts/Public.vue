@@ -24,12 +24,13 @@
             <router-link to="/products" class="nav-item" active-class="active">
               产品展示
             </router-link>
-            <router-link to="/shopping-cart" class="nav-item" active-class="active">
-              购物车
-            </router-link>
             <router-link to="/forum" class="nav-item" active-class="active">
               后花园
             </router-link>
+            <router-link to="/shopping-cart" class="nav-item" active-class="active">
+              购物车
+            </router-link>
+   
           </nav>
         </el-col>
 

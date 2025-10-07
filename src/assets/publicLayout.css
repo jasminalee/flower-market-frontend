@@ -46,7 +46,6 @@
 
 /* 导航菜单 */
 .nav-menu {
-  display: flex;
   align-items: center;
   justify-content: center;
   gap: 32px;
