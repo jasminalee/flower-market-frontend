@@ -37,12 +37,6 @@ const routes = [
         meta: { title: '购物车' }
       },
       {
-        path: 'order-preview',
-        name: 'OrderPreview',
-        component: () => import('@/views/public/OrderPreview.vue'),
-        meta: { title: '订单预览' }
-      },
-      {
         path: 'order-confirmation/:id',
         name: 'OrderConfirmation',
         component: () => import('@/views/public/OrderConfirmation.vue'),
