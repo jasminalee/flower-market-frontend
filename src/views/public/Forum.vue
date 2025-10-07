@@ -1,20 +1,20 @@
 <template>
   <!-- 论坛头部 -->
-  <div class="page-header">
-    <div class="page-header-content">
-      <h1>后花园</h1>
-      <p>分享花卉知识，交流养护经验</p>
+  <div class="forum-home-page">
+    <div class="page-header">
+      <div class="page-header-content">
+        <h1>后花园</h1>
+        <p>分享花卉知识，交流养护经验</p>
+      </div>
     </div>
-  </div>
-  <div class="forum">
-    <div class="container">
+    <div class="forum-container">
       <el-row :gutter="20" class="forum-layout">
         <!-- 左侧分类导航 -->
-        <el-col :span="4" class="category-sidebar">
-          <el-card class="category-card">
+        <el-col :span="5" class="category-sidebar">
+          <el-card class="category-card" shadow="never">
             <template #header>
               <div class="card-header">
-                <span>论坛板块</span>
+                <h3>论坛板块</h3>
               </div>
             </template>
             <el-menu
@@ -22,6 +22,7 @@
               :default-openeds="defaultOpeneds"
               class="category-menu"
               @select="handleCategorySelect"
+              unique-opened
             >
               <el-menu-item index="all">
                 <el-icon><House /></el-icon>
@@ -61,13 +62,18 @@
         </el-col>
 
         <!-- 右侧帖子内容 -->
-        <el-col :span="20" class="posts-main">
-          <el-card class="posts-card">
+        <el-col :span="19" class="posts-main">
+          <el-card class="posts-card" shadow="never">
             <template #header>
               <div class="posts-header">
                 <h2>{{ currentCategoryName }}</h2>
                 <div class="header-actions">
-                  <el-button type="primary" @click="viewAllPosts" v-if="activeCategory !== 'all'">
+                  <el-button 
+                    type="primary" 
+                    @click="viewAllPosts" 
+                    v-if="activeCategory !== 'all'"
+                    round
+                  >
                     <el-icon><Refresh /></el-icon>
                     查看全部
                   </el-button>
@@ -100,7 +106,7 @@
                     >
                       <div class="post-header">
                         <div class="post-avatar">
-                          <el-avatar :size="32" :src="post.userAvatar">
+                          <el-avatar :size="36" :src="post.userAvatar">
                             <el-icon><User /></el-icon>
                           </el-avatar>
                         </div>
@@ -112,8 +118,8 @@
                           </div>
                         </div>
                         <div class="post-tags">
-                          <el-tag v-if="post.isTop" type="danger" size="small">置顶</el-tag>
-                          <el-tag v-if="post.isEssence" type="warning" size="small">精华</el-tag>
+                          <el-tag v-if="post.isTop" type="danger" size="small" effect="dark">置顶</el-tag>
+                          <el-tag v-if="post.isEssence" type="warning" size="small" effect="dark">精华</el-tag>
                         </div>
                       </div>
                       <div class="post-content">
@@ -121,12 +127,21 @@
                       </div>
                       <div class="post-footer">
                         <div class="post-stats">
-                          <span><el-icon><View /></el-icon> {{ post.viewCount || 0 }}</span>
-                          <span><el-icon><ChatLineRound /></el-icon> {{ post.commentCount || 0 }}</span>
-                          <span><el-icon><Star /></el-icon> {{ post.likeCount || 0 }}</span>
+                          <span class="stat-item">
+                            <el-icon><View /></el-icon> 
+                            {{ post.viewCount || 0 }}
+                          </span>
+                          <span class="stat-item">
+                            <el-icon><ChatLineRound /></el-icon> 
+                            {{ post.commentCount || 0 }}
+                          </span>
+                          <span class="stat-item">
+                            <el-icon><Star /></el-icon> 
+                            {{ post.likeCount || 0 }}
+                          </span>
                         </div>
                         <div class="post-category">
-                          <el-tag size="small">{{ getCategoryName(post.categoryId) }}</el-tag>
+                          <el-tag size="small" type="info">{{ getCategoryName(post.categoryId) }}</el-tag>
                         </div>
                       </div>
                     </el-card>
@@ -143,13 +158,14 @@
                     layout="total, sizes, prev, pager, next, jumper"
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
+                    background
                   />
                 </div>
 
                 <!-- 无结果状态 -->
                 <div v-if="!loading && currentPosts.length === 0" class="no-results">
                   <el-empty description="暂无帖子">
-                    <el-button type="primary" @click="refreshPosts">刷新</el-button>
+                    <el-button type="primary" @click="refreshPosts" round>刷新</el-button>
                   </el-empty>
                 </div>
               </div>
@@ -250,8 +266,6 @@ const fetchCategories = async () => {
         // 如果分类有子分类，则将其ID添加到默认展开数组中
         if (category.children && category.children.length > 0) {
           openeds.push(category.id.toString())
-        }
-        if (category.children && category.children.length > 0) {
           category.children.forEach(child => {
             flatCategories.push(child)
           })
@@ -265,7 +279,7 @@ const fetchCategories = async () => {
     }
   } catch (error) {
     console.error('获取板块数据失败:', error)
-    ElMessage.error('获取板块数据失败')
+    ElMessage.error('获取板块数据失败: ' + (error.message || ''))
   }
 }
 
@@ -303,7 +317,7 @@ const fetchAllPosts = async () => {
     }
   } catch (error) {
     console.error('获取帖子数据失败:', error)
-    ElMessage.error('获取帖子数据失败')
+    ElMessage.error('获取帖子数据失败: ' + (error.message || ''))
   } finally {
     loading.value = false
   }
@@ -346,7 +360,7 @@ const fetchCategoryPosts = async (categoryId) => {
     }
   } catch (error) {
     console.error('获取帖子数据失败:', error)
-    ElMessage.error('获取帖子数据失败')
+    ElMessage.error('获取帖子数据失败: ' + (error.message || ''))
   } finally {
     loading.value = false
   }
@@ -453,4 +467,348 @@ onMounted(() => {
 })
 </script>
 
-<style src="@/assets/forum-home.css"></style>
+<style scoped>
+.forum-home-page {
+  background-color: var(--bg-color-page);
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+.page-header {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  margin: 0 20px 20px;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="forum-grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23forum-grain)"/></svg>');
+  pointer-events: none;
+}
+
+.page-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.page-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.forum-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.forum-layout {
+  margin-top: 0;
+}
+
+/* Category Sidebar */
+.category-sidebar {
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+  height: calc(100vh - 40px);
+}
+
+.category-card {
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  border: none;
+}
+
+.category-card .el-card__header {
+  background: transparent;
+  border-bottom: 1px solid var(--border-color-lighter);
+  padding: 16px 20px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color-primary);
+}
+
+.category-card .el-card__body {
+  padding: 0;
+}
+
+.category-menu {
+  border-right: none;
+  background: transparent;
+}
+
+.category-menu .el-menu-item,
+.category-menu .el-sub-menu__title {
+  height: 50px;
+  line-height: 50px;
+}
+
+.category-menu .el-sub-menu .el-menu-item {
+  height: 40px;
+  line-height: 40px;
+  padding-left: 40px !important;
+}
+
+/* Posts Main Content */
+.posts-main {
+  flex: 1;
+}
+
+.posts-card {
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  border: none;
+}
+
+.posts-card .el-card__header {
+  background: transparent;
+  border-bottom: 1px solid var(--border-color-lighter);
+  padding: 16px 20px;
+}
+
+.posts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.posts-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-color-primary);
+}
+
+.header-actions {
+  flex-shrink: 0;
+}
+
+/* Posts Grid */
+.posts-grid {
+  margin: 0 -10px;
+}
+
+.post-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.post-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color-lighter);
+}
+
+.post-avatar {
+  margin-right: 12px;
+}
+
+.post-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-color-primary);
+}
+
+.post-meta {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  color: var(--text-color-secondary);
+  gap: 2px;
+}
+
+.post-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: 10px;
+}
+
+.post-content {
+  padding: 16px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+}
+
+.post-preview {
+  color: var(--text-color-regular);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+  font-size: 14px;
+}
+
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: var(--bg-color-page);
+  border-top: 1px solid var(--border-color-lighter);
+  font-size: 12px;
+  color: var(--text-color-secondary);
+}
+
+.post-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.post-category .el-tag {
+  background-color: var(--primary-extra-light);
+  border-color: var(--primary-light);
+  color: var(--primary-color);
+}
+
+/* Pagination */
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* Loading */
+.loading-container {
+  padding: 20px 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .forum-layout {
+    flex-direction: column;
+  }
+  
+  .category-sidebar {
+    position: relative;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  
+  .el-col {
+    width: 100%;
+    padding: 0 10px;
+  }
+  
+  .page-header {
+    margin: 0 15px 15px;
+    padding: 1.5rem 0;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .page-header p {
+    font-size: 1rem;
+  }
+  
+  .forum-container {
+    padding: 0 15px;
+  }
+  
+  .posts-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .header-actions {
+    align-self: flex-end;
+  }
+  
+  .post-header {
+    padding: 12px;
+  }
+  
+  .post-content {
+    padding: 12px;
+  }
+  
+  .post-footer {
+    padding: 12px;
+  }
+  
+  .posts-grid {
+    margin: 0 -5px;
+  }
+  
+  .post-card {
+    margin-bottom: 15px;
+  }
+  
+  .posts-header h2 {
+    font-size: 20px;
+  }
+}
+</style>
