@@ -270,7 +270,7 @@ import { ElMessage } from 'element-plus'
 import { 
   HomeFilled, Goods, Document, Picture, ShoppingCart, Star, Share
 } from '@element-plus/icons-vue'
-import productApi from '@/api/product.js'
+import merchantProductApi from '@/api/merchantProduct.js'
 import productCategoryApi from '@/api/productCategory.js'
 import commentApi from '@/api/comment.js'
 
@@ -330,7 +330,7 @@ const formatDate = (dateString) => {
 const fetchProduct = async (id) => {
   loading.value = true
   try {
-    const response = await productApi.getById(id)
+    const response = await merchantProductApi.getById(id)
     if (response && response.code === 200) {
       product.value = response.data
       
