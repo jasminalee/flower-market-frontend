@@ -76,7 +76,7 @@
         </el-table-column>
         <el-table-column label="操作" width="250" fixed="right">
           <template #default="scope">
-            <el-button type="primary" size="small" text @click="viewOrder(scope.row)">
+            <el-button type="primary" size="small" text @click="viewOrderDetail(scope.row)">
               <el-icon><View /></el-icon>
               查看
             </el-button>
@@ -186,6 +186,120 @@
       </div>
     </template>
   </el-dialog>
+
+  <!-- Order Detail Dialog -->
+  <el-dialog
+    title="订单详情"
+    v-model="orderDetailDialogVisible"
+    width="800px"
+    :close-on-click-modal="false"
+  >
+    <div v-if="orderDetailLoading" class="loading-container">
+      <el-skeleton :rows="10" animated />
+    </div>
+    
+    <div v-else>
+      <!-- Order Info -->
+      <el-card class="mb-20">
+        <template #header>
+          <div class="card-header">
+            <span>订单信息</span>
+          </div>
+        </template>
+        
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">订单编号：</span>
+              <span>{{ orderDetail.order.orderNo }}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">下单时间：</span>
+              <span>{{ formatDate(orderDetail.order.createTime) }}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">订单状态：</span>
+              <el-tag :type="getOrderStatusType(orderDetail.order.status)">
+                {{ getOrderStatusText(orderDetail.order.status) }}
+              </el-tag>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">订单总额：</span>
+              <span>¥{{ orderDetail.order.totalAmount }}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">实际支付：</span>
+              <span>¥{{ orderDetail.order.payAmount }}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">收货人：</span>
+              <span>{{ orderDetail.order.receiverName }}</span>
+            </div>
+          </el-col>
+          <el-col :span="24">
+            <div class="info-item">
+              <span class="label">收货地址：</span>
+              <span>{{ orderDetail.order.receiverAddress }}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="info-item">
+              <span class="label">联系电话：</span>
+              <span>{{ orderDetail.order.receiverPhone }}</span>
+            </div>
+          </el-col>
+        </el-row>
+      </el-card>
+      
+      <!-- Order Items -->
+      <el-card class="mb-20">
+        <template #header>
+          <div class="card-header">
+            <span>商品明细</span>
+          </div>
+        </template>
+        
+        <el-table :data="orderDetail.orderItems" stripe style="width: 100%">
+          <el-table-column prop="productName" label="商品名称" min-width="150" />
+          <el-table-column prop="skuName" label="规格" min-width="120" />
+          <el-table-column prop="price" label="单价" min-width="100">
+            <template #default="scope">
+              ¥{{ scope.row.price }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="quantity" label="数量" min-width="80" />
+          <el-table-column prop="totalPrice" label="小计" min-width="100">
+            <template #default="scope">
+              ¥{{ scope.row.totalPrice }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
+    </div>
+    
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="orderDetailDialogVisible = false">关闭</el-button>
+        <el-button 
+          type="warning" 
+          @click="requestRefund"
+          v-if="orderDetail.order && orderDetail.order.status === 2"
+        >
+          申请退款
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -215,6 +329,14 @@ const paymentLoading = ref(false)
 const selectedOrder = ref({})
 const selectedPaymentMethod = ref(null)
 const availablePaymentMethods = ref([])
+
+// Order detail related data
+const orderDetailDialogVisible = ref(false)
+const orderDetailLoading = ref(false)
+const orderDetail = ref({
+  order: {},
+  orderItems: []
+})
 
 // 搜索表单
 const searchForm = reactive({
@@ -301,6 +423,30 @@ const fetchOrders = async () => {
 const viewOrder = (order) => {
   // 使用 router.push 跳转而不是 window.open
   router.push(`/order-confirmation/${order.id}`)
+}
+
+/**
+ * 查看订单详情
+ */
+const viewOrderDetail = async (order) => {
+  try {
+    orderDetailLoading.value = true
+    orderDetailDialogVisible.value = true
+    
+    // 调用API获取订单详情
+    const response = await orderApi.getDetailById(order.id)
+    
+    if (response.code === 200 && response.data) {
+      orderDetail.value = response.data
+    } else {
+      ElMessage.error(response.message || '获取订单详情失败')
+    }
+  } catch (error) {
+    console.error('获取订单详情失败:', error)
+    ElMessage.error('获取订单详情失败')
+  } finally {
+    orderDetailLoading.value = false
+  }
 }
 
 /**
@@ -446,6 +592,45 @@ const cancelOrder = (order) => {
 }
 
 /**
+ * 申请退款
+ */
+const requestRefund = () => {
+  ElMessageBox.confirm(
+    `确定要申请退款订单 ${orderDetail.value.order.orderNo} 吗？`,
+    '申请退款',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(async () => {
+    try {
+      // 更新订单状态为退款中 (状态码6)
+      const orderData = {
+        ...orderDetail.value.order,
+        status: 6 // 退款中
+      }
+      
+      const response = await orderApi.save(orderData)
+      
+      if (response.code === 200) {
+        ElMessage.success('退款申请已提交')
+        orderDetailDialogVisible.value = false
+        // 重新加载订单列表
+        await fetchOrders()
+      } else {
+        ElMessage.error(response.message || '退款申请失败')
+      }
+    } catch (error) {
+      console.error('退款申请失败:', error)
+      ElMessage.error('退款申请失败: ' + (error.message || '未知错误'))
+    }
+  }).catch(() => {
+    // 用户取消操作
+  })
+}
+
+/**
  * 搜索
  */
 const handleSearch = () => {
@@ -490,5 +675,18 @@ onMounted(() => {
 
 .selected-row {
   background-color: #ecf5ff;
+}
+
+.info-item {
+  margin-bottom: 10px;
+}
+
+.info-item .label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.card-header {
+  font-weight: bold;
 }
 </style>

@@ -248,7 +248,7 @@ const routes = [
           {
             path: 'orders',
             name: 'Orders',
-            component: () => import('@/views/admin/personal/Orders.vue'),
+            component: () => import('@/views/admin/personal/MyOrders.vue'),
             meta: { 
               title: '我的订单',
               requiresAuth: true
