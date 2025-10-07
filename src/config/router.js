@@ -210,7 +210,7 @@ const routes = [
       // 订单管理模块
       {
         path: 'orders',
-        name: 'Orders',
+        name: 'OrderManagement',
         redirect: '/admin/orders/merchant-orders',
         meta: { 
           title: '订单管理',
