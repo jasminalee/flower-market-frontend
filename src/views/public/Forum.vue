@@ -19,6 +19,7 @@
             </template>
             <el-menu
               :default-active="activeCategory"
+              :default-openeds="defaultOpeneds"
               class="category-menu"
               @select="handleCategorySelect"
             >
@@ -187,6 +188,7 @@ const allCategories = ref([]) // 所有分类（包括子分类）的平展数�
 const posts = ref([]) // 全部帖子
 const categoryPosts = ref({}) // 各分类的帖子
 const activeCategory = ref('all') // 当前活动分类
+const defaultOpeneds = ref([]) // 默认展开的子菜单
 const currentPage = ref(1)
 const pageSize = ref(12)
 const total = ref(0) // 全部帖子总数
@@ -242,8 +244,13 @@ const fetchCategories = async () => {
       
       // 创建所有分类的平展数组（包括子分类）
       const flatCategories = []
+      const openeds = []
       response.data.forEach(category => {
         flatCategories.push(category)
+        // 如果分类有子分类，则将其ID添加到默认展开数组中
+        if (category.children && category.children.length > 0) {
+          openeds.push(category.id.toString())
+        }
         if (category.children && category.children.length > 0) {
           category.children.forEach(child => {
             flatCategories.push(child)
@@ -251,6 +258,8 @@ const fetchCategories = async () => {
         }
       })
       allCategories.value = flatCategories
+      // 设置默认展开的子菜单为所有有子分类的一级分类
+      defaultOpeneds.value = openeds
     } else {
       ElMessage.error(response.message || '获取板块数据失败')
     }
