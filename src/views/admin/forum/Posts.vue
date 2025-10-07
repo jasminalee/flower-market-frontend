@@ -163,7 +163,7 @@
       :title="dialogTitle"
       v-model="dialogVisible"
       :close-on-click-modal="false"
-      width="800px"
+      width="1200px"
       class="post-dialog"
       @close="handleDialogClose"
   >
@@ -181,14 +181,15 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="所属板块" prop="categoryId">
-            <el-select v-model="postForm.categoryId" placeholder="请选择板块" filterable>
-              <el-option
-                v-for="category in categories"
-                :key="category.id"
-                :label="category.name"
-                :value="category.id"
-              />
-            </el-select>
+            <el-cascader
+              v-model="postForm.categoryId"
+              :options="categoryTree"
+              :props="{ value: 'id', label: 'name', children: 'children', emitPath: false }"
+              placeholder="请选择板块"
+              style="width: 100%"
+              clearable
+              filterable
+            />
           </el-form-item>
         </el-col>
       </el-row>
@@ -248,12 +249,22 @@
       <el-row :gutter="16">
         <el-col :span="24">
           <el-form-item label="帖子内容" prop="content">
-            <el-input
-              v-model="postForm.content"
-              type="textarea"
-              :rows="10"
-              placeholder="请输入帖子内容"
-            />
+            <div class="editor-container">
+              <Toolbar
+                class="editor-toolbar"
+                :editor="editorRef"
+                :defaultConfig="toolbarConfig"
+                :mode="mode"
+              />
+              <Editor
+                class="editor-content"
+                v-model="postForm.content"
+                :defaultConfig="editorConfig"
+                :mode="mode"
+                @onCreated="handleEditorCreated"
+                @onChange="handleEditorChange"
+              />
+            </div>
           </el-form-item>
         </el-col>
       </el-row>
@@ -268,7 +279,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, shallowRef, onBeforeUnmount } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, Refresh, Edit, Delete } from '@element-plus/icons-vue'
 import forumPostApi from '@/api/forumPost'
@@ -276,15 +287,22 @@ import forumCategoryApi from '@/api/forumCategory'
 import fileApi from '@/api/file'
 import { useAuthStore } from '@/config/store.js'
 import '@/assets/forum.css'
+import '@wangeditor/editor/dist/css/style.css'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import apiClient from '@/api/apiClient.js'
 
 // 响应式数据
 const loading = ref(false)
 const posts = ref([])
 const categories = ref([])
+const categoryTree = ref([])
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const authStore = useAuthStore()
+
+const API_BASE_URL = apiClient.raw.defaults.baseURL || 'http://localhost:18091'
+const uploadUrl = API_BASE_URL + "/api/upload/image";
 
 // 表单相关
 const dialogVisible = ref(false)
@@ -293,10 +311,52 @@ const isEdit = ref(false)
 const postFormRef = ref()
 
 // 上传相关
-const uploadUrl = import.meta.env.VITE_API_BASE_URL + '/api/upload/image'
 const uploadHeaders = computed(() => {
   const token = localStorage.getItem('token')
   return token ? { Authorization: `Bearer ${token}` } : {}
+})
+
+const mode = 'default'
+
+// 编辑器实例，必须用 shallowRef
+const editorRef = shallowRef()
+
+// 工具栏配置
+const toolbarConfig = {}
+
+// 富文本编辑器配置
+const editorConfig = reactive({
+  placeholder: '请输入帖子内容...',
+  MENU_CONF: {
+    'uploadImage': {
+      server: uploadUrl,
+      fieldName: 'file',
+      maxFileSize: 5 * 1024 * 1024, // 5M
+      base64LimitSize: 0, // 禁用base64，强制使用上传
+      // 自定义上传图片
+      async customUpload(file, insertFn) {
+        try {
+          const formData = new FormData()
+          formData.append('file', file)
+
+          const response = await fileApi.uploadImage(formData)
+
+          if (response && response.code === 200) {
+            // 直接插入服务器URL
+            const imageUrl = API_BASE_URL + response.data;
+            console.log('图片上传成功:', imageUrl)
+            // 插入图片
+            insertFn(imageUrl, 'image.png', '图片加载中...')
+            ElMessage.success('图片上传成功')
+          } else {
+            ElMessage.error('图片上传失败: ' + (response?.message || '未知错误'))
+          }
+        } catch (error) {
+          ElMessage.error('图片上传失败: ' + (error.message || '网络错误'))
+        }
+      }
+    }
+  }
 })
 
 // 筛选表单
@@ -630,7 +690,7 @@ const fetchPosts = async () => {
 }
 
 /**
- * 获取板块列表
+ * 获取板块列表（用于筛选）
  */
 const fetchCategories = async () => {
   try {
@@ -643,10 +703,42 @@ const fetchCategories = async () => {
   }
 }
 
+/**
+ * 获取板块树（用于表单中的级联选择器）
+ */
+const fetchCategoryTree = async () => {
+  try {
+    const response = await forumCategoryApi.getTree({})
+    if (response.code === 200) {
+      categoryTree.value = response.data
+    }
+  } catch (error) {
+    console.error('获取板块树失败:', error)
+  }
+}
+
+// 编辑器创建回调
+const handleEditorCreated = (editor) => {
+  editorRef.value = editor // 记录 editor 实例，重要！
+}
+
+// 编辑器内容变化处理
+const handleEditorChange = (editor) => {
+  postForm.content = editor.getHtml()
+}
+
+// 在组件卸载前销毁编辑器
+onBeforeUnmount(() => {
+  const editor = editorRef.value
+  if (editor == null) return
+  editor.destroy()
+})
+
 // 生命周期
 onMounted(() => {
   fetchPosts()
   fetchCategories()
+  fetchCategoryTree()
 })
 </script>
 
@@ -667,7 +759,7 @@ onMounted(() => {
 }
 
 .post-dialog {
-  width: 800px;
+  width: 1200px;
   margin-top: 4vh;
 }
 
@@ -735,5 +827,21 @@ onMounted(() => {
 
 .post-title {
   flex: 1;
+}
+
+/* 富文本编辑器容器 */
+.editor-container {
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+}
+
+.editor-toolbar {
+  border-bottom: 1px solid #dcdfe6;
+  background-color: #f5f7fa;
+}
+
+.editor-content {
+  min-height: 300px;
+  background-color: #fff;
 }
 </style>
