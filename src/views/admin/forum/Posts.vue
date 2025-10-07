@@ -1,24 +1,31 @@
 <template>
-  <div class="forum-posts">
-    <el-card class="post-card">
-      <template #header>
-        <div class="card-header">
-          <span>论坛帖子管理</span>
-          <el-button type="primary" @click="showPostForm">
-            <el-icon><Plus /></el-icon>
-            新增帖子
-          </el-button>
-        </div>
-      </template>
+  <el-page-header class="page-header" title="帖子管理">
+    <template #content>
+      管理论坛帖子信息
+    </template>
+  </el-page-header>
 
-      <!-- 搜索和筛选区域 -->
-      <div class="filter-section">
-        <el-form :inline="true" :model="filterForm" class="filter-form">
+  <el-card class="filter-card">
+    <el-row type="flex" justify="space-between" align="middle" class="filters-bar">
+      <el-col :span="23">
+        <el-form :model="filterForm" inline>
           <el-form-item label="帖子标题">
-            <el-input v-model="filterForm.title" placeholder="请输入帖子标题" clearable />
+            <el-input
+                v-model="filterForm.title"
+                placeholder="搜索帖子标题"
+                clearable
+                @keyup.enter="fetchPosts"
+            >
+              <template #prefix>
+                <el-icon>
+                  <Search/>
+                </el-icon>
+              </template>
+            </el-input>
           </el-form-item>
+
           <el-form-item label="板块">
-            <el-select v-model="filterForm.categoryId" placeholder="请选择板块" clearable filterable>
+            <el-select v-model="filterForm.categoryId" placeholder="选择板块" clearable filterable>
               <el-option label="全部" value="" />
               <el-option
                 v-for="category in categories"
@@ -28,94 +35,118 @@
               />
             </el-select>
           </el-form-item>
+
           <el-form-item label="状态">
-            <el-select v-model="filterForm.status" placeholder="请选择状态" clearable>
+            <el-select v-model="filterForm.status" placeholder="选择状态" clearable>
               <el-option label="全部" value="" />
               <el-option label="正常" :value="1" />
               <el-option label="审核中" :value="2" />
               <el-option label="删除" :value="0" />
             </el-select>
           </el-form-item>
+
           <el-form-item>
             <el-button type="primary" @click="fetchPosts">
-              <el-icon><Search /></el-icon>
-              查询
+              <el-icon>
+                <Search/>
+              </el-icon>
+              搜索
             </el-button>
             <el-button @click="resetFilter">
-              <el-icon><Refresh /></el-icon>
+              <el-icon>
+                <Refresh/>
+              </el-icon>
               重置
             </el-button>
           </el-form-item>
         </el-form>
-      </div>
+      </el-col>
 
-      <!-- 表格区域 -->
-      <el-table
+      <el-col :span="1" style="text-align: right;">
+        <el-button :icon="Plus" type="primary" @click="showPostForm">
+          新增帖子
+        </el-button>
+      </el-col>
+    </el-row>
+  </el-card>
+
+  <el-card class="table-card">
+    <el-table
         :data="posts"
-        v-loading="loading"
+        :loading="loading"
         stripe
         style="width: 100%"
-      >
-        <el-table-column prop="title" label="帖子标题" min-width="200" show-overflow-tooltip>
-          <template #default="{ row }">
-            <div class="post-title-cell">
-              <el-tag v-if="row.isTop" type="danger" size="small">置顶</el-tag>
-              <el-tag v-if="row.isEssence" type="warning" size="small">精华</el-tag>
-              <el-tag v-if="row.postType === 2" type="success" size="small">视频</el-tag>
-              <span class="post-title">{{ row.title }}</span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="categoryId" label="所属板块" width="120">
-          <template #default="{ row }">
-            {{ getCategoryName(row.categoryId) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="userId" label="用户ID" width="100" />
-        <el-table-column prop="viewCount" label="浏览量" width="100" />
-        <el-table-column prop="commentCount" label="评论数" width="100" />
-        <el-table-column prop="likeCount" label="点赞数" width="100" />
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="getPostStatusType(row.status)">
-              {{ getPostStatusText(row.status) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180">
-          <template #default="{ row }">
-            {{ formatDate(row.createTime) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="250" fixed="right">
-          <template #default="{ row }">
-            <el-button size="small" @click="editPost(row)">
-              编辑
-            </el-button>
-            <el-button 
-              size="small" 
-              :type="row.isTop ? 'warning' : 'default'" 
-              @click="toggleTop(row)"
-            >
-              {{ row.isTop ? '取消置顶' : '置顶' }}
-            </el-button>
-            <el-button 
-              size="small" 
-              :type="row.isEssence ? 'warning' : 'default'" 
-              @click="toggleEssence(row)"
-            >
-              {{ row.isEssence ? '取消精华' : '精华' }}
-            </el-button>
-            <el-button size="small" type="danger" @click="deletePost(row)">
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+    >
+      <el-table-column prop="id" label="ID" width="50" />
+      <el-table-column prop="title" label="帖子标题" min-width="200" show-overflow-tooltip>
+        <template #default="{ row }">
+          <div class="post-title-cell">
+            <el-tag v-if="row.isTop" type="danger" size="small">置顶</el-tag>
+            <el-tag v-if="row.isEssence" type="warning" size="small">精华</el-tag>
+            <el-tag v-if="row.postType === 2" type="success" size="small">视频</el-tag>
+            <span class="post-title">{{ row.title }}</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="categoryId" label="所属板块" width="120">
+        <template #default="{ row }">
+          {{ getCategoryName(row.categoryId) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="userId" label="用户ID" width="100" />
+      <el-table-column prop="viewCount" label="浏览量" width="100" />
+      <el-table-column prop="commentCount" label="评论数" width="100" />
+      <el-table-column prop="likeCount" label="点赞数" width="100" />
+      <el-table-column prop="status" label="状态" width="100">
+        <template #default="{ row }">
+          <el-tag :type="getPostStatusType(row.status)">
+            {{ getPostStatusText(row.status) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间" min-width="160">
+        <template #default="{ row }">
+          {{ formatDate(row.createTime) }}
+        </template>
+      </el-table-column>
 
-      <!-- 分页 -->
-      <div class="pagination-container">
-        <el-pagination
+      <el-table-column label="操作" width="300" fixed="right">
+        <template #default="{ row }">
+          <el-button type="primary" size="small" text @click="editPost(row)">
+            <el-icon>
+              <Edit/>
+            </el-icon>
+            编辑
+          </el-button>
+          <el-button 
+            size="small" 
+            :type="row.isTop ? 'warning' : 'default'" 
+            text
+            @click="toggleTop(row)"
+          >
+            {{ row.isTop ? '取消置顶' : '置顶' }}
+          </el-button>
+          <el-button 
+            size="small" 
+            :type="row.isEssence ? 'warning' : 'default'" 
+            text
+            @click="toggleEssence(row)"
+          >
+            {{ row.isEssence ? '取消精华' : '精华' }}
+          </el-button>
+          <el-button size="small" type="danger" text @click="deletePost(row)">
+            <el-icon>
+              <Delete/>
+            </el-icon>
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- 分页 -->
+    <div class="pagination-container">
+      <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
           :page-sizes="[10, 20, 50, 100]"
@@ -123,98 +154,128 @@
           layout="total, sizes, prev, pager, next, jumper"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
+      />
+    </div>
+  </el-card>
 
-    <!-- 帖子表单对话框 -->
-    <el-dialog
+  <!-- 帖子表单对话框 -->
+  <el-dialog
       :title="dialogTitle"
       v-model="dialogVisible"
+      :close-on-click-modal="false"
       width="800px"
+      class="post-dialog"
       @close="handleDialogClose"
-    >
-      <el-form
+  >
+    <el-form
         :model="postForm"
         :rules="postRules"
         ref="postFormRef"
         label-width="100px"
-      >
-        <el-form-item label="帖子标题" prop="title">
-          <el-input v-model="postForm.title" placeholder="请输入帖子标题" />
-        </el-form-item>
-        <el-form-item label="所属板块" prop="categoryId">
-          <el-select v-model="postForm.categoryId" placeholder="请选择板块" filterable>
-            <el-option
-              v-for="category in categories"
-              :key="category.id"
-              :label="category.name"
-              :value="category.id"
+    >
+      <el-row :gutter="16">
+        <el-col :span="12">
+          <el-form-item label="帖子标题" prop="title">
+            <el-input v-model="postForm.title" placeholder="请输入帖子标题" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="所属板块" prop="categoryId">
+            <el-select v-model="postForm.categoryId" placeholder="请选择板块" filterable>
+              <el-option
+                v-for="category in categories"
+                :key="category.id"
+                :label="category.name"
+                :value="category.id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="16">
+        <el-col :span="12">
+          <el-form-item label="帖子类型" prop="postType">
+            <el-radio-group v-model="postForm.postType">
+              <el-radio :label="1">普通文本</el-radio>
+              <el-radio :label="2">视频</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="状态" prop="status">
+            <el-select v-model="postForm.status" placeholder="请选择状态">
+              <el-option label="正常" :value="1" />
+              <el-option label="审核中" :value="2" />
+              <el-option label="删除" :value="0" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="16">
+        <el-col :span="24">
+          <el-form-item label="视频URL" prop="videoUrl" v-if="postForm.postType === 2">
+            <el-input v-model="postForm.videoUrl" placeholder="请输入视频URL" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="16">
+        <el-col :span="24">
+          <el-form-item label="视频封面" prop="coverImage" v-if="postForm.postType === 2">
+            <el-input v-model="postForm.coverImage" placeholder="请输入视频封面图片URL" />
+            <el-upload
+              class="cover-uploader"
+              :action="uploadUrl"
+              :headers="uploadHeaders"
+              :show-file-list="false"
+              :on-success="handleCoverUploadSuccess"
+              :before-upload="beforeCoverUpload"
+            >
+              <el-image
+                v-if="postForm.coverImage"
+                :src="postForm.coverImage"
+                class="cover"
+                fit="cover"
+              />
+              <el-icon v-else class="cover-uploader-icon"><Plus /></el-icon>
+            </el-upload>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="16">
+        <el-col :span="24">
+          <el-form-item label="帖子内容" prop="content">
+            <el-input
+              v-model="postForm.content"
+              type="textarea"
+              :rows="10"
+              placeholder="请输入帖子内容"
             />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="帖子类型" prop="postType">
-          <el-radio-group v-model="postForm.postType">
-            <el-radio :label="1">普通文本</el-radio>
-            <el-radio :label="2">视频</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="视频URL" prop="videoUrl" v-if="postForm.postType === 2">
-          <el-input v-model="postForm.videoUrl" placeholder="请输入视频URL" />
-        </el-form-item>
-        <el-form-item label="视频封面" prop="coverImage" v-if="postForm.postType === 2">
-          <el-input v-model="postForm.coverImage" placeholder="请输入视频封面图片URL" />
-          <el-upload
-            class="cover-uploader"
-            :action="uploadUrl"
-            :headers="uploadHeaders"
-            :show-file-list="false"
-            :on-success="handleCoverUploadSuccess"
-            :before-upload="beforeCoverUpload"
-          >
-            <el-image
-              v-if="postForm.coverImage"
-              :src="postForm.coverImage"
-              class="cover"
-              fit="cover"
-            />
-            <el-icon v-else class="cover-uploader-icon"><Plus /></el-icon>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="帖子内容" prop="content">
-          <el-input
-            v-model="postForm.content"
-            type="textarea"
-            :rows="10"
-            placeholder="请输入帖子内容"
-          />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="postForm.status" placeholder="请选择状态">
-            <el-option label="正常" :value="1" />
-            <el-option label="审核中" :value="2" />
-            <el-option label="删除" :value="0" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="savePost">保存</el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="savePost">保存</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search, Refresh } from '@element-plus/icons-vue'
+import { Plus, Search, Refresh, Edit, Delete } from '@element-plus/icons-vue'
 import forumPostApi from '@/api/forumPost'
 import forumCategoryApi from '@/api/forumCategory'
 import fileApi from '@/api/file'
 import { useAuthStore } from '@/config/store.js'
+import '@/assets/forum.css'
 
 // 响应式数据
 const loading = ref(false)
@@ -590,14 +651,80 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* 表格操作列样式 */
+.table-card .el-table .el-button--small {
+  padding: 6px 10px;
+  margin: 0 2px;
 }
 
-.filter-section {
-  margin-bottom: 20px;
+/* 表单对话框样式 */
+.post-dialog .el-dialog__body {
+  padding: 20px;
+}
+
+.post-dialog .el-form {
+  margin-top: 10px;
+}
+
+.post-dialog {
+  width: 800px;
+  margin-top: 4vh;
+}
+
+/* 表单行间距 */
+.post-dialog .el-row {
+  margin-bottom: 15px;
+}
+
+/* 表单项标签 */
+.post-dialog .el-form-item__label {
+  font-weight: 500;
+}
+
+/* 封面上传区域 */
+.cover-uploader {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+  margin-top: 10px;
+}
+
+.cover-uploader:hover {
+  border-color: #409eff;
+}
+
+.cover-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 120px;
+  height: 120px;
+  text-align: center;
+  line-height: 120px;
+}
+
+.cover {
+  width: 120px;
+  height: 120px;
+  display: block;
+  object-fit: cover;
+}
+
+/* 对话框底部按钮 */
+.dialog-footer {
+  text-align: right;
+  padding: 15px 20px 0;
+  border-top: 1px solid #ebeef5;
+  margin-top: 10px;
+}
+
+/* 分页容器 */
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .post-title-cell {
@@ -608,41 +735,5 @@ onMounted(() => {
 
 .post-title {
   flex: 1;
-}
-
-.pagination-container {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.cover-uploader .cover {
-  width: 100px;
-  height: 100px;
-  display: block;
-}
-
-.cover-uploader .cover-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 100px;
-  height: 100px;
-  line-height: 100px;
-  text-align: center;
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-}
-
-.cover-uploader :deep(.el-upload) {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: var(--el-transition-duration-fast);
-}
-
-.cover-uploader :deep(.el-upload:hover) {
-  border-color: var(--el-color-primary);
 }
 </style>
